@@ -1,0 +1,6 @@
+{
+    "IS_EMAIL": "Email must be a valid email address",
+    "IS_NOT_EMPTY": "The {property} field should not be empty",
+    "IS_STRING": "{property} must be a string",
+    "IS_STAFF_TYPE": "userType must be either 'sales' or 'support'"
+}

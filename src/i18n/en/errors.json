@@ -1,0 +1,6 @@
+{
+    "INVALID_CREDENTIALS": "Invalid email or password",
+    "USER_NOT_FOUND": "Staff member not found",
+    "EMAIL_TAKEN": "A user with this email already exists",
+    "SERVER_ERROR": "Internal server error"
+}
