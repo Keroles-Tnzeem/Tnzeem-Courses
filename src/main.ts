@@ -1,17 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import * as express from 'express';
-import multer = require('multer');
+
 import { AppModule } from './app.module';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  // Disable built-in body parser so we control the order
-  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Register parsers manually — order matters
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true })); // handles application/x-www-form-urlencoded
-  app.use(multer().none());                        // handles multipart/form-data (Postman "form-data" tab)
+  // Serve static assets
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+
+  // Additional parsers for urlencoded bodies
+  app.use(express.urlencoded({ extended: true }));
 
   // i18n-aware validation: translates messages based on request language header
   app.useGlobalPipes(new I18nValidationPipe({ whitelist: true, transform: true }));

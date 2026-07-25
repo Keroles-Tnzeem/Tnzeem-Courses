@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { UserEntity } from '../../shared/user/entities/user.entity';
 import { PermissionEntity } from '../../shared/user/entities/permission.entity';
 import { UserPermissionEntity } from '../../shared/user/entities/user-permission.entity';
+import { TrainerInfoEntity } from '../../shared/user/entities/trainer-info.entity';
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ const AppDataSource = new DataSource({
     username: process.env.DB_USERNAME || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_NAME || 'tnzeem',
-    entities: [UserEntity, PermissionEntity, UserPermissionEntity],
+    entities: [UserEntity, PermissionEntity, UserPermissionEntity, TrainerInfoEntity],
     synchronize: true,
 });
 

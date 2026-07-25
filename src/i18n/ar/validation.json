@@ -2,5 +2,7 @@
     "IS_EMAIL": "يجب أن يكون البريد الإلكتروني عنوانًا صالحًا",
     "IS_NOT_EMPTY": "حقل {property} لا يجب أن يكون فارغًا",
     "IS_STRING": "يجب أن يكون {property} نصًا",
-    "IS_STAFF_TYPE": "يجب أن يكون نوع المستخدم 'sales' أو 'support' فقط"
+    "IS_NUMBER": "يجب أن يكون {property} رقمًا",
+    "IS_STAFF_TYPE": "يجب أن يكون نوع المستخدم 'sales' أو 'support' فقط",
+    "IS_ENUM": "قيمة {property} غير صالحة"
 }

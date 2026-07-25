@@ -33,12 +33,20 @@ export class StaffService {
     }
 
     // ── List ─────────────────────────────────────────────────────────────────
-    async findAll(): Promise<UserEntity[]> {
-        return this.userRepo.find({
+    async findAll(query: { page?: number; limit?: number; search?: string } = {}): Promise<{ data: UserEntity[]; total: number }> {
+        const { page = 1, limit = 10, search } = query;
+        const skip = (page - 1) * limit;
+
+        const where: any[] = [{ userType: UserTypeEnum.SALES }, { userType: UserTypeEnum.SUPPORT }];
+        // Note: Real search logic could be added here if needed by mapping over `where` array
+        
+        const [data, total] = await this.userRepo.findAndCount({
             where: [{ userType: UserTypeEnum.SALES }, { userType: UserTypeEnum.SUPPORT }],
             relations: { userPermissions: { permission: true } },
             order: { id: 'DESC' },
         });
+
+        return { data, total };
     }
 
     // ── Single ────────────────────────────────────────────────────────────────

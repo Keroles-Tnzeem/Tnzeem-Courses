@@ -10,7 +10,16 @@ export class PermissionsService {
         private readonly permissionRepo: Repository<PermissionEntity>,
     ) {}
 
-    findAll(): Promise<PermissionEntity[]> {
-        return this.permissionRepo.find({ order: { module: 'ASC', name: 'ASC' } });
+    async findAll(query: { page?: number; limit?: number; search?: string } = {}): Promise<{ data: PermissionEntity[]; total: number }> {
+        const { page = 1, limit = 10 } = query;
+        const skip = (page - 1) * limit;
+
+        const [data, total] = await this.permissionRepo.findAndCount({ 
+            skip,
+            take: limit,
+            order: { module: 'ASC', name: 'ASC' }
+        });
+        
+        return { data, total };
     }
 }

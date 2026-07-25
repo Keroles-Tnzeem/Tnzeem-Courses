@@ -25,13 +25,19 @@ export const seedAdminUserAndPermissions = async (dataSource: DataSource) => {
         { name: 'trainers.update', module: 'trainers', description: { en: 'Update Trainer', ar: 'تحديث مدرب' } },
         { name: 'trainers.delete', module: 'trainers', description: { en: 'Delete Trainer', ar: 'حذف مدرب' } },
         { name: 'students.view', module: 'students', description: { en: 'View Students', ar: 'عرض الطلاب' } },
+        { name: 'students.create', module: 'students', description: { en: 'Create Student', ar: 'إنشاء طالب' } },
         { name: 'students.update', module: 'students', description: { en: 'Update Student', ar: 'تحديث طالب' } },
+        { name: 'students.delete', module: 'students', description: { en: 'Delete Student', ar: 'حذف طالب' } },
         { name: 'users.view', module: 'users', description: { en: 'View Staff', ar: 'عرض الموظفين' } },
         { name: 'users.create', module: 'users', description: { en: 'Create Staff', ar: 'إنشاء موظف' } },
         { name: 'users.update', module: 'users', description: { en: 'Update Staff', ar: 'تحديث موظف' } },
         { name: 'users.delete', module: 'users', description: { en: 'Delete Staff', ar: 'حذف موظف' } },
         { name: 'roles.view', module: 'roles', description: { en: 'View Roles/Permissions', ar: 'عرض الصلاحيات' } },
-        { name: 'roles.manage', module: 'roles', description: { en: 'Manage Roles/Permissions', ar: 'إدارة الصلاحيات' } }
+        { name: 'roles.manage', module: 'roles', description: { en: 'Manage Roles/Permissions', ar: 'إدارة الصلاحيات' } },
+        { name: 'course-categories.view', module: 'course-categories', description: { en: 'View Course Categories', ar: 'عرض تصنيفات الدورات' } },
+        { name: 'course-categories.create', module: 'course-categories', description: { en: 'Create Course Category', ar: 'إنشاء تصنيف دورة' } },
+        { name: 'course-categories.update', module: 'course-categories', description: { en: 'Update Course Category', ar: 'تحديث تصنيف دورة' } },
+        { name: 'course-categories.delete', module: 'course-categories', description: { en: 'Delete Course Category', ar: 'حذف تصنيف دورة' } }
     ];
 
     const savedPermissions: PermissionEntity[] = [];

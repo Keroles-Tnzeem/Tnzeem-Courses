@@ -41,13 +41,13 @@ nest --version
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Keroles-Tnzeem/Tnzeem-Courses.git
 ```
 
 ### 2. Navigate to the project
 
 ```bash
-cd <project-name>
+cd Tnzeem-Courses
 ```
 
 ### 3. Install dependencies

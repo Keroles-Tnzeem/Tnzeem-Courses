@@ -8,6 +8,7 @@ export class UserDataResponse {
     firstName: string;
     lastName: string;
     email: string;
+    img: string;
     userType: UserTypeEnum;
 
     permissions?: string[];

@@ -7,6 +7,7 @@ import {
     ParseIntPipe,
     Patch,
     Post,
+    Query,
     UseGuards,
 } from '@nestjs/common';
 import { I18nContext, I18nService } from 'nestjs-i18n';
@@ -18,6 +19,8 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { Permissions } from '../../common/decorators/permissions.decorator';
 import { ApiResponseDto } from '../../common/dto/responses/api.response';
+import { PaginationResponseDto } from '../../common/dto/responses/pagination.response';
+import { PaginationRequest } from '../../common/dto/requests/pagination.request';
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('staff-dashboard/staff')
@@ -34,10 +37,16 @@ export class StaffController {
     // GET /staff-dashboard/staff
     @Permissions('users.view')
     @Get()
-    async findAll() {
-        const data = await this.staffService.findAll();
-        return ApiResponseDto.success(
+    async findAll(@Query() query: PaginationRequest) {
+        const { data, total } = await this.staffService.findAll(query);
+        const limit = query.limit || 10;
+        const page = query.page || 1;
+
+        return PaginationResponseDto.success(
             data.map(StaffResponse.from),
+            total,
+            page,
+            limit,
             this.i18n.t('common.success', { lang: this.lang() }),
         );
     }

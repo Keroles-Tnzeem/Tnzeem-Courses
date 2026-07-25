@@ -4,6 +4,8 @@ import {LoginRequest} from "./dto/requests/login.request";
 import {LoginResponse} from "./dto/responses/login.response";
 import {ApiResponseDto} from "../../common/dto/responses/api.response";
 import { I18nService, I18nContext } from 'nestjs-i18n';
+import {RefreshTokenRequest} from "./dto/requests/refresh-token.request";
+import {TokenResponse} from "./dto/responses/token.response";
 
 @Controller("auth")
 export class AuthController {
@@ -23,4 +25,14 @@ export class AuthController {
         );
     }
 
+    @Post('refresh')
+    async refresh(
+        @Body() request: RefreshTokenRequest
+    ): Promise<ApiResponseDto<TokenResponse>> {
+        const response = await this.authService.refresh(request);
+        return ApiResponseDto.success(
+            response,
+            this.i18n.t('common.success', { lang: I18nContext.current()?.lang })
+        );
+    }
 }

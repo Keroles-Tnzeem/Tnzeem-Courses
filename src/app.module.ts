@@ -11,6 +11,10 @@ import { AuthModule } from './shared/auth/auth.module';
 import { UserModule } from './shared/user/user.module';
 import { StaffModule } from './staff-dashboard/staff/staff.module';
 import { PermissionsModule } from './staff-dashboard/permissions/permissions.module';
+import { TrainerModule } from './staff-dashboard/trainer/trainer.module';
+import { StudentModule } from './staff-dashboard/student/student.module';
+import { CourseCategoriesModule } from './staff-dashboard/course-categories/course-categories.module';
+import { StorageModule } from './shared/storage/storage.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -41,6 +45,10 @@ import { PermissionsModule } from './staff-dashboard/permissions/permissions.mod
     UserModule,
     StaffModule,
     PermissionsModule,
+    TrainerModule,
+    StudentModule,
+    CourseCategoriesModule,
+    StorageModule,
   ],
   controllers: [],
   providers: [],

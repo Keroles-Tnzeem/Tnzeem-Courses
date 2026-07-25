@@ -1,6 +1,7 @@
 import {UserTypeEnum} from "../../user/enums/user-type.enum";
 import {Injectable} from "@nestjs/common";
 import { JwtService as NestJwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 export interface JwtPayload {
     sub: number;
@@ -10,7 +11,10 @@ export interface JwtPayload {
 
 @Injectable()
 export class JwtTokenService {
-    constructor(private readonly jwtService: NestJwtService) {}
+    constructor(
+        private readonly jwtService: NestJwtService,
+        private readonly configService: ConfigService
+    ) {}
 
     generateAccessToken(payload: JwtPayload): { accessToken: string, expiresIn: number } {
         const accessToken = this.jwtService.sign(payload);
@@ -24,6 +28,19 @@ export class JwtTokenService {
 
     async verifyAccessToken(token: string): Promise<JwtPayload> {
         return this.jwtService.verifyAsync<JwtPayload>(token);
+    }
+
+    generateRefreshToken(payload: JwtPayload): string {
+        return this.jwtService.sign(payload, {
+            secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+            expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d') as any,
+        });
+    }
+
+    async verifyRefreshToken(token: string): Promise<JwtPayload> {
+        return this.jwtService.verifyAsync<JwtPayload>(token, {
+            secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        });
     }
 
     decode(token: string): JwtPayload | null {
