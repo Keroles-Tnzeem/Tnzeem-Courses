@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { I18nContext, I18nService } from 'nestjs-i18n';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CourseCategoriesService } from './course-categories.service';
 import { CreateCourseCategoryRequest } from './dto/requests/create-course-category.request';
 import { UpdateCourseCategoryRequest } from './dto/requests/update-course-category.request';
@@ -45,6 +45,7 @@ export class CourseCategoriesController {
     @Post()
     @UseInterceptors(FileInterceptor('image'))
     @ApiOperation({ summary: 'Create course category' })
+    @ApiCreatedResponse({ description: 'Course category created successfully', type: CourseCategoryResponse })
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         schema: {
@@ -71,6 +72,7 @@ export class CourseCategoriesController {
     @Permissions('course-categories.view')
     @Get()
     @ApiOperation({ summary: 'List course categories with pagination and search' })
+    @ApiOkResponse({ description: 'Course categories returned successfully', type: CourseCategoryResponse, isArray: true })
     async findAll(@Query() query: QueryCourseCategoryRequest) {
         const { data, total } = await this.courseCategoriesService.findAll(query);
         const limit = query.limit || 10;
@@ -88,6 +90,8 @@ export class CourseCategoriesController {
     @Permissions('course-categories.view')
     @Get(':id')
     @ApiOperation({ summary: 'Get course category by ID' })
+    @ApiParam({ name: 'id', type: Number })
+    @ApiOkResponse({ description: 'Course category returned successfully', type: CourseCategoryResponse })
     async findOne(@Param('id', ParseIntPipe) id: number) {
         const data = await this.courseCategoriesService.findOne(id);
         return ApiResponseDto.success(
@@ -100,6 +104,8 @@ export class CourseCategoriesController {
     @Patch(':id')
     @UseInterceptors(FileInterceptor('image'))
     @ApiOperation({ summary: 'Update course category' })
+    @ApiParam({ name: 'id', type: Number })
+    @ApiOkResponse({ description: 'Course category updated successfully', type: CourseCategoryResponse })
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         schema: {
@@ -126,6 +132,8 @@ export class CourseCategoriesController {
     @Permissions('course-categories.delete')
     @Delete(':id')
     @ApiOperation({ summary: 'Delete course category' })
+    @ApiParam({ name: 'id', type: Number })
+    @ApiOkResponse({ description: 'Course category deleted successfully' })
     async remove(@Param('id', ParseIntPipe) id: number) {
         await this.courseCategoriesService.remove(id);
         return ApiResponseDto.success(

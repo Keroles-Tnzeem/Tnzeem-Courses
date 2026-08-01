@@ -28,6 +28,7 @@ export const seedAdminUserAndPermissions = async (dataSource: DataSource) => {
         { name: 'students.create', module: 'students', description: { en: 'Create Student', ar: 'إنشاء طالب' } },
         { name: 'students.update', module: 'students', description: { en: 'Update Student', ar: 'تحديث طالب' } },
         { name: 'students.delete', module: 'students', description: { en: 'Delete Student', ar: 'حذف طالب' } },
+        { name: 'students.assign', module: 'students', description: { en: 'Assign Staff to Student', ar: 'إسناد موظف إلى طالب' } },
         { name: 'users.view', module: 'users', description: { en: 'View Staff', ar: 'عرض الموظفين' } },
         { name: 'users.create', module: 'users', description: { en: 'Create Staff', ar: 'إنشاء موظف' } },
         { name: 'users.update', module: 'users', description: { en: 'Update Staff', ar: 'تحديث موظف' } },
@@ -37,7 +38,19 @@ export const seedAdminUserAndPermissions = async (dataSource: DataSource) => {
         { name: 'course-categories.view', module: 'course-categories', description: { en: 'View Course Categories', ar: 'عرض تصنيفات الدورات' } },
         { name: 'course-categories.create', module: 'course-categories', description: { en: 'Create Course Category', ar: 'إنشاء تصنيف دورة' } },
         { name: 'course-categories.update', module: 'course-categories', description: { en: 'Update Course Category', ar: 'تحديث تصنيف دورة' } },
-        { name: 'course-categories.delete', module: 'course-categories', description: { en: 'Delete Course Category', ar: 'حذف تصنيف دورة' } }
+        { name: 'course-categories.delete', module: 'course-categories', description: { en: 'Delete Course Category', ar: 'حذف تصنيف دورة' } },
+        { name: 'sources.view', module: 'sources', description: { en: 'View Sources', ar: 'عرض المصادر' } },
+        { name: 'sources.create', module: 'sources', description: { en: 'Create Source', ar: 'إنشاء مصدر' } },
+        { name: 'sources.update', module: 'sources', description: { en: 'Update Source', ar: 'تحديث مصدر' } },
+        { name: 'sources.delete', module: 'sources', description: { en: 'Delete Source', ar: 'حذف مصدر' } },
+        { name: 'rounds.view', module: 'rounds', description: { en: 'View Rounds', ar: 'عرض الجولات' } },
+        { name: 'rounds.create', module: 'rounds', description: { en: 'Create Round', ar: 'إنشاء جولة' } },
+        { name: 'rounds.update', module: 'rounds', description: { en: 'Update Round', ar: 'تحديث جولة' } },
+        { name: 'rounds.delete', module: 'rounds', description: { en: 'Delete Round', ar: 'حذف جولة' } },
+        { name: 'round-sessions.view', module: 'round-sessions', description: { en: 'View Round Sessions', ar: 'عرض جلسات الجولة' } },
+        { name: 'round-sessions.create', module: 'round-sessions', description: { en: 'Create Round Session', ar: 'إنشاء جلسة جولة' } },
+        { name: 'round-sessions.update', module: 'round-sessions', description: { en: 'Update Round Session', ar: 'تحديث جلسة جولة' } },
+        { name: 'round-sessions.delete', module: 'round-sessions', description: { en: 'Delete Round Session', ar: 'حذف جلسة جولة' } }
     ];
 
     const savedPermissions: PermissionEntity[] = [];

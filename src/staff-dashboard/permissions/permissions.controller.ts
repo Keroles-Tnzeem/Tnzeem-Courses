@@ -9,7 +9,10 @@ import { Lang } from '../../common/decorators/lang.decorator';
 import { ApiResponseDto } from '../../common/dto/responses/api.response';
 import { PaginationResponseDto } from '../../common/dto/responses/pagination.response';
 import { PaginationRequest } from '../../common/dto/requests/pagination.request';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Staff Dashboard - Permissions')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('staff-dashboard/permissions')
 export class PermissionsController {
@@ -21,6 +24,8 @@ export class PermissionsController {
     // GET /staff-dashboard/permissions
     @Permissions('roles.view')
     @Get()
+    @ApiOperation({ summary: 'List permissions with pagination and search' })
+    @ApiOkResponse({ description: 'Permissions returned successfully', type: PermissionResponse, isArray: true })
     async findAll(@Lang() lang: string, @Query() query: PaginationRequest) {
         const { data, total } = await this.permissionsService.findAll(query);
         const limit = query.limit || 10;

@@ -2,5 +2,11 @@
     "success": "Success",
     "updated": "Updated Successfully",
     "created": "Created Successfully",
-    "deleted": "Deleted Successfully"
+    "deleted": "Deleted Successfully",
+    "courseLevels": {
+        "introductory": "Introductory",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+    }
 }

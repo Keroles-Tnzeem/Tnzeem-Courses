@@ -3,5 +3,10 @@
     "USER_NOT_FOUND": "Staff member not found",
     "NOT_FOUND": "Record not found",
     "EMAIL_TAKEN": "A user with this email already exists",
-    "SERVER_ERROR": "Internal server error"
+    "SERVER_ERROR": "Internal server error",
+    "NAME_TAKEN": "A record with this name already exists",
+    "COURSE_NOT_FOUND": "Course not found",
+    "ROUND_NOT_FOUND": "Round not found",
+    "ROUND_NUMBER_TAKEN": "A round with this number already exists for this course",
+    "SESSION_NUMBER_TAKEN": "A session with this number already exists for this round"
 }

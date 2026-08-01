@@ -21,7 +21,10 @@ import { Permissions } from '../../common/decorators/permissions.decorator';
 import { ApiResponseDto } from '../../common/dto/responses/api.response';
 import { PaginationResponseDto } from '../../common/dto/responses/pagination.response';
 import { PaginationRequest } from '../../common/dto/requests/pagination.request';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Staff Dashboard - Trainers')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('staff-dashboard/trainer')
 export class TrainerController {
@@ -37,6 +40,8 @@ export class TrainerController {
     // GET /staff-dashboard/trainer
     @Permissions('trainers.view')
     @Get()
+    @ApiOperation({ summary: 'List trainers with pagination and search' })
+    @ApiOkResponse({ description: 'Trainers returned successfully', type: TrainerResponse, isArray: true })
     async findAll(@Query() query: PaginationRequest) {
         const { data, total } = await this.trainerService.findAll(query);
         const limit = query.limit || 10;
@@ -54,6 +59,9 @@ export class TrainerController {
     // GET /staff-dashboard/trainer/:id
     @Permissions('trainers.view')
     @Get(':id')
+    @ApiOperation({ summary: 'Get a trainer by ID' })
+    @ApiParam({ name: 'id', type: Number })
+    @ApiOkResponse({ description: 'Trainer returned successfully', type: TrainerResponse })
     async findOne(@Param('id', ParseIntPipe) id: number) {
         const data = await this.trainerService.findOne(id);
         return ApiResponseDto.success(
@@ -65,6 +73,8 @@ export class TrainerController {
     // POST /staff-dashboard/trainer
     @Permissions('trainers.create')
     @Post()
+    @ApiOperation({ summary: 'Create a trainer' })
+    @ApiCreatedResponse({ description: 'Trainer created successfully', type: TrainerResponse })
     async create(@Body() dto: CreateTrainerRequest) {
         const data = await this.trainerService.create(dto);
         return ApiResponseDto.success(
@@ -76,6 +86,9 @@ export class TrainerController {
     // PATCH /staff-dashboard/trainer/:id
     @Permissions('trainers.update')
     @Patch(':id')
+    @ApiOperation({ summary: 'Update a trainer' })
+    @ApiParam({ name: 'id', type: Number })
+    @ApiOkResponse({ description: 'Trainer updated successfully', type: TrainerResponse })
     async update(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateTrainerRequest,
@@ -90,6 +103,9 @@ export class TrainerController {
     // DELETE /staff-dashboard/trainer/:id
     @Permissions('trainers.delete')
     @Delete(':id')
+    @ApiOperation({ summary: 'Delete a trainer' })
+    @ApiParam({ name: 'id', type: Number })
+    @ApiOkResponse({ description: 'Trainer deleted successfully' })
     async remove(@Param('id', ParseIntPipe) id: number) {
         await this.trainerService.remove(id);
         return ApiResponseDto.success(

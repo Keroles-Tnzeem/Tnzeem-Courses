@@ -4,5 +4,6 @@ export class LoginResponse{
     accessToken: string;
     refreshToken: string;
     expireIn: number;
+    url?: string;
     user: UserDataResponse
 }

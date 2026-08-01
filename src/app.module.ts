@@ -6,6 +6,7 @@ import { AcceptLanguageResolver, HeaderResolver, I18nModule } from 'nestjs-i18n'
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import i18nConfig from './config/i18n.config';
+import { existsSync } from 'fs';
 import * as path from 'path';
 import { AuthModule } from './shared/auth/auth.module';
 import { UserModule } from './shared/user/user.module';
@@ -15,6 +16,16 @@ import { TrainerModule } from './staff-dashboard/trainer/trainer.module';
 import { StudentModule } from './staff-dashboard/student/student.module';
 import { CourseCategoriesModule } from './staff-dashboard/course-categories/course-categories.module';
 import { StorageModule } from './shared/storage/storage.module';
+import { CoursesModule } from './staff-dashboard/courses/courses.module';
+import { SourcesModule } from './staff-dashboard/sources/sources.module';
+import { RoundsModule } from './staff-dashboard/rounds/rounds.module';
+import { RoundSessionsModule } from './staff-dashboard/round-sessions/round-sessions.module';
+
+const compiledI18nPath = path.join(__dirname, 'i18n');
+const i18nPath = existsSync(compiledI18nPath)
+  ? compiledI18nPath
+  : path.join(process.cwd(), 'src', 'i18n');
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -32,8 +43,8 @@ import { StorageModule } from './shared/storage/storage.module';
       useFactory: (configService: ConfigService) => ({
         fallbackLanguage: configService.get('i18n.fallbackLanguage') || 'en',
         loaderOptions: {
-          path: path.join(__dirname, '/i18n/'),
-          watch: true,
+          path: i18nPath,
+          watch: process.env.NODE_ENV !== 'production',
         },
       }),
       resolvers: [
@@ -49,6 +60,10 @@ import { StorageModule } from './shared/storage/storage.module';
     StudentModule,
     CourseCategoriesModule,
     StorageModule,
+    CoursesModule,
+    SourcesModule,
+    RoundsModule,
+    RoundSessionsModule,
   ],
   controllers: [],
   providers: [],

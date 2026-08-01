@@ -46,10 +46,20 @@ export class AuthService {
             
         const refreshToken = this.jwtTokenService.generateRefreshToken(payload);
 
+        const dashboardUrls: Record<UserTypeEnum, string> = {
+            [UserTypeEnum.ADMIN]: 'staff-dashboard',
+            [UserTypeEnum.SALES]: 'staff-dashboard',
+            [UserTypeEnum.SUPPORT]: 'staff-dashboard',
+            [UserTypeEnum.TRAINER]: 'trainer-dashboard',
+            [UserTypeEnum.STUDENT]: 'student-dashboard',
+        };
+        const url = dashboardUrls[user.userType] || '';
+
         return {
             accessToken,
             refreshToken,
             expireIn: expiresIn,
+            url,
             user: this.userService.toUserDataResponse(user),
         };
     }

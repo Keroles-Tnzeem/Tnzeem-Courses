@@ -2,5 +2,11 @@
     "success": "نجاح",
     "updated": "تم التحديث بنجاح",
     "created": "تم الإنشاء بنجاح",
-    "deleted": "تم الحذف بنجاح"
+    "deleted": "تم الحذف بنجاح",
+    "courseLevels": {
+        "introductory": "تمهيدي",
+        "beginner": "مبتدئ",
+        "intermediate": "متوسط",
+        "advanced": "متقدم"
+    }
 }
