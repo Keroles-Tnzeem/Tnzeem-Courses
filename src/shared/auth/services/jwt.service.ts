@@ -32,8 +32,8 @@ export class JwtTokenService {
 
     generateRefreshToken(payload: JwtPayload): string {
         return this.jwtService.sign(payload, {
-            secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-            expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d') as any,
+            secret: this.configService.get<string>('JWT_REFRESH_SECRET')?.trim(),
+            expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d')?.trim() as any,
         });
     }
 
