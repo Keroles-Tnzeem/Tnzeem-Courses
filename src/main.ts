@@ -8,8 +8,10 @@ import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
+   console.log('Starting Nest application...');
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  console.log('Nest application created');
   // Serve static assets
   app.useStaticAssets(join(__dirname, '..', 'public'));
 
@@ -32,6 +34,9 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
 
   await app.listen(port, '0.0.0.0');
+
+  console.log(`Listening on ${port}`);
+
 
 }
 bootstrap().catch((err) => {
