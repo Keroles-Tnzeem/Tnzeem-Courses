@@ -14,20 +14,11 @@ export class StorageStrategyResolver {
     ) {}
 
     resolve(uploadType: UploadType): StorageProvider {
-        // Defaulting to local strategy for testing right now.
-        return this.localStrategy;
-        
-        /* 
-        switch (uploadType) {
-            case UploadType.IMAGE:
-            case UploadType.DOCUMENT:
-            case UploadType.FILE:
-                return this.digitalOceanStrategy;
-            case UploadType.VIDEO:
-                return this.vimeoStrategy;
-            default:
-                throw new InternalServerErrorException(`No storage strategy configured for upload type: ${uploadType}`);
+        if (uploadType === UploadType.VIDEO) {
+            return this.vimeoStrategy;
         }
-        */
+        
+        // Digital Ocean Spaces is now the default for all other uploads (IMAGE, DOCUMENT, FILE)
+        return this.digitalOceanStrategy;
     }
 }
