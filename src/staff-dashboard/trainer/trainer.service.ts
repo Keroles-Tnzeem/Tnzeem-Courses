@@ -68,6 +68,15 @@ export class TrainerService {
             );
         }
 
+        if (dto.phone) {
+            const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
+            if (phoneExists) {
+                throw new ConflictException(
+                    this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
+                );
+            }
+        }
+
         const randomDummyPassword = Math.random().toString(36).slice(-10);
         const hashed = await bcrypt.hash(randomDummyPassword, 10);
 
@@ -82,6 +91,8 @@ export class TrainerService {
             firstName: dto.firstName,
             lastName: dto.lastName,
             email: dto.email,
+            phone: dto.phone,
+            gender: dto.gender,
             password: hashed,
             userType: UserTypeEnum.TRAINER,
             trainerInfo: trainerInfo,
@@ -101,6 +112,15 @@ export class TrainerService {
             if (exists) {
                 throw new ConflictException(
                     this.i18n.t('errors.EMAIL_TAKEN', { lang: this.lang() }),
+                );
+            }
+        }
+
+        if (dto.phone && dto.phone !== trainer.phone) {
+            const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
+            if (phoneExists) {
+                throw new ConflictException(
+                    this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
                 );
             }
         }

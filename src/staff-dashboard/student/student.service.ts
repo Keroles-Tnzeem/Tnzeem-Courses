@@ -120,6 +120,15 @@ export class StudentService {
       );
     }
 
+    if (dto.phone) {
+      const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
+      if (phoneExists) {
+        throw new ConflictException(
+          this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
+        );
+      }
+    }
+
     const randomDummyPassword = Math.random().toString(36).slice(-10);
     const hashed = await bcrypt.hash(randomDummyPassword, 10);
 
@@ -155,6 +164,15 @@ export class StudentService {
       if (exists) {
         throw new ConflictException(
           this.i18n.t('errors.EMAIL_TAKEN', { lang: this.lang() }),
+        );
+      }
+    }
+
+    if (dto.phone && dto.phone !== student.phone) {
+      const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
+      if (phoneExists) {
+        throw new ConflictException(
+          this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
         );
       }
     }

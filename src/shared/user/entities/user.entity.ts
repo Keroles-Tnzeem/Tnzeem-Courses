@@ -29,7 +29,7 @@ export class UserEntity {
     @Column({ unique: true })
     email: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, unique: true })
     phone: string;
 
     @Column({ type: 'enum', enum: GenderEnum, nullable: true })

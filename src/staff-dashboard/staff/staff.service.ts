@@ -74,12 +74,23 @@ export class StaffService {
             );
         }
 
+        if (dto.phone) {
+            const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
+            if (phoneExists) {
+                throw new ConflictException(
+                    this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
+                );
+            }
+        }
+
         const hashed = await bcrypt.hash(dto.password, 10);
 
         const staff = this.userRepo.create({
             firstName: dto.firstName,
             lastName: dto.lastName,
             email: dto.email,
+            phone: dto.phone,
+            gender: dto.gender,
             password: hashed,
             userType: dto.userType,
         });
@@ -102,6 +113,15 @@ export class StaffService {
             if (exists) {
                 throw new ConflictException(
                     this.i18n.t('errors.EMAIL_TAKEN', { lang: this.lang() }),
+                );
+            }
+        }
+
+        if (dto.phone && dto.phone !== staff.phone) {
+            const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
+            if (phoneExists) {
+                throw new ConflictException(
+                    this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
                 );
             }
         }

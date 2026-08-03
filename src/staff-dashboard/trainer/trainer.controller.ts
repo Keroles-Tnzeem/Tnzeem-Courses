@@ -9,7 +9,9 @@ import {
     Post,
     Query,
     UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { TrainerService } from './trainer.service';
 import { CreateTrainerRequest } from './dto/requests/create-trainer.request';
@@ -73,6 +75,7 @@ export class TrainerController {
     // POST /staff-dashboard/trainer
     @Permissions('trainers.create')
     @Post()
+    @UseInterceptors(NoFilesInterceptor())
     @ApiOperation({ summary: 'Create a trainer' })
     @ApiCreatedResponse({ description: 'Trainer created successfully', type: TrainerResponse })
     async create(@Body() dto: CreateTrainerRequest) {
@@ -86,6 +89,7 @@ export class TrainerController {
     // PATCH /staff-dashboard/trainer/:id
     @Permissions('trainers.update')
     @Patch(':id')
+    @UseInterceptors(NoFilesInterceptor())
     @ApiOperation({ summary: 'Update a trainer' })
     @ApiParam({ name: 'id', type: Number })
     @ApiOkResponse({ description: 'Trainer updated successfully', type: TrainerResponse })

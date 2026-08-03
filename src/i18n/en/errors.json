@@ -8,5 +8,6 @@
     "COURSE_NOT_FOUND": "Course not found",
     "ROUND_NOT_FOUND": "Round not found",
     "ROUND_NUMBER_TAKEN": "A round with this number already exists for this course",
-    "SESSION_NUMBER_TAKEN": "A session with this number already exists for this round"
+    "SESSION_NUMBER_TAKEN": "A session with this number already exists for this round",
+    "PHONE_TAKEN": "A user with this phone number already exists"
 }

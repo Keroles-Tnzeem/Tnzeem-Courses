@@ -21,9 +21,8 @@ import { SourcesModule } from './staff-dashboard/sources/sources.module';
 import { RoundsModule } from './staff-dashboard/rounds/rounds.module';
 import { RoundSessionsModule } from './staff-dashboard/round-sessions/round-sessions.module';
 
-const compiledI18nPath = path.join(__dirname, 'i18n');
-const i18nPath = existsSync(compiledI18nPath)
-  ? compiledI18nPath
+const i18nPath = process.env.NODE_ENV === 'production'
+  ? path.join(__dirname, 'i18n')
   : path.join(process.cwd(), 'src', 'i18n');
 
 @Module({

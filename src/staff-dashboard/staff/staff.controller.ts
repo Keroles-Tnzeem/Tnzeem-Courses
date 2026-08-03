@@ -9,7 +9,9 @@ import {
     Post,
     Query,
     UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { StaffService } from './staff.service';
 import { CreateStaffRequest } from './dto/requests/create-staff.request';
@@ -73,6 +75,7 @@ export class StaffController {
     // POST /staff-dashboard/staff
     @Permissions('users.create')
     @Post()
+    @UseInterceptors(NoFilesInterceptor())
     @ApiOperation({ summary: 'Create a staff member' })
     @ApiCreatedResponse({ description: 'Staff member created successfully', type: StaffResponse })
     async create(@Body() dto: CreateStaffRequest) {
@@ -86,6 +89,7 @@ export class StaffController {
     // PATCH /staff-dashboard/staff/:id
     @Permissions('users.update')
     @Patch(':id')
+    @UseInterceptors(NoFilesInterceptor())
     @ApiOperation({ summary: 'Update a staff member' })
     @ApiParam({ name: 'id', type: Number })
     @ApiOkResponse({ description: 'Staff member updated successfully', type: StaffResponse })
