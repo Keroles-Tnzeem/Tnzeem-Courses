@@ -12,18 +12,19 @@ import { CourseResponse } from './dto/responses/course.response';
 import { I18nService, I18nContext } from 'nestjs-i18n';
 import { courseLevelTranslationKey } from '../../shared/enums/course-level.enum';
 import { UserTypeEnum } from '../../shared/user/enums/user-type.enum';
+import { UserEntity } from 'src/shared/user/entities/user.entity';
 
 @Injectable()
 export class CoursesService {
     constructor(
         @InjectRepository(CourseEntity)
         private readonly courseRepo: Repository<CourseEntity>,
-        @InjectRepository(TrainerInfoEntity)
-        private readonly trainerRepo: Repository<TrainerInfoEntity>,
+        @InjectRepository(UserEntity)
+        private readonly trainerRepo: Repository<UserEntity> ,
         @InjectRepository(CourseCategoryEntity)
         private readonly categoryRepo: Repository<CourseCategoryEntity>,
         private readonly i18n: I18nService
-    ) {}
+    ) { }
 
     private lang(): string {
         return I18nContext.current()?.lang ?? 'en';
@@ -33,19 +34,18 @@ export class CoursesService {
         const level = this.i18n.t(courseLevelTranslationKey(course.level), {
             lang: this.lang(),
         }) as string;
-        return CourseResponse.fromEntity(course, level);
+        return CourseResponse.fromEntity(course, level, this.lang());
     }
 
     async create(dto: CreateCourseRequest, image?: string, introVideo?: string): Promise<CourseResponse> {
         // Verify Trainer
         const trainer = await this.trainerRepo.findOne({
-            where: { userId: dto.trainerId },
-            relations: { user: true }
+            where: { id: dto.trainerId }
         });
         if (!trainer) {
             throw new NotFoundException(this.i18n.t('errors.TRAINER_NOT_FOUND', { lang: I18nContext.current()?.lang }) || 'Trainer not found');
         }
-        if (trainer.user?.userType !== UserTypeEnum.TRAINER) {
+        if (trainer.userType !== UserTypeEnum.TRAINER) {
             throw new BadRequestException('Assigned user is not a trainer');
         }
 
@@ -62,7 +62,7 @@ export class CoursesService {
         }
 
         const courseData: any = { ...dto, image, introVideo };
-        courseData.trainerId = trainer.id; // Use TrainerInfoEntity ID for the foreign key
+        courseData.trainerId = trainer.id; // Use UserEntity ID for the foreign key
 
         const course = this.courseRepo.create(courseData as Partial<CourseEntity>);
         const savedCourse = await this.courseRepo.save(course);
@@ -130,13 +130,12 @@ export class CoursesService {
 
         if (dto.trainerId) {
             const trainer = await this.trainerRepo.findOne({
-                where: { userId: dto.trainerId },
-                relations: { user: true }
+                where: { id: dto.trainerId }
             });
             if (!trainer) {
                 throw new NotFoundException(this.i18n.t('errors.TRAINER_NOT_FOUND', { lang: I18nContext.current()?.lang }) || 'Trainer not found');
             }
-            if (trainer.user?.userType !== UserTypeEnum.TRAINER) {
+            if (trainer.userType !== UserTypeEnum.TRAINER) {
                 throw new BadRequestException('Assigned user is not a trainer');
             }
         }
@@ -158,7 +157,7 @@ export class CoursesService {
         const courseData: any = { ...dto };
         if (dto.trainerId) {
             // we already validated trainer above
-            const trainer = await this.trainerRepo.findOne({ where: { userId: dto.trainerId } });
+            const trainer = await this.trainerRepo.findOne({ where: { id: dto.trainerId } });
             if (trainer) courseData.trainerId = trainer.id;
         }
         if (image !== undefined) courseData.image = image;

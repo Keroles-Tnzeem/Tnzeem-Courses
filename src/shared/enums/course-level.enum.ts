@@ -6,4 +6,4 @@ export enum CourseLevelEnum {
 }
 
 export const courseLevelTranslationKey = (level: CourseLevelEnum): string =>
-  `courseLevels.${level}`;
+  `common.courseLevels.${level}`;

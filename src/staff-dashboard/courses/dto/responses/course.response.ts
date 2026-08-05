@@ -23,15 +23,15 @@ export class CourseResponse {
     trainer?: any;
     category?: any;
 
-    static fromEntity(entity: CourseEntity, localizedLevel: string): CourseResponse {
+    static fromEntity(entity: CourseEntity, localizedLevel: string, lang = 'en'): CourseResponse {
         const response = new CourseResponse();
         response.id = entity.id;
         response.trainerId = entity.trainerId;
         response.categoryId = entity.categoryId;
-        response.name = entity.name;
-        response.description = entity.description;
-        response.requirements = entity.requirements;
-        response.benefits = entity.benefits;
+        response.name = entity.name?.[lang] ?? entity.name?.['en'];
+        response.description = entity.description?.[lang] ?? entity.description?.['en'];
+        response.requirements = entity.requirements?.[lang] ?? entity.requirements?.['en'];
+        response.benefits = entity.benefits?.[lang] ?? entity.benefits?.['en'];
         response.slug = entity.slug;
         response.image = entity.image;
         response.introVideo = entity.introVideo;
@@ -47,8 +47,8 @@ export class CourseResponse {
             // Include trainer response mapping if needed, simplified for now
             response.trainer = {
                 id: entity.trainer.id,
-                userId: entity.trainer.userId,
-                numExperience: entity.trainer.numExperience,
+                firstName: entity.trainer.firstName,
+                lastName: entity.trainer.lastName,
                 // Add more trainer details as required
             };
         }
