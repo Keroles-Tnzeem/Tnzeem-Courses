@@ -11,6 +11,6 @@ export default registerAs('database', () => ({
         process.env.NODE_ENV === 'production'
             ? { rejectUnauthorized: false }
             : false,
-    synchronize: process.env.NODE_ENV !== 'production',
+    synchronize: process.env.TYPEORM_SYNC === 'true' || process.env.NODE_ENV !== 'production',
     autoLoadEntities: true,
 }));
