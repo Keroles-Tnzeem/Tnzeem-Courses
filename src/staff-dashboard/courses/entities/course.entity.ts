@@ -4,7 +4,7 @@ import { AuditColumns } from '../../../common/entities/audit-columns';
 import { TrainerInfoEntity } from '../../../shared/user/entities/trainer-info.entity';
 import { CourseCategoryEntity } from '../../course-categories/entities/course-category.entity';
 import { CourseLevelEnum } from '../../../shared/enums/course-level.enum';
-import { UserEntity } from 'src/shared/user/entities/user.entity';
+import { UserEntity } from '../../../shared/user/entities/user.entity';
 
 @Entity('courses')
 export class CourseEntity {
