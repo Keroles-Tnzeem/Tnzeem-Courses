@@ -1,0 +1,223 @@
+import {
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
+import { I18nContext, I18nService } from 'nestjs-i18n';
+import { OrdersRepository } from '../../shared/orders/repositories/orders.repository';
+import { OrderCreatorTypeEnum } from '../../shared/orders/enums/order-creator-type.enum';
+import { OrderStatusEnum } from '../../shared/orders/enums/order-status.enum';
+import { PaymentStatusEnum } from '../../shared/payment/enums/payment-status.enum';
+import { PaginationResponseDto as PaginationResponse } from '../../common/dto/responses/pagination.response';
+import { RoundsService } from '../rounds/rounds.service';
+import { CreateOrderRequest } from './dto/requests/create-order.request';
+import { UpdateOrderRequest } from './dto/requests/update-order.request';
+import { QueryOrderRequest } from './dto/requests/query-order.request';
+import { OrderResponse } from './dto/responses/order.response';
+
+@Injectable()
+export class OrdersService {
+    constructor(
+        private readonly ordersRepository: OrdersRepository,
+        private readonly roundsService: RoundsService,
+        private readonly i18n: I18nService,
+    ) {}
+
+    private lang(): string {
+        return I18nContext.current()?.lang ?? 'en';
+    }
+
+    // ── Create ────────────────────────────────────────────────────────────────
+
+    async create(
+        dto: CreateOrderRequest,
+        staffId: number,
+        transferBankImgUrl?: string,
+    ): Promise<OrderResponse> {
+        // Fetch the round (with its course) to pull the price snapshot
+        const round = await this.roundsService.findOne(dto.roundId);
+
+        const coursePrice = Number(round.course.price);
+        const trainerId = round.course.trainerId;
+        const courseId = round.courseId;
+
+        // priceAfterDiscount is set equal to finalPrice (discount feature skipped for now)
+        const order = this.ordersRepository.create({
+            studentId: dto.studentId,
+            roundId: dto.roundId,
+            courseId,
+            trainerId,
+            mainPrice: coursePrice,
+            finalPrice: coursePrice,
+            priceAfterDiscount: coursePrice,
+            paymentType: dto.paymentType,
+            paymentMethod: dto.paymentMethod,
+            paymentNotes: dto.paymentNotes,
+            transferBankImg: transferBankImgUrl,
+            createdBy: dto.createdBy ?? OrderCreatorTypeEnum.STAFF,
+            createdById: staffId,
+            status: OrderStatusEnum.PENDING,
+        });
+
+        const saved = await this.ordersRepository.save(order);
+
+        const withRelations = await this.ordersRepository.findOne({
+            where: { id: saved.id },
+            relations: { student: true, trainer: true, round: true, course: true },
+        });
+
+        return OrderResponse.fromEntity(withRelations!, this.lang());
+    }
+
+    // ── Find All (paginated) ──────────────────────────────────────────────────
+
+    async findAll(query: QueryOrderRequest): Promise<PaginationResponse<OrderResponse>> {
+        const {
+            page = 1,
+            limit = 10,
+            keyword,
+            studentId,
+            roundId,
+            trainerId,
+            status,
+            paymentType,
+            paymentMethod,
+            paymentStatus,
+            sortBy = 'createdAt',
+            sortOrder = 'DESC',
+        } = query;
+
+        const qb = this.ordersRepository
+            .createQueryBuilder('order')
+            .leftJoinAndSelect('order.student', 'student')
+            .leftJoinAndSelect('order.trainer', 'trainer')
+            .leftJoinAndSelect('order.round', 'round')
+            .leftJoinAndSelect('order.course', 'course');
+
+        if (keyword) {
+            qb.andWhere(
+                '(student.first_name ILIKE :keyword OR student.last_name ILIKE :keyword OR order.id ILIKE :keyword)',
+                { keyword: `%${keyword}%` },
+            );
+        }
+
+        if (studentId) {
+            qb.andWhere('order.student_id = :studentId', { studentId });
+        }
+
+        if (roundId) {
+            qb.andWhere('order.round_id = :roundId', { roundId });
+        }
+
+        if (trainerId) {
+            qb.andWhere('order.trainer_id = :trainerId', { trainerId });
+        }
+
+        if (status) {
+            qb.andWhere('order.status = :status', { status });
+        }
+
+        if (paymentType) {
+            qb.andWhere('order.payment_type = :paymentType', { paymentType });
+        }
+
+        if (paymentMethod) {
+            qb.andWhere('order.payment_method = :paymentMethod', { paymentMethod });
+        }
+
+        if (paymentStatus) {
+            qb.andWhere('order.payment_status = :paymentStatus', { paymentStatus });
+        }
+
+        // Sorting
+        const sortColumn = sortBy === 'finalPrice'
+            ? 'order.finalPrice'
+            : 'order.createdAt';
+        qb.orderBy(sortColumn, sortOrder);
+
+        const [entities, total] = await qb
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getManyAndCount();
+
+        const data = entities.map(e => OrderResponse.fromEntity(e, this.lang()));
+        return PaginationResponse.success(data, total, page, limit);
+    }
+
+    // ── Find One ──────────────────────────────────────────────────────────────
+
+    async findOne(id: string): Promise<OrderResponse> {
+        const order = await this.ordersRepository.findOne({
+            where: { id },
+            relations: { student: true, trainer: true, round: true, course: true },
+        });
+
+        if (!order) {
+            throw new NotFoundException(
+                this.i18n.t('errors.ORDER_NOT_FOUND', { lang: this.lang() }),
+            );
+        }
+
+        return OrderResponse.fromEntity(order, this.lang());
+    }
+
+    // ── Update ────────────────────────────────────────────────────────────────
+
+    async update(
+        id: string,
+        dto: UpdateOrderRequest,
+        transferBankImgUrl?: string,
+    ): Promise<OrderResponse> {
+        const order = await this.ordersRepository.findOne({ where: { id } });
+
+        if (!order) {
+            throw new NotFoundException(
+                this.i18n.t('errors.ORDER_NOT_FOUND', { lang: this.lang() }),
+            );
+        }
+
+        if (dto.status !== undefined) {
+            order.status = dto.status;
+
+            // Auto-update payment status and paidAt based on order status
+            if (dto.status === OrderStatusEnum.CONFIRMED) {
+                order.paymentStatus = PaymentStatusEnum.COMPLETED;
+                order.paidAt = new Date();
+            } else if (dto.status === OrderStatusEnum.CANCELLED) {
+                order.paymentStatus = PaymentStatusEnum.CANCELLED;
+            }
+        }
+
+        if (dto.paymentType !== undefined) order.paymentType = dto.paymentType;
+        if (dto.paymentMethod !== undefined) order.paymentMethod = dto.paymentMethod;
+        if (dto.paymentStatus !== undefined) order.paymentStatus = dto.paymentStatus;
+        if (dto.paymentNotes !== undefined) order.paymentNotes = dto.paymentNotes;
+        if (dto.paidAt !== undefined) order.paidAt = new Date(dto.paidAt);
+        if (transferBankImgUrl !== undefined) order.transferBankImg = transferBankImgUrl;
+
+        const updated = await this.ordersRepository.save(order);
+
+        const withRelations = await this.ordersRepository.findOne({
+            where: { id: updated.id },
+            relations: { student: true, trainer: true, round: true, course: true },
+        });
+
+        return OrderResponse.fromEntity(withRelations!, this.lang());
+    }
+
+    // ── Cancel (soft delete via status) ───────────────────────────────────────
+
+    async cancel(id: string): Promise<void> {
+        const order = await this.ordersRepository.findOne({ where: { id } });
+
+        if (!order) {
+            throw new NotFoundException(
+                this.i18n.t('errors.ORDER_NOT_FOUND', { lang: this.lang() }),
+            );
+        }
+
+        order.status = OrderStatusEnum.CANCELLED;
+        order.paymentStatus = PaymentStatusEnum.CANCELLED;
+        await this.ordersRepository.save(order);
+    }
+}
+

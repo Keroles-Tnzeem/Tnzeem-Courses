@@ -25,6 +25,7 @@ export class DigitalOceanStorageStrategy implements StorageProvider {
         this.s3Client = new S3Client({
             endpoint: this.endpoint,
             region,
+            forcePathStyle: true,
             credentials: {
                 accessKeyId: process.env.DO_SPACES_KEY || '',
                 secretAccessKey: process.env.DO_SPACES_SECRET || '',
@@ -48,10 +49,10 @@ export class DigitalOceanStorageStrategy implements StorageProvider {
 
         await this.s3Client.send(command);
 
-        // DO Spaces URL format: https://[bucket].[region].digitaloceanspaces.com/[key]
-        // If endpoint is https://nyc3.digitaloceanspaces.com, we inject the bucket name:
-        const urlObj = new URL(this.endpoint);
-        const url = `https://${this.bucket}.${urlObj.hostname}/${key}`;
+        // Build the public CDN URL in virtual-hosted style:
+        // https://[bucket].[region].digitaloceanspaces.com/[key]
+        const doRegion = process.env.DO_SPACES_REGION || 'sfo3';
+        const url = `https://${this.bucket}.${doRegion}.digitaloceanspaces.com/${key}`;
 
         return {
             provider: 'digitalocean',
@@ -90,7 +91,7 @@ export class DigitalOceanStorageStrategy implements StorageProvider {
     }
 
     async getUrl(key: string): Promise<string> {
-        const urlObj = new URL(this.endpoint);
-        return `https://${this.bucket}.${urlObj.hostname}/${key}`;
+        const doRegion = process.env.DO_SPACES_REGION || 'sfo3';
+        return `https://${this.bucket}.${doRegion}.digitaloceanspaces.com/${key}`;
     }
 }

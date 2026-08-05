@@ -14,6 +14,7 @@ import { CreateStudentRequest } from './dto/requests/create-student.request';
 import { UpdateStudentRequest } from './dto/requests/update-student.request';
 import { AssignStaffToStudentRequest } from './dto/requests/assign-staff.request';
 import { PaginationRequest } from '../../common/dto/requests/pagination.request';
+import { OrdersRepository } from '../../shared/orders/repositories/orders.repository';
 
 @Injectable()
 export class StudentService {
@@ -22,6 +23,7 @@ export class StudentService {
     private readonly userRepo: Repository<UserEntity>,
     @InjectRepository(SourceEntity)
     private readonly sourceRepo: Repository<SourceEntity>,
+    private readonly ordersRepository: OrdersRepository,
     private readonly i18n: I18nService,
   ) {}
 
@@ -209,6 +211,13 @@ export class StudentService {
     student.assignAt = new Date();
 
     await this.userRepo.save(student);
+
+    // Update all existing orders for this student to be assigned to this staff member
+    await this.ordersRepository.update(
+      { studentId },
+      { assignToId: dto.assignToId }
+    );
+
     return this.findOne(studentId);
   }
 

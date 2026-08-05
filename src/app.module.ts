@@ -20,6 +20,9 @@ import { CoursesModule } from './staff-dashboard/courses/courses.module';
 import { SourcesModule } from './staff-dashboard/sources/sources.module';
 import { RoundsModule } from './staff-dashboard/rounds/rounds.module';
 import { RoundSessionsModule } from './staff-dashboard/round-sessions/round-sessions.module';
+import { OrdersModule } from './shared/orders/orders.module';
+import { PaymentModule } from './shared/payment/payment.module';
+import { StaffOrdersModule } from './staff-dashboard/orders/orders.module';
 
 const i18nPath = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'i18n')
@@ -63,6 +66,9 @@ const i18nPath = process.env.NODE_ENV === 'production'
     SourcesModule,
     RoundsModule,
     RoundSessionsModule,
+    OrdersModule,
+    PaymentModule,
+    StaffOrdersModule,
   ],
   controllers: [],
   providers: [],

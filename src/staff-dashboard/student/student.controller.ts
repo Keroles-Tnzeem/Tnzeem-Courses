@@ -99,6 +99,7 @@ export class StudentController {
     // POST /staff-dashboard/student
     @Permissions('students.create')
     @Post()
+    @UseInterceptors(NoFilesInterceptor())
     @ApiOperation({ summary: 'Create a student' })
     @ApiCreatedResponse({ description: 'Student created successfully', type: StudentResponse })
     async create(@Body() dto: CreateStudentRequest) {
@@ -112,6 +113,7 @@ export class StudentController {
     // PATCH /staff-dashboard/student/:id
     @Permissions('students.update')
     @Patch(':id')
+    @UseInterceptors(NoFilesInterceptor())
     @ApiOperation({ summary: 'Update a student' })
     @ApiParam({ name: 'id', type: Number })
     @ApiOkResponse({ description: 'Student updated successfully', type: StudentResponse })

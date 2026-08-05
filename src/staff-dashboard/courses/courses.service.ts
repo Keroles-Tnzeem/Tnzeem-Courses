@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CourseEntity } from './entities/course.entity';
@@ -39,7 +39,7 @@ export class CoursesService {
     async create(dto: CreateCourseRequest, image?: string, introVideo?: string): Promise<CourseResponse> {
         // Verify Trainer
         const trainer = await this.trainerRepo.findOne({
-            where: { id: dto.trainerId },
+            where: { userId: dto.trainerId },
             relations: { user: true }
         });
         if (!trainer) {
@@ -55,9 +55,14 @@ export class CoursesService {
             throw new NotFoundException(this.i18n.t('errors.CATEGORY_NOT_FOUND', { lang: I18nContext.current()?.lang }) || 'Category not found');
         }
 
+        // Verify Slug Uniqueness
+        const existingCourse = await this.courseRepo.findOne({ where: { slug: dto.slug } });
+        if (existingCourse) {
+            throw new ConflictException(this.i18n.t('errors.SLUG_TAKEN', { lang: I18nContext.current()?.lang }) || 'Course with this slug already exists');
+        }
+
         const courseData: any = { ...dto, image, introVideo };
-        // delete courseData.image; 
-        // delete courseData.introVideo;
+        courseData.trainerId = trainer.id; // Use TrainerInfoEntity ID for the foreign key
 
         const course = this.courseRepo.create(courseData as Partial<CourseEntity>);
         const savedCourse = await this.courseRepo.save(course);
@@ -125,7 +130,7 @@ export class CoursesService {
 
         if (dto.trainerId) {
             const trainer = await this.trainerRepo.findOne({
-                where: { id: dto.trainerId },
+                where: { userId: dto.trainerId },
                 relations: { user: true }
             });
             if (!trainer) {
@@ -143,7 +148,19 @@ export class CoursesService {
             }
         }
 
+        if (dto.slug && dto.slug !== course.slug) {
+            const existingCourse = await this.courseRepo.findOne({ where: { slug: dto.slug } });
+            if (existingCourse) {
+                throw new ConflictException(this.i18n.t('errors.SLUG_TAKEN', { lang: I18nContext.current()?.lang }) || 'Course with this slug already exists');
+            }
+        }
+
         const courseData: any = { ...dto };
+        if (dto.trainerId) {
+            // we already validated trainer above
+            const trainer = await this.trainerRepo.findOne({ where: { userId: dto.trainerId } });
+            if (trainer) courseData.trainerId = trainer.id;
+        }
         if (image !== undefined) courseData.image = image;
         if (introVideo !== undefined) courseData.introVideo = introVideo;
 

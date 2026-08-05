@@ -1,10 +1,13 @@
 import { UserEntity } from '../../../../shared/user/entities/user.entity';
+import { GenderEnum } from '../../../../shared/user/enums/gender.enum';
 
 export class TrainerResponse {
     id: number;
     firstName: string;
     lastName: string;
     email: string;
+    phone?: string;
+    gender?: GenderEnum;
     img: string;
     age?: number;
     numExperience?: number;
@@ -17,6 +20,8 @@ export class TrainerResponse {
         response.firstName = user.firstName;
         response.lastName = user.lastName;
         response.email = user.email;
+        response.phone = user.phone;
+        response.gender = user.gender;
         const appUrl = process.env.APP_URL || 'http://localhost:3000';
         const imgPath = user.img || '/images/empty-user.jpeg';
         response.img = imgPath.startsWith('http') ? imgPath : `${appUrl}${imgPath}`;
@@ -30,4 +35,3 @@ export class TrainerResponse {
         return response;
     }
 }
-

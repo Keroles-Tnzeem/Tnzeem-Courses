@@ -60,7 +60,7 @@ export class TrainerService {
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
-    async create(dto: CreateTrainerRequest): Promise<UserEntity> {
+    async create(dto: CreateTrainerRequest, img?: string): Promise<UserEntity> {
         const exists = await this.userRepo.findOne({ where: { email: dto.email } });
         if (exists) {
             throw new ConflictException(
@@ -93,6 +93,7 @@ export class TrainerService {
             email: dto.email,
             phone: dto.phone,
             gender: dto.gender,
+            img: img,
             password: hashed,
             userType: UserTypeEnum.TRAINER,
             trainerInfo: trainerInfo,
@@ -104,7 +105,7 @@ export class TrainerService {
     }
 
     // ── Update ────────────────────────────────────────────────────────────────
-    async update(id: number, dto: UpdateTrainerRequest): Promise<UserEntity> {
+    async update(id: number, dto: UpdateTrainerRequest, img?: string): Promise<UserEntity> {
         const trainer = await this.findOne(id);
 
         if (dto.email && dto.email !== trainer.email) {
@@ -128,6 +129,10 @@ export class TrainerService {
         const { age, numExperience, experience, numCourses, ...userFields } = dto;
         
         Object.assign(trainer, userFields);
+
+        if (img) {
+            trainer.img = img;
+        }
 
         if (age !== undefined || numExperience !== undefined || experience !== undefined || numCourses !== undefined) {
             if (!trainer.trainerInfo) {

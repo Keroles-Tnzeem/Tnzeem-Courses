@@ -5,10 +5,12 @@ import { UserPermissionEntity } from '../../shared/user/entities/user-permission
 import { PermissionEntity } from '../../shared/user/entities/permission.entity';
 import { StaffService } from './staff.service';
 import { StaffController } from './staff.controller';
+import { StorageModule } from '../../shared/storage/storage.module';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([UserEntity, UserPermissionEntity, PermissionEntity]),
+        StorageModule,
     ],
     controllers: [StaffController],
     providers: [StaffService],

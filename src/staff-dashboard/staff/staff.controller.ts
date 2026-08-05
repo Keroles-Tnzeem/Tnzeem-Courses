@@ -10,8 +10,12 @@ import {
     Query,
     UseGuards,
     UseInterceptors,
+    UploadedFile,
 } from '@nestjs/common';
-import { NoFilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
+import { StorageService } from '../../shared/storage/storage.service';
+import { UploadType } from '../../shared/storage/enums/upload-type.enum';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { StaffService } from './staff.service';
 import { CreateStaffRequest } from './dto/requests/create-staff.request';
@@ -23,7 +27,7 @@ import { Permissions } from '../../common/decorators/permissions.decorator';
 import { ApiResponseDto } from '../../common/dto/responses/api.response';
 import { PaginationResponseDto } from '../../common/dto/responses/pagination.response';
 import { PaginationRequest } from '../../common/dto/requests/pagination.request';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, ApiConsumes } from '@nestjs/swagger';
 
 @ApiTags('Staff Dashboard - Staff')
 @ApiBearerAuth()
@@ -33,6 +37,7 @@ export class StaffController {
     constructor(
         private readonly staffService: StaffService,
         private readonly i18n: I18nService,
+        private readonly storageService: StorageService,
     ) {}
 
     private lang(): string {
@@ -75,11 +80,21 @@ export class StaffController {
     // POST /staff-dashboard/staff
     @Permissions('users.create')
     @Post()
-    @UseInterceptors(NoFilesInterceptor())
+    @UseInterceptors(FileInterceptor('img'))
+    @ApiConsumes('multipart/form-data')
     @ApiOperation({ summary: 'Create a staff member' })
     @ApiCreatedResponse({ description: 'Staff member created successfully', type: StaffResponse })
-    async create(@Body() dto: CreateStaffRequest) {
-        const data = await this.staffService.create(dto);
+    async create(
+        @Body() dto: CreateStaffRequest,
+        @UploadedFile() file?: Express.Multer.File,
+    ) {
+        let imgUrl: string | undefined;
+        if (file) {
+            const uploaded = await this.storageService.upload(file, UploadType.IMAGE);
+            imgUrl = uploaded.url;
+        }
+
+        const data = await this.staffService.create(dto, imgUrl);
         return ApiResponseDto.success(
             StaffResponse.from(data),
             this.i18n.t('common.created', { lang: this.lang() }),
@@ -89,15 +104,23 @@ export class StaffController {
     // PATCH /staff-dashboard/staff/:id
     @Permissions('users.update')
     @Patch(':id')
-    @UseInterceptors(NoFilesInterceptor())
+    @UseInterceptors(FileInterceptor('img'))
+    @ApiConsumes('multipart/form-data')
     @ApiOperation({ summary: 'Update a staff member' })
     @ApiParam({ name: 'id', type: Number })
     @ApiOkResponse({ description: 'Staff member updated successfully', type: StaffResponse })
     async update(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateStaffRequest,
+        @UploadedFile() file?: Express.Multer.File,
     ) {
-        const data = await this.staffService.update(id, dto);
+        let imgUrl: string | undefined;
+        if (file) {
+            const uploaded = await this.storageService.upload(file, UploadType.IMAGE);
+            imgUrl = uploaded.url;
+        }
+
+        const data = await this.staffService.update(id, dto, imgUrl);
         return ApiResponseDto.success(
             StaffResponse.from(data),
             this.i18n.t('common.updated', { lang: this.lang() }),

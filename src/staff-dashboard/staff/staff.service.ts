@@ -66,7 +66,7 @@ export class StaffService {
     }
 
     // ── Create ────────────────────────────────────────────────────────────────
-    async create(dto: CreateStaffRequest): Promise<UserEntity> {
+    async create(dto: CreateStaffRequest, img?: string): Promise<UserEntity> {
         const exists = await this.userRepo.findOne({ where: { email: dto.email } });
         if (exists) {
             throw new ConflictException(
@@ -91,6 +91,7 @@ export class StaffService {
             email: dto.email,
             phone: dto.phone,
             gender: dto.gender,
+            img: img,
             password: hashed,
             userType: dto.userType,
         });
@@ -105,7 +106,7 @@ export class StaffService {
     }
 
     // ── Update ────────────────────────────────────────────────────────────────
-    async update(id: number, dto: UpdateStaffRequest): Promise<UserEntity> {
+    async update(id: number, dto: UpdateStaffRequest, img?: string): Promise<UserEntity> {
         const staff = await this.findOne(id);
 
         if (dto.email && dto.email !== staff.email) {
@@ -132,6 +133,11 @@ export class StaffService {
 
         const { permissionIds, ...fields } = dto;
         Object.assign(staff, fields);
+        
+        if (img) {
+            staff.img = img;
+        }
+
         await this.userRepo.save(staff);
 
         if (permissionIds !== undefined) {

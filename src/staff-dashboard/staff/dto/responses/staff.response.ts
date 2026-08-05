@@ -8,6 +8,7 @@ export class StaffResponse {
     email: string;
     phone?: string;
     gender?: GenderEnum;
+    img?: string;
     userType: UserTypeEnum;
     permissions: string[];
 
@@ -18,6 +19,7 @@ export class StaffResponse {
         email: string;
         phone?: string;
         gender?: GenderEnum;
+        img?: string;
         userType: UserTypeEnum;
         userPermissions?: { permission: { name: string } }[];
     }): StaffResponse {
@@ -28,6 +30,11 @@ export class StaffResponse {
         res.email       = user.email;
         res.phone       = user.phone;
         res.gender      = user.gender;
+        
+        const appUrl = process.env.APP_URL || 'http://localhost:3000';
+        const imgPath = user.img || '/images/empty-user.jpeg';
+        res.img = imgPath.startsWith('http') ? imgPath : `${appUrl}${imgPath}`;
+
         res.userType    = user.userType;
         res.permissions = user.userPermissions?.map((up) => up.permission.name) ?? [];
         return res;
