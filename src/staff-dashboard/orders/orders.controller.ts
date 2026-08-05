@@ -74,9 +74,8 @@ export class OrdersController {
     @ApiResponse({ status: 200, type: OrderResponse, isArray: true })
     async findAll(
         @Query() query: QueryOrderRequest,
-    ): Promise<ApiResponseDto<PaginationResponse<OrderResponse>>> {
-        const result = await this.ordersService.findAll(query);
-        return ApiResponseDto.success(result);
+    ): Promise<PaginationResponse<OrderResponse>> {
+        return await this.ordersService.findAll(query);
     }
 
     // ── Find One ──────────────────────────────────────────────────────────────

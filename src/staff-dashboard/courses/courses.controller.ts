@@ -50,9 +50,8 @@ export class CoursesController {
     @Get()
     @ApiOperation({ summary: 'Return paginated courses' })
     @ApiResponse({ status: 200, type: CourseResponse, isArray: true })
-    async findAll(@Query() query: QueryCourseRequest): Promise<ApiResponseDto<PaginationResponse<CourseResponse>>> {
-        const result = await this.coursesService.findAll(query);
-        return ApiResponseDto.success(result);
+    async findAll(@Query() query: QueryCourseRequest): Promise<PaginationResponse<CourseResponse>> {
+        return await this.coursesService.findAll(query);
     }
 
     @Get(':id')
