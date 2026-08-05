@@ -36,6 +36,12 @@ export class OrdersService {
         // Fetch the round (with its course) to pull the price snapshot
         const round = await this.roundsService.findOne(dto.roundId);
 
+        if (!round.course) {
+            throw new NotFoundException(
+                this.i18n.t('errors.COURSE_NOT_FOUND', { lang: this.lang() }),
+            );
+        }
+
         const coursePrice = Number(round.course.price);
         const trainerId = round.course.trainerId;
         const courseId = round.courseId;
