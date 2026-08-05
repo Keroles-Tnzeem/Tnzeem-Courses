@@ -10,8 +10,19 @@ export class CourseCategoryResponse {
     static from(entity: CourseCategoryEntity, lang = 'en'): CourseCategoryResponse {
         const response = new CourseCategoryResponse();
         response.id = entity.id;
-        response.name = entity.name?.[lang] ?? entity.name?.['en'];
-        response.description = entity.description?.[lang] ?? entity.description?.['en'];
+        
+        const parseJson = (val: any) => {
+            if (typeof val === 'string') {
+                try { return JSON.parse(val); } catch { return {}; }
+            }
+            return val || {};
+        };
+        
+        const nameObj = parseJson(entity.name);
+        const descObj = parseJson(entity.description);
+
+        response.name = nameObj[lang] ?? nameObj['en'] ?? entity.name;
+        response.description = descObj[lang] ?? descObj['en'] ?? entity.description;
         response.image = entity.image;
         response.courses_num = entity.coursesNum;
         return response;

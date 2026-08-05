@@ -23,6 +23,8 @@ import { RoundSessionsModule } from './staff-dashboard/round-sessions/round-sess
 import { OrdersModule } from './shared/orders/orders.module';
 import { PaymentModule } from './shared/payment/payment.module';
 import { StaffOrdersModule } from './staff-dashboard/orders/orders.module';
+import { GuestCourseCategoriesModule } from './website/guest/course-categories/course-categories.module';
+import { GuestCourseRoundsModule } from './website/guest/course-rounds/course-rounds.module';
 
 const i18nPath = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'i18n')
@@ -69,6 +71,8 @@ const i18nPath = process.env.NODE_ENV === 'production'
     OrdersModule,
     PaymentModule,
     StaffOrdersModule,
+    GuestCourseCategoriesModule,
+    GuestCourseRoundsModule,
   ],
   controllers: [],
   providers: [],
