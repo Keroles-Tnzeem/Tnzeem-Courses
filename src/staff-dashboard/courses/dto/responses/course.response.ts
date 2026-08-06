@@ -1,12 +1,13 @@
 import { CourseStatusEnum } from '../../enums/course-status.enum';
 import { CourseEntity } from '../../entities/course.entity';
+import {parseJson} from "../../../../shared/helpers/parse-json.helper";
 
 export class CourseResponse {
     id: number;
     trainerId: number;
     categoryId: number;
-    name: { ar: string; en: string };
-    description: { ar: string; en: string };
+    name: string;
+    description: string;
     requirements?: string;
     benefits?: string;
     slug: string;
@@ -17,8 +18,8 @@ export class CourseResponse {
     price: number;
     status: CourseStatusEnum;
     level: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: Date | undefined;
+    updatedAt: Date | undefined;
 
     trainer?: any;
     category?: any;
@@ -28,17 +29,12 @@ export class CourseResponse {
         response.id = entity.id;
         response.trainerId = entity.trainerId;
         response.categoryId = entity.categoryId;
-        const parseJson = (val: any) => {
-            if (typeof val === 'string') {
-                try { return JSON.parse(val); } catch { return {}; }
-            }
-            return val || {};
-        };
-        
-        const nameObj = parseJson(entity.name);
-        const descObj = parseJson(entity.description);
-        const reqObj = parseJson(entity.requirements);
-        const benObj = parseJson(entity.benefits);
+
+
+        const nameObj = parseJson<Record<string, string>>(entity.name);
+        const descObj = parseJson<Record<string, string>>(entity.description);
+        const reqObj = parseJson<Record<string, string>>(entity.requirements);
+        const benObj = parseJson<Record<string, string>>(entity.benefits);
 
         response.name = nameObj[lang] ?? nameObj['en'] ?? entity.name;
         response.description = descObj[lang] ?? descObj['en'] ?? entity.description;
