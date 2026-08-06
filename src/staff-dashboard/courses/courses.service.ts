@@ -156,9 +156,18 @@ export class CoursesService {
 
         const courseData: any = { ...dto };
         if (dto.trainerId) {
-            // we already validated trainer above
             const trainer = await this.trainerRepo.findOne({ where: { id: dto.trainerId } });
-            if (trainer) courseData.trainerId = trainer.id;
+            if (trainer) {
+                courseData.trainerId = trainer.id;
+                course.trainer = trainer;
+            }
+        }
+        if (dto.categoryId) {
+            const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
+            if (category) {
+                courseData.categoryId = category.id;
+                course.category = category;
+            }
         }
         if (image !== undefined) courseData.image = image;
         if (introVideo !== undefined) courseData.introVideo = introVideo;

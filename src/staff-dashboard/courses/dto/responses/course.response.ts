@@ -28,10 +28,22 @@ export class CourseResponse {
         response.id = entity.id;
         response.trainerId = entity.trainerId;
         response.categoryId = entity.categoryId;
-        response.name = entity.name?.[lang] ?? entity.name?.['en'];
-        response.description = entity.description?.[lang] ?? entity.description?.['en'];
-        response.requirements = entity.requirements?.[lang] ?? entity.requirements?.['en'];
-        response.benefits = entity.benefits?.[lang] ?? entity.benefits?.['en'];
+        const parseJson = (val: any) => {
+            if (typeof val === 'string') {
+                try { return JSON.parse(val); } catch { return {}; }
+            }
+            return val || {};
+        };
+        
+        const nameObj = parseJson(entity.name);
+        const descObj = parseJson(entity.description);
+        const reqObj = parseJson(entity.requirements);
+        const benObj = parseJson(entity.benefits);
+
+        response.name = nameObj[lang] ?? nameObj['en'] ?? entity.name;
+        response.description = descObj[lang] ?? descObj['en'] ?? entity.description;
+        response.requirements = reqObj[lang] ?? reqObj['en'] ?? entity.requirements;
+        response.benefits = benObj[lang] ?? benObj['en'] ?? entity.benefits;
         response.slug = entity.slug;
         response.image = entity.image;
         response.introVideo = entity.introVideo;
@@ -44,20 +56,17 @@ export class CourseResponse {
         response.updatedAt = entity.audit?.updatedAt;
 
         if (entity.trainer) {
-            // Include trainer response mapping if needed, simplified for now
             response.trainer = {
                 id: entity.trainer.id,
                 firstName: entity.trainer.firstName,
                 lastName: entity.trainer.lastName,
-                // Add more trainer details as required
             };
         }
 
         if (entity.category) {
-            // Include category response mapping if needed, simplified for now
             response.category = {
                 id: entity.category.id,
-                name: entity.category.name,
+                name: entity.category.name?.[lang] ?? entity.category.name?.['en'],
             };
         }
 
