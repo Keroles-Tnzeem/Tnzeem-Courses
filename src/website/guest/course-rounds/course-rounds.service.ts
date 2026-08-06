@@ -17,10 +17,10 @@ export class GuestCourseRoundsService {
         });
     }
 
-    async findOneBySlugAndRoundNumber(courseSlug: string, roundNumber: number): Promise<RoundEntity | null> {
+    async findOneBySlugAndRoundNumber(courseSlug: string, id: number): Promise<RoundEntity | null> {
         return await this.roundRepository.findOne({
             where: {
-                roundNumber,
+                id,
                 course: { slug: courseSlug }
             },
             relations: ['course', 'course.trainer', 'sessions'],

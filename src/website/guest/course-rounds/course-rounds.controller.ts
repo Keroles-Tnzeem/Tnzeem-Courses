@@ -4,6 +4,7 @@ import { I18nContext, I18nService } from 'nestjs-i18n';
 import { GuestCourseRoundsService } from './course-rounds.service';
 import { GuestCourseRoundResponse } from './dto/responses/guest-course-round.response';
 import { ApiResponseDto } from '../../../common/dto/responses/api.response';
+import {getLang} from "../../../shared/helpers/lang.helper";
 
 @ApiTags('Website - Guest - Course Rounds')
 @Controller('website')
@@ -21,12 +22,8 @@ export class GuestCourseRoundsController {
     @ApiOperation({ summary: 'List all course rounds with course and trainer relations without pagination' })
     @ApiQuery({ name: 'lang', required: false, description: 'Language (e.g. ar or en)' })
     @ApiOkResponse({ type: GuestCourseRoundResponse, isArray: true })
-    async findAll(
-        @Query('lang') queryLang?: string,
-        @Headers('lang') headerLang?: string,
-        @Headers('x-lang') xLang?: string,
-    ): Promise<ApiResponseDto<GuestCourseRoundResponse[]>> {
-        const lang = this.lang(queryLang, headerLang || xLang);
+    async findAll(): Promise<ApiResponseDto<GuestCourseRoundResponse[]>> {
+        const lang = getLang();
         const rounds = await this.courseRoundsService.findAll();
         const data = rounds.map(r => GuestCourseRoundResponse.from(r, lang));
         return ApiResponseDto.success(
@@ -35,21 +32,17 @@ export class GuestCourseRoundsController {
         );
     }
 
-    @Get('courses/:courseSlug/rounds/:roundNumber')
-    @ApiOperation({ summary: 'Get course round details by course slug and round number' })
+    @Get('courses/:courseSlug/rounds/:roundId')
+    @ApiOperation({ summary: 'Get course round details by course slug and round Id' })
     @ApiParam({ name: 'courseSlug', type: String, description: 'Slug of the course' })
-    @ApiParam({ name: 'roundNumber', type: Number, description: 'Number of the round' })
+    @ApiParam({ name: 'roundId', type: Number, description: 'Id of the round' })
     @ApiQuery({ name: 'lang', required: false, description: 'Language (e.g. ar or en)' })
     @ApiOkResponse({ type: GuestCourseRoundResponse })
     async findOne(
         @Param('courseSlug') courseSlug: string,
-        @Param('roundNumber', ParseIntPipe) roundNumber: number,
-        @Query('lang') queryLang?: string,
-        @Headers('lang') headerLang?: string,
-        @Headers('x-lang') xLang?: string,
-    ): Promise<ApiResponseDto<GuestCourseRoundResponse>> {
-        const lang = this.lang(queryLang, headerLang || xLang);
-        const round = await this.courseRoundsService.findOneBySlugAndRoundNumber(courseSlug, roundNumber);
+        @Param('roundId', ParseIntPipe) roundId: number): Promise<ApiResponseDto<GuestCourseRoundResponse>> {
+        const lang = getLang();
+        const round = await this.courseRoundsService.findOneBySlugAndRoundNumber(courseSlug, roundId);
         
         if (!round) {
             throw new NotFoundException({
