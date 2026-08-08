@@ -15,6 +15,7 @@ import { UpdateStudentRequest } from './dto/requests/update-student.request';
 import { AssignStaffToStudentRequest } from './dto/requests/assign-staff.request';
 import { PaginationRequest } from '../../common/dto/requests/pagination.request';
 import { OrdersRepository } from '../../shared/orders/repositories/orders.repository';
+import {getLang} from "../../common/helpers/lang.helper";
 
 @Injectable()
 export class StudentService {
@@ -27,9 +28,7 @@ export class StudentService {
     private readonly i18n: I18nService,
   ) {}
 
-  private lang(): string {
-    return I18nContext.current()?.lang ?? 'en';
-  }
+
 
   private readonly relations = { source: true };
 
@@ -41,7 +40,7 @@ export class StudentService {
     const source = await this.sourceRepo.findOne({ where: { id: sourceId } });
     if (!source) {
       throw new NotFoundException(
-        this.i18n.t('errors.NOT_FOUND', { lang: this.lang() }),
+        this.i18n.t('errors.NOT_FOUND', { lang: getLang() }),
       );
     }
   }
@@ -106,7 +105,7 @@ export class StudentService {
 
     if (!student || student.userType !== UserTypeEnum.STUDENT) {
       throw new NotFoundException(
-        this.i18n.t('errors.USER_NOT_FOUND', { lang: this.lang() }),
+        this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }),
       );
     }
 
@@ -118,7 +117,7 @@ export class StudentService {
     const exists = await this.userRepo.findOne({ where: { email: dto.email } });
     if (exists) {
       throw new ConflictException(
-        this.i18n.t('errors.EMAIL_TAKEN', { lang: this.lang() }),
+        this.i18n.t('errors.EMAIL_TAKEN', { lang: getLang() }),
       );
     }
 
@@ -126,7 +125,7 @@ export class StudentService {
       const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
       if (phoneExists) {
         throw new ConflictException(
-          this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
+          this.i18n.t('errors.PHONE_TAKEN', { lang: getLang() }),
         );
       }
     }
@@ -165,7 +164,7 @@ export class StudentService {
       });
       if (exists) {
         throw new ConflictException(
-          this.i18n.t('errors.EMAIL_TAKEN', { lang: this.lang() }),
+          this.i18n.t('errors.EMAIL_TAKEN', { lang: getLang() }),
         );
       }
     }
@@ -174,7 +173,7 @@ export class StudentService {
       const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
       if (phoneExists) {
         throw new ConflictException(
-          this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
+          this.i18n.t('errors.PHONE_TAKEN', { lang: getLang() }),
         );
       }
     }
@@ -204,7 +203,7 @@ export class StudentService {
     });
 
     if (!staffUser) {
-      throw new NotFoundException(this.i18n.t('errors.USER_NOT_FOUND', { lang: this.lang() }));
+      throw new NotFoundException(this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }));
     }
 
     student.assignToId = dto.assignToId;

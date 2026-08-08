@@ -12,6 +12,7 @@ import { TrainerInfoEntity } from '../../shared/user/entities/trainer-info.entit
 import { UserTypeEnum } from '../../shared/user/enums/user-type.enum';
 import { CreateTrainerRequest } from './dto/requests/create-trainer.request';
 import { UpdateTrainerRequest } from './dto/requests/update-trainer.request';
+import {getLang} from "../../common/helpers/lang.helper";
 
 @Injectable()
 export class TrainerService {
@@ -23,11 +24,8 @@ export class TrainerService {
         private readonly i18n: I18nService,
     ) {}
 
-    private lang(): string {
-        return I18nContext.current()?.lang ?? 'en';
-    }
 
-    // ── List ─────────────────────────────────────────────────────────────────
+
     async findAll(query: { page?: number; limit?: number; search?: string } = {}): Promise<{ data: UserEntity[]; total: number }> {
         const { page = 1, limit = 10, search } = query;
         const skip = (page - 1) * limit;
@@ -43,7 +41,6 @@ export class TrainerService {
         return { data, total };
     }
 
-    // ── Single ────────────────────────────────────────────────────────────────
     async findOne(id: number): Promise<UserEntity> {
         const trainer = await this.userRepo.findOne({
             where: { id },
@@ -52,19 +49,18 @@ export class TrainerService {
 
         if (!trainer || trainer.userType !== UserTypeEnum.TRAINER) {
             throw new NotFoundException(
-                this.i18n.t('errors.USER_NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }),
             );
         }
 
         return trainer;
     }
 
-    // ── Create ────────────────────────────────────────────────────────────────
     async create(dto: CreateTrainerRequest, img?: string): Promise<UserEntity> {
         const exists = await this.userRepo.findOne({ where: { email: dto.email } });
         if (exists) {
             throw new ConflictException(
-                this.i18n.t('errors.EMAIL_TAKEN', { lang: this.lang() }),
+                this.i18n.t('errors.EMAIL_TAKEN', { lang: getLang() }),
             );
         }
 
@@ -72,7 +68,7 @@ export class TrainerService {
             const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
             if (phoneExists) {
                 throw new ConflictException(
-                    this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
+                    this.i18n.t('errors.PHONE_TAKEN', { lang: getLang() }),
                 );
             }
         }
@@ -104,7 +100,6 @@ export class TrainerService {
         return this.findOne(saved.id);
     }
 
-    // ── Update ────────────────────────────────────────────────────────────────
     async update(id: number, dto: UpdateTrainerRequest, img?: string): Promise<UserEntity> {
         const trainer = await this.findOne(id);
 
@@ -112,7 +107,7 @@ export class TrainerService {
             const exists = await this.userRepo.findOne({ where: { email: dto.email } });
             if (exists) {
                 throw new ConflictException(
-                    this.i18n.t('errors.EMAIL_TAKEN', { lang: this.lang() }),
+                    this.i18n.t('errors.EMAIL_TAKEN', { lang: getLang() }),
                 );
             }
         }
@@ -121,7 +116,7 @@ export class TrainerService {
             const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
             if (phoneExists) {
                 throw new ConflictException(
-                    this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
+                    this.i18n.t('errors.PHONE_TAKEN', { lang: getLang() }),
                 );
             }
         }
@@ -149,7 +144,6 @@ export class TrainerService {
         return this.findOne(id);
     }
 
-    // ── Delete ────────────────────────────────────────────────────────────────
     async remove(id: number): Promise<void> {
         const trainer = await this.findOne(id);
         await this.userRepo.remove(trainer);

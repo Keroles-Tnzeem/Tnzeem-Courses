@@ -6,6 +6,7 @@ import { SourceEntity } from './entities/source.entity';
 import { CreateSourceRequest } from './dto/requests/create-source.request';
 import { UpdateSourceRequest } from './dto/requests/update-source.request';
 import { QuerySourceRequest } from './dto/requests/query-source.request';
+import {getLang} from "../../common/helpers/lang.helper";
 
 @Injectable()
 export class SourcesService {
@@ -15,9 +16,7 @@ export class SourcesService {
     private readonly i18n: I18nService,
   ) {}
 
-  private lang(): string {
-    return I18nContext.current()?.lang ?? 'en';
-  }
+
 
   async create(dto: CreateSourceRequest): Promise<SourceEntity> {
     const exists = await this.sourceRepository.findOne({
@@ -25,7 +24,7 @@ export class SourcesService {
     });
     if (exists) {
       throw new ConflictException(
-        this.i18n.t('errors.NAME_TAKEN', { lang: this.lang() }),
+        this.i18n.t('errors.NAME_TAKEN', { lang: getLang() }),
       );
     }
 
@@ -71,7 +70,7 @@ export class SourcesService {
     const entity = await this.sourceRepository.findOne({ where: { id } });
     if (!entity) {
       throw new NotFoundException(
-        this.i18n.t('errors.NOT_FOUND', { lang: this.lang() }),
+        this.i18n.t('errors.NOT_FOUND', { lang: getLang() }),
       );
     }
     return entity;
@@ -89,7 +88,7 @@ export class SourcesService {
       });
       if (exists) {
         throw new ConflictException(
-          this.i18n.t('errors.NAME_TAKEN', { lang: this.lang() }),
+          this.i18n.t('errors.NAME_TAKEN', { lang: getLang() }),
         );
       }
     }

@@ -11,6 +11,7 @@ import { CourseEntity } from '../courses/entities/course.entity';
 import { CreateRoundRequest } from './dto/requests/create-round.request';
 import { UpdateRoundRequest } from './dto/requests/update-round.request';
 import { QueryRoundRequest } from './dto/requests/query-round.request';
+import {getLang} from "../../common/helpers/lang.helper";
 
 @Injectable()
 export class RoundsService {
@@ -24,9 +25,7 @@ export class RoundsService {
         private readonly i18n: I18nService,
     ) {}
 
-    private lang(): string {
-        return I18nContext.current()?.lang ?? 'en';
-    }
+
 
     async create(dto: CreateRoundRequest): Promise<RoundEntity> {
         const course = await this.courseRepository.findOne({
@@ -34,7 +33,7 @@ export class RoundsService {
         });
         if (!course) {
             throw new NotFoundException(
-                this.i18n.t('errors.COURSE_NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.COURSE_NOT_FOUND', { lang: getLang() }),
             );
         }
 
@@ -43,7 +42,7 @@ export class RoundsService {
         });
         if (duplicate) {
             throw new BadRequestException(
-                this.i18n.t('errors.ROUND_NUMBER_TAKEN', { lang: this.lang() }),
+                this.i18n.t('errors.ROUND_NUMBER_TAKEN', { lang: getLang() }),
             );
         }
 
@@ -106,7 +105,7 @@ export class RoundsService {
         });
         if (!entity) {
             throw new NotFoundException(
-                this.i18n.t('errors.NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.NOT_FOUND', { lang: getLang() }),
             );
         }
         return entity;
@@ -118,7 +117,7 @@ export class RoundsService {
         });
         if (!course) {
             throw new NotFoundException(
-                this.i18n.t('errors.COURSE_NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.COURSE_NOT_FOUND', { lang: getLang() }),
             );
         }
 
@@ -138,7 +137,7 @@ export class RoundsService {
             });
             if (duplicate) {
                 throw new BadRequestException(
-                    this.i18n.t('errors.ROUND_NUMBER_TAKEN', { lang: this.lang() }),
+                    this.i18n.t('errors.ROUND_NUMBER_TAKEN', { lang: getLang() }),
                 );
             }
         }

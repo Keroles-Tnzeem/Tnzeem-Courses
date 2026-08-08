@@ -5,7 +5,6 @@ import { CourseEntity } from './entities/course.entity';
 import { CreateCourseRequest } from './dto/requests/create-course.request';
 import { UpdateCourseRequest } from './dto/requests/update-course.request';
 import { QueryCourseRequest } from './dto/requests/query-course.request';
-import { TrainerInfoEntity } from '../../shared/user/entities/trainer-info.entity';
 import { CourseCategoryEntity } from '../course-categories/entities/course-category.entity';
 import { PaginationResponseDto as PaginationResponse } from '../../common/dto/responses/pagination.response';
 import { CourseResponse } from './dto/responses/course.response';
@@ -13,6 +12,7 @@ import { I18nService, I18nContext } from 'nestjs-i18n';
 import { courseLevelTranslationKey } from '../../common/enums/course-level.enum';
 import { UserTypeEnum } from '../../shared/user/enums/user-type.enum';
 import { UserEntity } from 'src/shared/user/entities/user.entity';
+import {getLang} from "../../common/helpers/lang.helper";
 
 @Injectable()
 export class CoursesService {
@@ -26,15 +26,12 @@ export class CoursesService {
         private readonly i18n: I18nService
     ) { }
 
-    private lang(): string {
-        return I18nContext.current()?.lang ?? 'en';
-    }
 
     private toResponse(course: CourseEntity): CourseResponse {
         const level = this.i18n.t(courseLevelTranslationKey(course.level), {
-            lang: this.lang(),
+            lang: getLang(),
         }) as string;
-        return CourseResponse.fromEntity(course, level, this.lang());
+        return CourseResponse.fromEntity(course, level, getLang());
     }
 
     async create(dto: CreateCourseRequest, image?: string, introVideo?: string): Promise<CourseResponse> {
@@ -43,7 +40,7 @@ export class CoursesService {
             where: { id: dto.trainerId }
         });
         if (!trainer) {
-            throw new NotFoundException(this.i18n.t('errors.TRAINER_NOT_FOUND', { lang: I18nContext.current()?.lang }) || 'Trainer not found');
+            throw new NotFoundException(this.i18n.t('errors.TRAINER_NOT_FOUND', { lang: getLang()}) || 'Trainer not found');
         }
         if (trainer.userType !== UserTypeEnum.TRAINER) {
             throw new BadRequestException('Assigned user is not a trainer');
@@ -52,13 +49,13 @@ export class CoursesService {
         // Verify Category
         const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
         if (!category) {
-            throw new NotFoundException(this.i18n.t('errors.CATEGORY_NOT_FOUND', { lang: I18nContext.current()?.lang }) || 'Category not found');
+            throw new NotFoundException(this.i18n.t('errors.CATEGORY_NOT_FOUND', { lang: getLang()}) || 'Category not found');
         }
 
         // Verify Slug Uniqueness
         const existingCourse = await this.courseRepo.findOne({ where: { slug: dto.slug } });
         if (existingCourse) {
-            throw new ConflictException(this.i18n.t('errors.SLUG_TAKEN', { lang: I18nContext.current()?.lang }) || 'Course with this slug already exists');
+            throw new ConflictException(this.i18n.t('errors.SLUG_TAKEN', { lang: getLang()}) || 'Course with this slug already exists');
         }
 
         const courseData: any = { ...dto, image, introVideo };
@@ -116,7 +113,7 @@ export class CoursesService {
         });
 
         if (!course) {
-            throw new NotFoundException(this.i18n.t('errors.COURSE_NOT_FOUND', { lang: I18nContext.current()?.lang }) || 'Course not found');
+            throw new NotFoundException(this.i18n.t('errors.COURSE_NOT_FOUND', { lang: getLang()}) || 'Course not found');
         }
 
         return this.toResponse(course);
@@ -125,7 +122,7 @@ export class CoursesService {
     async update(id: number, dto: UpdateCourseRequest, image?: string, introVideo?: string): Promise<CourseResponse> {
         const course = await this.courseRepo.findOne({ where: { id } });
         if (!course) {
-            throw new NotFoundException(this.i18n.t('errors.COURSE_NOT_FOUND', { lang: I18nContext.current()?.lang }) || 'Course not found');
+            throw new NotFoundException(this.i18n.t('errors.COURSE_NOT_FOUND', { lang: getLang()}) || 'Course not found');
         }
 
         if (dto.trainerId) {
@@ -133,7 +130,7 @@ export class CoursesService {
                 where: { id: dto.trainerId }
             });
             if (!trainer) {
-                throw new NotFoundException(this.i18n.t('errors.TRAINER_NOT_FOUND', { lang: I18nContext.current()?.lang }) || 'Trainer not found');
+                throw new NotFoundException(this.i18n.t('errors.TRAINER_NOT_FOUND', { lang: getLang()}) || 'Trainer not found');
             }
             if (trainer.userType !== UserTypeEnum.TRAINER) {
                 throw new BadRequestException('Assigned user is not a trainer');
@@ -143,14 +140,14 @@ export class CoursesService {
         if (dto.categoryId) {
             const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
             if (!category) {
-                throw new NotFoundException(this.i18n.t('errors.CATEGORY_NOT_FOUND', { lang: I18nContext.current()?.lang }) || 'Category not found');
+                throw new NotFoundException(this.i18n.t('errors.CATEGORY_NOT_FOUND', { lang: getLang()}) || 'Category not found');
             }
         }
 
         if (dto.slug && dto.slug !== course.slug) {
             const existingCourse = await this.courseRepo.findOne({ where: { slug: dto.slug } });
             if (existingCourse) {
-                throw new ConflictException(this.i18n.t('errors.SLUG_TAKEN', { lang: I18nContext.current()?.lang }) || 'Course with this slug already exists');
+                throw new ConflictException(this.i18n.t('errors.SLUG_TAKEN', { lang: getLang()}) || 'Course with this slug already exists');
             }
         }
 
@@ -180,7 +177,7 @@ export class CoursesService {
     async remove(id: number): Promise<void> {
         const course = await this.courseRepo.findOne({ where: { id } });
         if (!course) {
-            throw new NotFoundException(this.i18n.t('errors.COURSE_NOT_FOUND', { lang: I18nContext.current()?.lang }) || 'Course not found');
+            throw new NotFoundException(this.i18n.t('errors.COURSE_NOT_FOUND', { lang: getLang()}) || 'Course not found');
         }
         await this.courseRepo.softDelete(id);
     }

@@ -13,6 +13,7 @@ import { PermissionEntity } from '../../shared/user/entities/permission.entity';
 import { UserTypeEnum } from '../../shared/user/enums/user-type.enum';
 import { CreateStaffRequest } from './dto/requests/create-staff.request';
 import { UpdateStaffRequest } from './dto/requests/update-staff.request';
+import {getLang} from "../../common/helpers/lang.helper";
 
 const STAFF_TYPES = [UserTypeEnum.SALES, UserTypeEnum.SUPPORT];
 
@@ -28,11 +29,8 @@ export class StaffService {
         private readonly i18n: I18nService,
     ) {}
 
-    private lang(): string {
-        return I18nContext.current()?.lang ?? 'en';
-    }
 
-    // ── List ─────────────────────────────────────────────────────────────────
+
     async findAll(query: { page?: number; limit?: number; search?: string } = {}): Promise<{ data: UserEntity[]; total: number }> {
         const { page = 1, limit = 10, search } = query;
         const skip = (page - 1) * limit;
@@ -49,7 +47,6 @@ export class StaffService {
         return { data, total };
     }
 
-    // ── Single ────────────────────────────────────────────────────────────────
     async findOne(id: number): Promise<UserEntity> {
         const staff = await this.userRepo.findOne({
             where: { id },
@@ -58,7 +55,7 @@ export class StaffService {
 
         if (!staff || !STAFF_TYPES.includes(staff.userType)) {
             throw new NotFoundException(
-                this.i18n.t('errors.USER_NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }),
             );
         }
 
@@ -70,7 +67,7 @@ export class StaffService {
         const exists = await this.userRepo.findOne({ where: { email: dto.email } });
         if (exists) {
             throw new ConflictException(
-                this.i18n.t('errors.EMAIL_TAKEN', { lang: this.lang() }),
+                this.i18n.t('errors.EMAIL_TAKEN', { lang: getLang() }),
             );
         }
 
@@ -78,7 +75,7 @@ export class StaffService {
             const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
             if (phoneExists) {
                 throw new ConflictException(
-                    this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
+                    this.i18n.t('errors.PHONE_TAKEN', { lang: getLang() }),
                 );
             }
         }
@@ -113,7 +110,7 @@ export class StaffService {
             const exists = await this.userRepo.findOne({ where: { email: dto.email } });
             if (exists) {
                 throw new ConflictException(
-                    this.i18n.t('errors.EMAIL_TAKEN', { lang: this.lang() }),
+                    this.i18n.t('errors.EMAIL_TAKEN', { lang: getLang() }),
                 );
             }
         }
@@ -122,7 +119,7 @@ export class StaffService {
             const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
             if (phoneExists) {
                 throw new ConflictException(
-                    this.i18n.t('errors.PHONE_TAKEN', { lang: this.lang() }),
+                    this.i18n.t('errors.PHONE_TAKEN', { lang: getLang() }),
                 );
             }
         }

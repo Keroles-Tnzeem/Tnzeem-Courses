@@ -8,6 +8,7 @@ import { QueryCourseCategoryRequest } from './dto/requests/query-course-category
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { StorageService } from '../../shared/storage/storage.service';
 import { UploadType } from '../../shared/storage/enums/upload-type.enum';
+import { getLang } from 'src/common/helpers/lang.helper';
 
 @Injectable()
 export class CourseCategoriesService {
@@ -18,9 +19,7 @@ export class CourseCategoriesService {
         private readonly storageService: StorageService,
     ) {}
 
-    private lang(): string {
-        return I18nContext.current()?.lang ?? 'en';
-    }
+   
 
     /** Multipart sends nested objects as JSON strings — parse them safely */
     private parseJsonField<T>(value: T | string | undefined): T | undefined {
@@ -69,7 +68,7 @@ export class CourseCategoriesService {
     async findOne(id: number): Promise<CourseCategoryEntity> {
         const entity = await this.courseCategoryRepository.findOne({ where: { id } });
         if (!entity) {
-            throw new NotFoundException(this.i18n.t('errors.NOT_FOUND', { lang: this.lang() }));
+            throw new NotFoundException(this.i18n.t('errors.NOT_FOUND', { lang: getLang() }));
         }
         return entity;
     }
@@ -100,7 +99,11 @@ export class CourseCategoriesService {
             await this.courseCategoryRepository.remove(entity);
         } catch (error) {
             if (error instanceof QueryFailedError && (error as any).code === '23503') {
-                throw new ConflictException(this.i18n.t('errors.CANNOT_DELETE_HAS_RELATIONS', { lang: this.lang() }));
+                throw new ConflictException(
+                    this.i18n.t('errors.CANNOT_DELETE_HAS_RELATIONS', {
+                        lang: getLang(),
+                    }),
+                );    
             }
             throw error;
         }

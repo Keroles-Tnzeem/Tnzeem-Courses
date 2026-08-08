@@ -14,7 +14,7 @@ import {
     UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { I18nContext, I18nService } from 'nestjs-i18n';
+import { I18nContext, I18nService, I18nLang } from 'nestjs-i18n';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CourseCategoriesService } from './course-categories.service';
 import { CreateCourseCategoryRequest } from './dto/requests/create-course-category.request';
@@ -26,6 +26,7 @@ import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { Permissions } from '../../common/decorators/permissions.decorator';
 import { ApiResponseDto } from '../../common/dto/responses/api.response';
 import { PaginationResponseDto } from '../../common/dto/responses/pagination.response';
+import { getLang } from 'src/common/helpers/lang.helper';
 
 @ApiTags('Staff Dashboard - Course Categories')
 @ApiBearerAuth()

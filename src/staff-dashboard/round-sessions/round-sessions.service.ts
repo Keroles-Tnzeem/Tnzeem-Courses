@@ -11,6 +11,7 @@ import { RoundEntity } from '../rounds/entities/round.entity';
 import { CreateRoundSessionRequest } from './dto/requests/create-round-session.request';
 import { UpdateRoundSessionRequest } from './dto/requests/update-round-session.request';
 import { QueryRoundSessionRequest } from './dto/requests/query-round-session.request';
+import {getLang} from "../../common/helpers/lang.helper";
 
 @Injectable()
 export class RoundSessionsService {
@@ -34,7 +35,7 @@ export class RoundSessionsService {
         });
         if (!round) {
             throw new NotFoundException(
-                this.i18n.t('errors.ROUND_NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.ROUND_NOT_FOUND', { lang: getLang() }),
             );
         }
 
@@ -43,7 +44,7 @@ export class RoundSessionsService {
         });
         if (duplicate) {
             throw new BadRequestException(
-                this.i18n.t('errors.SESSION_NUMBER_TAKEN', { lang: this.lang() }),
+                this.i18n.t('errors.SESSION_NUMBER_TAKEN', { lang: getLang() }),
             );
         }
 
@@ -101,7 +102,7 @@ export class RoundSessionsService {
         });
         if (!entity) {
             throw new NotFoundException(
-                this.i18n.t('errors.NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.NOT_FOUND', { lang: getLang() }),
             );
         }
         return entity;
@@ -111,7 +112,7 @@ export class RoundSessionsService {
         const round = await this.roundRepository.findOne({ where: { id: roundId } });
         if (!round) {
             throw new NotFoundException(
-                this.i18n.t('errors.ROUND_NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.ROUND_NOT_FOUND', { lang: getLang() }),
             );
         }
 
@@ -133,7 +134,7 @@ export class RoundSessionsService {
             });
             if (duplicate) {
                 throw new BadRequestException(
-                    this.i18n.t('errors.SESSION_NUMBER_TAKEN', { lang: this.lang() }),
+                    this.i18n.t('errors.SESSION_NUMBER_TAKEN', { lang: getLang() }),
                 );
             }
         }

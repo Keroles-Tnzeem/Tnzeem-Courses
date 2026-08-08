@@ -13,6 +13,7 @@ import { CreateOrderRequest } from './dto/requests/create-order.request';
 import { UpdateOrderRequest } from './dto/requests/update-order.request';
 import { QueryOrderRequest } from './dto/requests/query-order.request';
 import { OrderResponse } from './dto/responses/order.response';
+import {getLang} from "../../common/helpers/lang.helper";
 
 @Injectable()
 export class OrdersService {
@@ -22,11 +23,6 @@ export class OrdersService {
         private readonly i18n: I18nService,
     ) {}
 
-    private lang(): string {
-        return I18nContext.current()?.lang ?? 'en';
-    }
-
-    // ── Create ────────────────────────────────────────────────────────────────
 
     async create(
         dto: CreateOrderRequest,
@@ -38,7 +34,7 @@ export class OrdersService {
 
         if (!round.course) {
             throw new NotFoundException(
-                this.i18n.t('errors.COURSE_NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.COURSE_NOT_FOUND', { lang: getLang() }),
             );
         }
 
@@ -72,10 +68,10 @@ export class OrdersService {
             relations: { student: true, trainer: true, round: true, course: true },
         });
 
-        return OrderResponse.fromEntity(withRelations!, this.lang());
+        return OrderResponse.fromEntity(withRelations!, getLang());
     }
 
-    // ── Find All (paginated) ──────────────────────────────────────────────────
+    // ── Find All (paginated)
 
     async findAll(query: QueryOrderRequest): Promise<PaginationResponse<OrderResponse>> {
         const {
@@ -146,11 +142,10 @@ export class OrdersService {
             .take(limit)
             .getManyAndCount();
 
-        const data = entities.map(e => OrderResponse.fromEntity(e, this.lang()));
+        const data = entities.map(e => OrderResponse.fromEntity(e, getLang()));
         return PaginationResponse.success(data, total, page, limit);
     }
 
-    // ── Find One ──────────────────────────────────────────────────────────────
 
     async findOne(id: string): Promise<OrderResponse> {
         const order = await this.ordersRepository.findOne({
@@ -160,14 +155,13 @@ export class OrdersService {
 
         if (!order) {
             throw new NotFoundException(
-                this.i18n.t('errors.ORDER_NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.ORDER_NOT_FOUND', { lang: getLang() }),
             );
         }
 
-        return OrderResponse.fromEntity(order, this.lang());
+        return OrderResponse.fromEntity(order, getLang());
     }
 
-    // ── Update ────────────────────────────────────────────────────────────────
 
     async update(
         id: string,
@@ -178,7 +172,7 @@ export class OrdersService {
 
         if (!order) {
             throw new NotFoundException(
-                this.i18n.t('errors.ORDER_NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.ORDER_NOT_FOUND', { lang: getLang() }),
             );
         }
 
@@ -208,17 +202,17 @@ export class OrdersService {
             relations: { student: true, trainer: true, round: true, course: true },
         });
 
-        return OrderResponse.fromEntity(withRelations!, this.lang());
+        return OrderResponse.fromEntity(withRelations!, getLang());
     }
 
-    // ── Cancel (soft delete via status) ───────────────────────────────────────
+    // ── Cancel (soft delete via status)
 
     async cancel(id: string): Promise<void> {
         const order = await this.ordersRepository.findOne({ where: { id } });
 
         if (!order) {
             throw new NotFoundException(
-                this.i18n.t('errors.ORDER_NOT_FOUND', { lang: this.lang() }),
+                this.i18n.t('errors.ORDER_NOT_FOUND', { lang: getLang() }),
             );
         }
 

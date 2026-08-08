@@ -53,7 +53,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
         },
       }),
       resolvers: [
-        { use: HeaderResolver, options: ['lang'] },
+        { use: HeaderResolver, options: ['x-lang'] },
         AcceptLanguageResolver,
       ],
     }),
