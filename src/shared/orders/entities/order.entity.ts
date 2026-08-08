@@ -16,7 +16,7 @@ import { PaymentTypeEnum } from '../../payment/enums/payment-type.enum';
 import { PaymentMethodEnum } from '../../payment/enums/payment-method.enum';
 import { PaymentStatusEnum } from '../../payment/enums/payment-status.enum';
 import { OrderCreatorTypeEnum } from '../enums/order-creator-type.enum';
-import { generateUlid } from '../../helpers/ulid.helper';
+import { generateUlid } from '../../../common/helpers/ulid.helper';
 
 @Entity('orders')
 export class OrderEntity {
@@ -30,8 +30,7 @@ export class OrderEntity {
         }
     }
 
-    // ── Foreign Keys 
-
+    // ── Foreign Keys
     @Column({ name: 'student_id' })
     studentId: number;
 
@@ -68,6 +67,9 @@ export class OrderEntity {
         default: OrderStatusEnum.PENDING,
     })
     status: OrderStatusEnum;
+
+    @Column({ type: 'text', nullable: true })
+    notes?: string;
 
     // ── Payment Information
 

@@ -19,7 +19,6 @@ async function bootstrap() {
   // CORS — origins are driven by CORS_ALLOWED_ORIGINS in .env
   app.enableCors({
     origin: (origin, callback) => {
-      // Allow server-to-server requests (no origin header) and listed origins
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {

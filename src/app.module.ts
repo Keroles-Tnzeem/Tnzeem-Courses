@@ -6,7 +6,6 @@ import { AcceptLanguageResolver, HeaderResolver, I18nModule } from 'nestjs-i18n'
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import i18nConfig from './config/i18n.config';
-import { existsSync } from 'fs';
 import * as path from 'path';
 import { AuthModule } from './shared/auth/auth.module';
 import { UserModule } from './shared/user/user.module';
@@ -26,6 +25,7 @@ import { StaffOrdersModule } from './staff-dashboard/orders/orders.module';
 import { GuestCourseCategoriesModule } from './website/guest/course-categories/course-categories.module';
 import { GuestCourseRoundsModule } from './website/guest/course-rounds/course-rounds.module';
 import { MenuModule } from './staff-dashboard/menu/menu.module';
+import {ContactUsModule} from "./website/guest/countact-us/contact-us.module";
 
 const i18nPath = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'i18n')
@@ -53,7 +53,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
         },
       }),
       resolvers: [
-        { use: HeaderResolver, options: ['x-lang'] },
+        { use: HeaderResolver, options: ['lang'] },
         AcceptLanguageResolver,
       ],
     }),
@@ -75,6 +75,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
     GuestCourseCategoriesModule,
     GuestCourseRoundsModule,
     MenuModule,
+    ContactUsModule
   ],
   controllers: [],
   providers: [],

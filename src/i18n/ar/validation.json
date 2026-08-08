@@ -4,5 +4,7 @@
     "IS_STRING": "يجب أن يكون {property} نصًا",
     "IS_NUMBER": "يجب أن يكون {property} رقمًا",
     "IS_STAFF_TYPE": "يجب أن يكون نوع المستخدم 'sales' أو 'support' فقط",
-    "IS_ENUM": "قيمة {property} غير صالحة"
+    "IS_ENUM": "قيمة {property} غير صالحة",
+    "INVALID_SAUDI_PHONE": "رقم الهاتف يجب أن يكون رقم جوال سعودي صحيح (مثال: 5XXXXXXXX أو 05XXXXXXXX)"
+
 }

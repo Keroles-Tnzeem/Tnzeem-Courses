@@ -64,6 +64,9 @@ export class OrderResponse {
     @ApiPropertyOptional()
     assignToId?: number;
 
+    @ApiPropertyOptional()
+    notes?: string;
+
     @ApiProperty()
     createdAt: Date;
 
@@ -121,6 +124,7 @@ export class OrderResponse {
         response.createdBy = entity.createdBy;
         response.createdById = entity.createdById;
         response.assignToId = entity.assignToId;
+        response.notes = entity.notes;
         response.createdAt = entity.createdAt;
         response.updatedAt = entity.updatedAt;
 

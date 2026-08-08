@@ -4,6 +4,7 @@ import { I18nContext, I18nService } from 'nestjs-i18n';
 import { GuestCourseCategoriesService } from './course-categories.service';
 import { CourseCategoryResponse } from '../../../staff-dashboard/course-categories/dto/responses/course-category.response';
 import { ApiResponseDto } from '../../../common/dto/responses/api.response';
+import { getLang } from 'src/common/helpers/lang.helper';
 
 @ApiTags('Website - Guest - Course Categories')
 @Controller('website/course-categories')
@@ -22,11 +23,9 @@ export class GuestCourseCategoriesController {
     @ApiQuery({ name: 'lang', required: false, description: 'Language (e.g. ar or en)' })
     @ApiOkResponse({ type: CourseCategoryResponse, isArray: true })
     async findAll(
-        @Query('lang') queryLang?: string,
-        @Headers('lang') headerLang?: string,
-        @Headers('x-lang') xLang?: string,
+       
     ): Promise<ApiResponseDto<CourseCategoryResponse[]>> {
-        const lang = this.lang(queryLang, headerLang || xLang);
+        const lang = getLang();
         const categories = await this.courseCategoriesService.findAll();
         const data = categories.map(c => CourseCategoryResponse.from(c, lang));
         return ApiResponseDto.success(

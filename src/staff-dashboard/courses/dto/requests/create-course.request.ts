@@ -1,7 +1,7 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { CourseLevelEnum } from '../../../../shared/enums/course-level.enum';
+import { CourseLevelEnum } from '../../../../common/enums/course-level.enum';
 
 class MultiLingualPropertyDto {
     @ApiProperty({ example: 'دورة نود جي إس' })

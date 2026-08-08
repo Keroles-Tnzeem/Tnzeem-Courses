@@ -4,7 +4,7 @@ import { I18nContext, I18nService } from 'nestjs-i18n';
 import { GuestCourseRoundsService } from './course-rounds.service';
 import { GuestCourseRoundResponse } from './dto/responses/guest-course-round.response';
 import { ApiResponseDto } from '../../../common/dto/responses/api.response';
-import {getLang} from "../../../shared/helpers/lang.helper";
+import {getLang} from "../../../common/helpers/lang.helper";
 
 @ApiTags('Website - Guest - Course Rounds')
 @Controller('website')

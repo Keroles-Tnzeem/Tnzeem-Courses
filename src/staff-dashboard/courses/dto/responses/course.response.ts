@@ -1,6 +1,6 @@
 import { CourseStatusEnum } from '../../enums/course-status.enum';
 import { CourseEntity } from '../../entities/course.entity';
-import {parseJson} from "../../../../shared/helpers/parse-json.helper";
+import {parseJson} from "../../../../common/helpers/parse-json.helper";
 
 export class CourseResponse {
     id: number;

@@ -10,7 +10,7 @@ import { CourseCategoryEntity } from '../course-categories/entities/course-categ
 import { PaginationResponseDto as PaginationResponse } from '../../common/dto/responses/pagination.response';
 import { CourseResponse } from './dto/responses/course.response';
 import { I18nService, I18nContext } from 'nestjs-i18n';
-import { courseLevelTranslationKey } from '../../shared/enums/course-level.enum';
+import { courseLevelTranslationKey } from '../../common/enums/course-level.enum';
 import { UserTypeEnum } from '../../shared/user/enums/user-type.enum';
 import { UserEntity } from 'src/shared/user/entities/user.entity';
 

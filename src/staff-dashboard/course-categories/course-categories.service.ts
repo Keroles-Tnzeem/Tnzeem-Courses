@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike, Repository, QueryFailedError } from 'typeorm';
 import { CourseCategoryEntity } from './entities/course-category.entity';
 import { CreateCourseCategoryRequest } from './dto/requests/create-course-category.request';
 import { UpdateCourseCategoryRequest } from './dto/requests/update-course-category.request';
@@ -96,6 +96,13 @@ export class CourseCategoriesService {
 
     async remove(id: number): Promise<void> {
         const entity = await this.findOne(id);
-        await this.courseCategoryRepository.remove(entity);
+        try {
+            await this.courseCategoryRepository.remove(entity);
+        } catch (error) {
+            if (error instanceof QueryFailedError && (error as any).code === '23503') {
+                throw new ConflictException(this.i18n.t('errors.CANNOT_DELETE_HAS_RELATIONS', { lang: this.lang() }));
+            }
+            throw error;
+        }
     }
 }

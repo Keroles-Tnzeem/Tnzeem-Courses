@@ -62,6 +62,7 @@ export class OrdersService {
             createdBy: dto.createdBy ?? OrderCreatorTypeEnum.STAFF,
             createdById: staffId,
             status: OrderStatusEnum.PENDING,
+            notes: dto.notes,
         });
 
         const saved = await this.ordersRepository.save(order);

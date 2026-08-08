@@ -6,6 +6,7 @@ import {
     IsNotEmpty,
     IsOptional,
     IsString,
+    MaxLength,
     Min,
 } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
@@ -50,4 +51,10 @@ export class CreateOrderRequest {
 
     @ApiPropertyOptional({ type: 'string', format: 'binary', description: 'Bank transfer receipt image (optional)' })
     transferBankImg?: any;
+
+    @ApiPropertyOptional({ example: 'order notes' })
+    @IsOptional()
+    @IsString()
+    @MaxLength(500)
+    notes?: string;
 }
