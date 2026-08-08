@@ -5,6 +5,7 @@ import { GuestCourseRoundsService } from './course-rounds.service';
 import { GuestCourseRoundResponse } from './dto/responses/guest-course-round.response';
 import { ApiResponseDto } from '../../../common/dto/responses/api.response';
 import {getLang} from "../../../common/helpers/lang.helper";
+import {QueryCourseRoundsRequest} from "./dto/reauests/query-course-rounds.request";
 
 @ApiTags('Website - Guest - Course Rounds')
 @Controller('website')
@@ -22,9 +23,11 @@ export class GuestCourseRoundsController {
     @ApiOperation({ summary: 'List all course rounds with course and trainer relations without pagination' })
     @ApiQuery({ name: 'lang', required: false, description: 'Language (e.g. ar or en)' })
     @ApiOkResponse({ type: GuestCourseRoundResponse, isArray: true })
-    async findAll(): Promise<ApiResponseDto<GuestCourseRoundResponse[]>> {
+    async findAll(
+        @Query() query: QueryCourseRoundsRequest,
+    ): Promise<ApiResponseDto<GuestCourseRoundResponse[]>> {
         const lang = getLang();
-        const rounds = await this.courseRoundsService.findAll();
+        const rounds = await this.courseRoundsService.findAll(query);
         const data = rounds.map(r => GuestCourseRoundResponse.from(r, lang));
         return ApiResponseDto.success(
             data,
