@@ -28,7 +28,7 @@ import { MenuModule } from './staff-dashboard/menu/menu.module';
 import {ContactUsModule} from "./website/guest/countact-us/contact-us.module";
 
 const i18nPath = process.env.NODE_ENV === 'production'
-  ? path.join(__dirname, 'i18n')
+  ? path.join(__dirname, '..', 'i18n')
   : path.join(process.cwd(), 'src', 'i18n');
 
 @Module({
