@@ -9,7 +9,7 @@
     "node": "22.x"
   },
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && echo '===== VERIFY DIST =====' && ls -lah dist && ls -lah dist/main.js",
     "postbuild": "mkdir -p dist/i18n && cp -R src/i18n/. dist/i18n/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main.js",
