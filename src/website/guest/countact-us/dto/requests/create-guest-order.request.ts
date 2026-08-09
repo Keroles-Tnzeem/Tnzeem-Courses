@@ -9,9 +9,9 @@ import {
     IsString,
     MaxLength,
 } from 'class-validator';
-import {GenderEnum} from "../../../../../shared/user/enums/gender.enum";
-import {IsSaudiPhoneNumber} from "../../../../../common/validators/saudi-phone.validator";
-import {IsNull} from "typeorm";
+import { GenderEnum } from "../../../../../shared/user/enums/gender.enum";
+import { IsSaudiPhoneNumber } from "../../../../../common/validators/saudi-phone.validator";
+
 
 export class CreateGuestOrderRequest {
     @ApiProperty({ example: 'Ahmed' })
@@ -32,9 +32,10 @@ export class CreateGuestOrderRequest {
     @IsEmail()
     email: string;
 
-    @ApiProperty({ enum: GenderEnum })
+    @ApiPropertyOptional({ enum: GenderEnum })
+    @IsOptional()
     @IsEnum(GenderEnum)
-    gender: GenderEnum;
+    gender?: GenderEnum;
 
     @ApiProperty({ example: 12 })
     @IsInt()
@@ -46,4 +47,9 @@ export class CreateGuestOrderRequest {
     @IsString()
     @MaxLength(500)
     notes?: string;
+
+    @ApiPropertyOptional({ example: 'Google' })
+    @IsOptional()
+    @IsString()
+    source?: string;
 }

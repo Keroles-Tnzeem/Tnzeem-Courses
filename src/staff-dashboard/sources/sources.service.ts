@@ -101,4 +101,12 @@ export class SourcesService {
     const entity = await this.findOne(id);
     await this.sourceRepository.remove(entity);
   }
+
+  async findIdByName(name: string): Promise<number | null> {
+    const entity = await this.sourceRepository.findOne({
+      where: { name: ILike(name) },
+      select: ['id'],
+    });
+    return entity?.id ?? null;
+  }
 }

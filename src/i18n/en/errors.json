@@ -10,5 +10,7 @@
     "ROUND_NUMBER_TAKEN": "A round with this number already exists for this course",
     "SESSION_NUMBER_TAKEN": "A session with this number already exists for this round",
     "PHONE_TAKEN": "A user with this phone number already exists",
+    "PHONE_TAKEN_DIFFERENT_EMAIL": "This phone number is already registered with a different email address.",
+    "EMAIL_TAKEN_DIFFERENT_PHONE": "This email address is already registered with a different phone number.",
     "CANNOT_DELETE_HAS_RELATIONS": "Cannot delete because there are related records"
 }

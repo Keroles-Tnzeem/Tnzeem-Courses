@@ -13,6 +13,7 @@ export class StudentResponse {
   sourceName?: string;
   assignToId?: number;
   assignAt?: Date;
+  assignTo?: { firstName: string; lastName: string };
 
   static from(user: UserEntity): StudentResponse {
     const response = new StudentResponse();
@@ -26,6 +27,12 @@ export class StudentResponse {
     response.sourceName = user.source?.name;
     response.assignToId = user.assignToId;
     response.assignAt = user.assignAt;
+    if (user.assignToId && user.assignTo) {
+      response.assignTo = {
+        firstName: user.assignTo.firstName,
+        lastName: user.assignTo.lastName,
+      };
+    }
     const appUrl = process.env.APP_URL || 'http://localhost:3000';
     const imgPath = user.img || '/images/empty-user.jpeg';
     response.img = `${appUrl}${imgPath}`;

@@ -30,7 +30,7 @@ export class StudentService {
 
 
 
-  private readonly relations = { source: true };
+  private readonly relations = { source: true, assignTo: true };
 
   private async ensureSourceExists(sourceId?: number | null): Promise<void> {
     if (sourceId == null) {
@@ -45,7 +45,6 @@ export class StudentService {
     }
   }
 
-  // ── List ─────────────────────────────────────────────────────────────────
   async findAll(
     query: PaginationRequest,
   ): Promise<{ data: UserEntity[]; total: number }> {
@@ -68,7 +67,6 @@ export class StudentService {
     return { data, total };
   }
 
-  // ── List My Students ──────────────────────────────────────────────────────
   async findMyStudents(
     userId: number,
     query: PaginationRequest,
@@ -96,7 +94,7 @@ export class StudentService {
     return { data, total };
   }
 
-  // ── Single ────────────────────────────────────────────────────────────────
+  // ── Single 
   async findOne(id: number): Promise<UserEntity> {
     const student = await this.userRepo.findOne({
       where: { id },
@@ -112,7 +110,6 @@ export class StudentService {
     return student;
   }
 
-  // ── Create ────────────────────────────────────────────────────────────────
   async create(dto: CreateStudentRequest): Promise<UserEntity> {
     const exists = await this.userRepo.findOne({ where: { email: dto.email } });
     if (exists) {
@@ -151,7 +148,6 @@ export class StudentService {
     return this.findOne(saved.id);
   }
 
-  // ── Update ────────────────────────────────────────────────────────────────
   async update(
     id: number,
     dto: UpdateStudentRequest,
