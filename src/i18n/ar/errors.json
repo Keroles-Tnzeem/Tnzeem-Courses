@@ -12,5 +12,8 @@
     "PHONE_TAKEN": "يوجد مستخدم بهذا رقم الهاتف بالفعل",
     "PHONE_TAKEN_DIFFERENT_EMAIL": "رقم الهاتف هذا مسجل بالفعل ببريد إلكتروني مختلف.",
     "EMAIL_TAKEN_DIFFERENT_PHONE": "البريد الإلكتروني هذا مسجل بالفعل برقم هاتف مختلف.",
-    "CANNOT_DELETE_HAS_RELATIONS": "لا يمكن الحذف بسبب وجود بيانات مرتبطة"
+    "CANNOT_DELETE_HAS_RELATIONS": "لا يمكن الحذف بسبب وجود بيانات مرتبطة",
+    "ENROLLMENT_NOT_FOUND": "التسجيل غير موجود",
+    "ENROLLMENT_ALREADY_EXISTS": "الطالب مسجل بالفعل في هذه الجولة",
+    "ORDER_NOT_FOUND": "الطلب غير موجود"
 }

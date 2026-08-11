@@ -12,5 +12,8 @@
     "PHONE_TAKEN": "A user with this phone number already exists",
     "PHONE_TAKEN_DIFFERENT_EMAIL": "This phone number is already registered with a different email address.",
     "EMAIL_TAKEN_DIFFERENT_PHONE": "This email address is already registered with a different phone number.",
-    "CANNOT_DELETE_HAS_RELATIONS": "Cannot delete because there are related records"
+    "CANNOT_DELETE_HAS_RELATIONS": "Cannot delete because there are related records",
+    "ENROLLMENT_NOT_FOUND": "Enrollment not found",
+    "ENROLLMENT_ALREADY_EXISTS": "Student is already enrolled in this round",
+    "ORDER_NOT_FOUND": "Order not found"
 }

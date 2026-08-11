@@ -9,6 +9,8 @@ import { OrderStatusEnum } from '../../shared/orders/enums/order-status.enum';
 import { PaymentStatusEnum } from '../../shared/payment/enums/payment-status.enum';
 import { PaginationResponseDto as PaginationResponse } from '../../common/dto/responses/pagination.response';
 import { RoundsService } from '../rounds/rounds.service';
+import { EnrollmentsService } from '../../shared/enrollments/enrollments.service';
+import { EnrollmentStatusEnum } from '../../shared/enrollments/enums/enrollment-status.enum';
 import { CreateOrderRequest } from './dto/requests/create-order.request';
 import { UpdateOrderRequest } from './dto/requests/update-order.request';
 import { QueryOrderRequest } from './dto/requests/query-order.request';
@@ -20,6 +22,7 @@ export class OrdersService {
     constructor(
         private readonly ordersRepository: OrdersRepository,
         private readonly roundsService: RoundsService,
+        private readonly enrollmentsService: EnrollmentsService,
         private readonly i18n: I18nService,
     ) {}
 
@@ -183,6 +186,17 @@ export class OrdersService {
             if (dto.status === OrderStatusEnum.CONFIRMED) {
                 order.paymentStatus = PaymentStatusEnum.COMPLETED;
                 order.paidAt = new Date();
+                
+                // Generate enrollment if it doesn't have one
+                if (!order.hasEnrollment) {
+                    await this.enrollmentsService.create({
+                        studentId: order.studentId,
+                        roundId: order.roundId,
+                        orderId: order.id,
+                        status: EnrollmentStatusEnum.PENDING,
+                    });
+                    order.hasEnrollment = true;
+                }
             } else if (dto.status === OrderStatusEnum.CANCELLED) {
                 order.paymentStatus = PaymentStatusEnum.CANCELLED;
             }

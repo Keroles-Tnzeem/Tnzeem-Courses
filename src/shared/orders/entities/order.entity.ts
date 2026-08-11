@@ -61,6 +61,9 @@ export class OrderEntity {
 
     // ── Status
 
+    @Column({ name: 'has_enrollment', type: 'boolean', default: false })
+    hasEnrollment: boolean;
+
     @Column({
         type: 'enum',
         enum: OrderStatusEnum,

@@ -50,7 +50,11 @@ export const seedAdminUserAndPermissions = async (dataSource: DataSource) => {
         { name: 'round-sessions.view', module: 'round-sessions', description: { en: 'View Round Sessions', ar: 'عرض جلسات الجولة' } },
         { name: 'round-sessions.create', module: 'round-sessions', description: { en: 'Create Round Session', ar: 'إنشاء جلسة جولة' } },
         { name: 'round-sessions.update', module: 'round-sessions', description: { en: 'Update Round Session', ar: 'تحديث جلسة جولة' } },
-        { name: 'round-sessions.delete', module: 'round-sessions', description: { en: 'Delete Round Session', ar: 'حذف جلسة جولة' } }
+        { name: 'round-sessions.delete', module: 'round-sessions', description: { en: 'Delete Round Session', ar: 'حذف جلسة جولة' } },
+        { name: 'enrollments.view', module: 'enrollments', description: { en: 'View Enrollments', ar: 'عرض التسجيلات' } },
+        { name: 'enrollments.create', module: 'enrollments', description: { en: 'Create Enrollment', ar: 'إنشاء تسجيل' } },
+        { name: 'enrollments.update', module: 'enrollments', description: { en: 'Update Enrollment', ar: 'تحديث تسجيل' } },
+        { name: 'enrollments.delete', module: 'enrollments', description: { en: 'Delete Enrollment', ar: 'حذف تسجيل' } }
     ];
 
     const savedPermissions: PermissionEntity[] = [];
