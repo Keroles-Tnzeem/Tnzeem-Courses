@@ -19,6 +19,10 @@ const AppDataSource = new DataSource({
     database: process.env.DB_NAME || 'tnzeem',
     entities: [UserEntity, PermissionEntity, UserPermissionEntity, TrainerInfoEntity, SourceEntity],
 
+    ssl: {
+        rejectUnauthorized: false,
+    },
+
     synchronize: true,
 });
 
