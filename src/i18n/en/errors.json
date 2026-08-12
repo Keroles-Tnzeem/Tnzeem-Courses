@@ -15,5 +15,7 @@
     "CANNOT_DELETE_HAS_RELATIONS": "Cannot delete because there are related records",
     "ENROLLMENT_NOT_FOUND": "Enrollment not found",
     "ENROLLMENT_ALREADY_EXISTS": "Student is already enrolled in this round",
-    "ORDER_NOT_FOUND": "Order not found"
+    "ORDER_NOT_FOUND": "Order not found",
+    "CERTIFICATE_NOT_FOUND": "Certificate not found",
+    "CERTIFICATE_NOT_COMPLETE_YET": "Certificate not complete yet"
 }

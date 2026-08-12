@@ -15,5 +15,7 @@
     "CANNOT_DELETE_HAS_RELATIONS": "لا يمكن الحذف بسبب وجود بيانات مرتبطة",
     "ENROLLMENT_NOT_FOUND": "التسجيل غير موجود",
     "ENROLLMENT_ALREADY_EXISTS": "الطالب مسجل بالفعل في هذه الجولة",
-    "ORDER_NOT_FOUND": "الطلب غير موجود"
+    "ORDER_NOT_FOUND": "الطلب غير موجود",
+    "CERTIFICATE_NOT_FOUND": "الشهادة غير موجودة",
+    "CERTIFICATE_NOT_COMPLETE_YET": "الشهادة لم تكتمل بعد"
 }

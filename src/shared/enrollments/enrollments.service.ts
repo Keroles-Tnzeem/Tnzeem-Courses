@@ -17,6 +17,7 @@ import { UpdateEnrollmentRequest } from './dto/requests/update-enrollment.reques
 import { QueryEnrollmentRequest } from './dto/requests/query-enrollment.request';
 import { EnrollmentStatusEnum } from './enums/enrollment-status.enum';
 import { getLang } from '../../common/helpers/lang.helper';
+import { CertificateResponse } from './dto/responses/certificate.response';
 
 @Injectable()
 export class EnrollmentsService {
@@ -140,5 +141,30 @@ export class EnrollmentsService {
     async remove(id: string): Promise<void> {
         const enrollment = await this.findOne(id);
         await this.enrollmentsRepository.remove(enrollment);
+    }
+
+    // Verify Certificate
+    async verifyCertificate(certificateSerialNum: string): Promise<CertificateResponse> {
+        const enrollment = await this.enrollmentsRepository.findOne({
+            where: { certificateSerialNum },
+            relations: { student: true, round: { course: { trainer: true } } },
+        });
+
+        if (!enrollment) {
+            throw new NotFoundException(
+                this.i18n.t('errors.CERTIFICATE_NOT_FOUND', { lang: getLang() }),
+            );
+        }
+
+        if (enrollment.status !== EnrollmentStatusEnum.COMPLETED) {
+            throw new ConflictException(
+                this.i18n.t('errors.CERTIFICATE_NOT_COMPLETE_YET', { lang: getLang() }),
+            );
+        }
+
+        const appUrl = process.env.APP_URL || 'http://localhost:3000';
+        const lang = getLang();
+
+        return CertificateResponse.fromEntity(enrollment, appUrl, lang);
     }
 }

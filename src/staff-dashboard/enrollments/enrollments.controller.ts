@@ -127,4 +127,18 @@ export class EnrollmentsController {
             this.i18n.t('common.deleted', { lang: this.lang() }),
         );
     }
+
+    // Verify Certificate
+    @Permissions('enrollments.view')
+    @Get('verify-certificate/:serialNum')
+    @ApiOperation({ summary: 'Verify a certificate by its serial number' })
+    @ApiParam({ name: 'serialNum', type: String })
+    @ApiResponse({ status: 200, description: 'Certificate verified successfully' })
+    async verifyCertificate(@Param('serialNum') serialNum: string): Promise<ApiResponseDto<any>> {
+        const data = await this.enrollmentsService.verifyCertificate(serialNum);
+        return ApiResponseDto.success(
+            data,
+            this.i18n.t('common.success', { lang: this.lang() }),
+        );
+    }
 }

@@ -12,14 +12,14 @@ import { PaymentStatusEnum } from '../../../../shared/payment/enums/payment-stat
 import { PaymentTypeEnum } from '../../../../shared/payment/enums/payment-type.enum';
 
 export class UpdateOrderRequest {
-    // ── Status ────────────────────────────────────────────────────────────────
+    // Status
 
     @ApiPropertyOptional({ enum: OrderStatusEnum })
     @IsEnum(OrderStatusEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
     @IsOptional()
     status?: OrderStatusEnum;
 
-    // ── Payment ───────────────────────────────────────────────────────────────
+    // Payment
 
     @ApiPropertyOptional({ enum: PaymentTypeEnum })
     @IsEnum(PaymentTypeEnum, { message: i18nValidationMessage('validation.IS_ENUM') })

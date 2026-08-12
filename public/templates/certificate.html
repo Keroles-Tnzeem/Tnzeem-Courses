@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&display=swap"
+  rel="stylesheet"
+/>
+
+  <title>شهادة إتمام </title>
+
+  <style>
+    :root {
+      --teal: #076266;
+      --teal-dark: #033032;
+      --gold: #af823e;
+      --gold-light: #d7b574;
+      --ink: #183638;
+      --muted: #6b7474;
+      --paper: #fbfbf8;
+      --white: #ffffff;
+      --dot-teal: rgba(7, 98, 102, 0.095);
+      --dot-gold: rgba(175, 130, 62, 0.075);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: #d9dddd;
+      color: var(--ink);
+      font-family: "Almarai", Tahoma, Arial, sans-serif;
+
+    }
+    
+    h1,
+    .student-name,
+    .course-name,
+    .details dd {
+  	font-family: "Almarai", Tahoma, Arial, sans-serif;
+}
+
+    .certificate {
+      position: relative;
+      width: min(1400px, 100%);
+      aspect-ratio: 297 / 210;
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle,
+          var(--dot-teal) 0 0.8px,
+          transparent 1px
+        ) 0 0 / 13px 13px,
+
+        radial-gradient(
+          circle,
+          var(--dot-gold) 0 0.7px,
+          transparent 0.95px
+        ) 6.5px 6.5px / 26px 26px,
+
+        radial-gradient(
+          circle at 22% 24%,
+          rgba(175, 130, 62, 0.08),
+          transparent 29%
+        ),
+
+        radial-gradient(
+          circle at 82% 78%,
+          rgba(7, 98, 102, 0.045),
+          transparent 30%
+        ),
+
+        linear-gradient(
+          225deg,
+          var(--white) 0%,
+          var(--paper) 62%,
+          #f4f5f1 100%
+        );
+
+      border: 1px solid rgba(7, 98, 102, 0.14);
+      box-shadow: 0 20px 60px rgba(3, 48, 50, 0.18);
+      isolation: isolate;
+    }
+
+    .certificate::before,
+    .certificate::after {
+      position: absolute;
+      content: "";
+      pointer-events: none;
+    }
+
+    .certificate::before {
+      inset: 2.2%;
+      border: 1px solid rgba(175, 130, 62, 0.35);
+    }
+
+    .certificate::after {
+      top: 3.1%;
+      right: 2.8%;
+      bottom: 3.1%;
+      left: 2.8%;
+      border: 1px solid rgba(7, 98, 102, 0.1);
+    }
+
+    .content {
+      position: absolute;
+      top: 12%;
+      right: 9%;
+      width: 53%;
+      z-index: 2;
+      text-align: right;
+    }
+
+    h1 {
+      margin: 0 0 4.5%;
+      color: var(--teal);
+      font-family: Tahoma, Arial, sans-serif;
+      font-size: clamp(32px, 4.15vw, 62px);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(13px, 1.45vw, 21px);
+      line-height: 1.6;
+    }
+
+    .student-name,
+    .course-name {
+      margin: 1.2% 0 3.4%;
+      color: var(--ink);
+      font-family: Tahoma, Arial, sans-serif;
+      font-size: clamp(20px, 2.35vw, 35px);
+      font-weight: 700;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .student-name {
+      position: relative;
+      display: inline-block;
+      min-width: 58%;
+      padding-bottom: 1.1%;
+      color: var(--teal-dark);
+    }
+
+    .student-name::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 1px;
+      content: "";
+      background:
+        linear-gradient(
+          270deg,
+          var(--gold),
+          rgba(175, 130, 62, 0)
+        );
+    }
+
+    .course-name {
+      margin-top: 1.4%;
+      margin-bottom: 4.5%;
+      color: var(--teal);
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: max-content minmax(150px, 1fr);
+      gap:
+        clamp(7px, 1.05vw, 15px)
+        clamp(22px, 3vw, 44px);
+      align-items: baseline;
+      margin: 0;
+      font-size: clamp(11px, 1.25vw, 18px);
+      text-align: right;
+    }
+
+    .details dt {
+      position: relative;
+      padding-right: 15px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .details dt::before {
+      position: absolute;
+      top: 0.58em;
+      right: 0;
+      width: 5px;
+      height: 5px;
+      content: "";
+      transform: rotate(45deg);
+      background: var(--gold);
+    }
+
+    .details dd {
+      margin: 0;
+      color: var(--ink);
+      font-family: Tahoma, Arial, sans-serif;
+      font-weight: 700;
+    }
+
+    .award-badge {
+      position: absolute;
+      top: -0.4%;
+      left: 7.5%;
+      z-index: 2;
+      width: clamp(100px, 13.5%, 190px);
+      filter: drop-shadow(
+        0 10px 9px rgba(3, 48, 50, 0.18)
+      );
+    }
+
+    .award-badge svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .brand {
+      position: absolute;
+      left: 8.5%;
+      bottom: 14.5%;
+      z-index: 2;
+      width: 25%;
+      color: var(--teal);
+      text-align: center;
+      white-space: nowrap;
+      font-size: clamp(24px, 3.5vw, 32px);
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .brand-accent {
+      color: var(--gold);
+    }
+
+    .brand-subtitle {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: clamp(7px, 0.75vw, 17px);
+      font-weight: 600;
+      line-height: 1.5;
+      white-space: normal;
+    }
+
+    /* ===== Logo — redesigned ===== */
+    .brand-logo {
+      position: absolute;
+      right: 9%;
+      bottom: 9.5%;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .certificate-logo {
+      display: block;
+      width: clamp(80px, 8.5vw, 200px);
+      height: 180px;
+      max-height: clamp(80px, 8.5vw, 170px);
+      object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(3, 48, 50, 0.14));
+    }
+
+    .footer-note {
+      position: absolute;
+      right: 10%;
+      bottom: 5.7%;
+      left: 10%;
+      z-index: 2;
+      margin: 0;
+      color: #657071;
+      text-align: center;
+      font-size: clamp(8px, 0.9vw, 15px);
+      line-height: 1.6;
+    }
+
+    @page {
+      size: A4 landscape;
+      margin: 0;
+    }
+
+    @media print {
+      html,
+      body {
+        width: 297mm;
+        height: 210mm;
+        background: #ffffff;
+      }
+
+      body {
+        display: block;
+        padding: 0;
+      }
+
+      .certificate {
+        width: 297mm;
+        height: 210mm;
+        border: 0;
+        box-shadow: none;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        padding: 8px;
+      }
+
+      .content {
+        right: 8%;
+        width: 64%;
+      }
+
+      .details {
+        gap: 4px 12px;
+      }
+
+      .details dt {
+        padding-right: 9px;
+      }
+
+      .details dt::before {
+        width: 3px;
+        height: 3px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- استبدل المتغيرات التالية من خلال الـ Backend قبل عرض الشهادة. -->
+
+  <main
+    class="certificate"
+    aria-label="شهادة إتمام أكاديمية التنظيم"
+  >
+    <div class="award-badge" aria-hidden="true">
+      <svg viewBox="0 0 120 260" role="img">
+        <defs>
+          <linearGradient
+            id="tealRibbon"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="1"
+          >
+            <stop offset="0" stop-color="#0b7478" />
+            <stop offset="1" stop-color="#033032" />
+          </linearGradient>
+
+          <linearGradient
+            id="goldMedal"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="1"
+          >
+            <stop offset="0" stop-color="#d7b574" />
+            <stop offset="0.48" stop-color="#af823e" />
+            <stop offset="1" stop-color="#7d5926" />
+          </linearGradient>
+        </defs>
+
+        <g
+          stroke="#033032"
+          stroke-width="0.75"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M38 0H60V103H38Z"
+            fill="url(#tealRibbon)"
+          />
+
+          <path
+            d="M60 0H82V103H60Z"
+            fill="#076266"
+          />
+
+          <path
+            d="M38 157H60V222L38 248Z"
+            fill="#076266"
+          />
+
+          <path
+            d="M60 157H82V248L60 222Z"
+            fill="url(#tealRibbon)"
+          />
+        </g>
+
+        <circle
+          cx="60"
+          cy="130"
+          r="50"
+          fill="#fbfbf8"
+          stroke="#af823e"
+          stroke-width="2"
+        />
+
+        <circle
+          cx="60"
+          cy="130"
+          r="43"
+          fill="url(#goldMedal)"
+        />
+
+        <circle
+          cx="60"
+          cy="130"
+          r="35"
+          fill="#076266"
+          stroke="#f1d59d"
+          stroke-width="1.4"
+        />
+
+        <circle
+          cx="60"
+          cy="130"
+          r="28"
+          fill="none"
+          stroke="#ffffff"
+          stroke-width="0.8"
+          opacity="0.42"
+        />
+
+        <polygon
+          points="
+            60,110 65,123 79,124 68,133 71,147
+            60,139 49,147 52,133 41,124 55,123
+          "
+          fill="#f1d59d"
+          stroke="#7d5926"
+          stroke-width="0.8"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+
+    <section class="content">
+      <h1>شهادة إتمام</h1>
+
+      <p class="lead">
+        تُمنح هذه الشهادة بكل فخر إلى
+      </p>
+
+      <p class="student-name" dir="auto">
+        Keroles Masoud Issac
+      </p>
+
+      <p class="lead">
+        تقديرًا لإتمامه بنجاح دورة
+      </p>
+
+      <p class="course-name" dir="auto">
+        Python Basics & OOP
+      </p>
+
+      <dl class="details">
+        <dt>مدة الدورة</dt>
+        <dd dir="auto">5 ساعة</dd>
+
+        <dt>تاريخ الإتمام</dt>
+        <dd dir="auto">27/07/2026</dd>
+
+        <dt>رمز التحقق</dt>
+        <dd dir="auto">WebeyrX12</dd>
+      </dl>
+    </section>
+
+    <div
+      class="brand-logo"
+      aria-label="معهد التنظيم العالي للتدريب"
+    >
+      <img
+        src="logo.png"
+        alt="معهد التنظيم"
+        class="certificate-logo"
+      />
+    </div>
+
+    <div
+      class="brand"
+      aria-label="معهد التنظيم العالي للتدريب"
+    >
+      <span>معهد التنظيم</span>
+      <span class="brand-accent">العالي للتدريب</span>
+
+      <div class="brand-subtitle">
+        للتدريب والتطوير المهني
+      </div>
+    </div>
+
+    <p class="footer-note">
+      صادرة عن معهد التنظيم العالي للتدريب للمتدربين الذين استوفوا
+      جميع متطلبات إتمام الدورة بنجاح.
+    </p>
+  </main>
+</body>
+</html>

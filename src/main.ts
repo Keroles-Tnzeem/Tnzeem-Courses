@@ -30,9 +30,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  console.log('Nest application created');
   // Serve static assets
-  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.useStaticAssets(join(process.cwd(), 'public'), { prefix: '/public/' });
 
   // Additional parsers for urlencoded bodies
   app.use(express.urlencoded({ extended: true }));
