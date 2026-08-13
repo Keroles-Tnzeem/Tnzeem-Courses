@@ -26,7 +26,14 @@ async function bootstrap() {
       }
     },
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept-Language'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'Origin',
+      'Accept-Language',
+      'X-Lang',
+    ],
     credentials: true,
   });
 
