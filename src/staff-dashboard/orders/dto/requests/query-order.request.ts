@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+    IsDateString,
     IsEnum,
     IsInt,
     IsOptional,
@@ -73,6 +74,16 @@ export class QueryOrderRequest {
     @IsEnum(PaymentStatusEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
     @IsOptional()
     paymentStatus?: PaymentStatusEnum;
+
+    @ApiPropertyOptional({ example: '2024-01-01', description: 'Start date filter' })
+    @IsDateString()
+    @IsOptional()
+    startDate?: string;
+
+    @ApiPropertyOptional({ example: '2024-01-31', description: 'End date filter' })
+    @IsDateString()
+    @IsOptional()
+    endDate?: string;
 
     @ApiPropertyOptional({ example: 'createdAt', description: 'Sort field' })
     @IsString()

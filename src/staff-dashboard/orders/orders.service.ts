@@ -88,6 +88,8 @@ export class OrdersService {
             paymentType,
             paymentMethod,
             paymentStatus,
+            startDate,
+            endDate,
             sortBy = 'createdAt',
             sortOrder = 'DESC',
         } = query;
@@ -132,6 +134,16 @@ export class OrdersService {
 
         if (paymentStatus) {
             qb.andWhere('order.payment_status = :paymentStatus', { paymentStatus });
+        }
+
+        if (startDate) {
+            qb.andWhere('order.created_at >= :startDate', { startDate });
+        }
+
+        if (endDate) {
+            qb.andWhere('order.created_at < :endDate', {
+                endDate: new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)),
+            });
         }
 
         // Sorting
