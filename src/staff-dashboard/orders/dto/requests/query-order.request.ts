@@ -55,6 +55,13 @@ export class QueryOrderRequest {
     @IsOptional()
     trainerId?: number;
 
+    @ApiPropertyOptional({ example: 1, description: 'Filter by assigned staff ID' })
+    @Type(() => Number)
+    @IsInt({ message: i18nValidationMessage('validation.IS_NUMBER') })
+    @Min(1)
+    @IsOptional()
+    assignToId?: number;
+
     @ApiPropertyOptional({ enum: OrderStatusEnum, description: 'Filter by order status' })
     @IsEnum(OrderStatusEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
     @IsOptional()

@@ -92,6 +92,7 @@ export class OrdersService {
             endDate,
             sortBy = 'createdAt',
             sortOrder = 'DESC',
+            assignToId,
         } = query;
 
         const qb = this.ordersRepository
@@ -119,6 +120,10 @@ export class OrdersService {
 
         if (trainerId) {
             qb.andWhere('order.trainer_id = :trainerId', { trainerId });
+        }
+
+        if (assignToId) {
+            qb.andWhere('order.assign_to_id = :assignToId', { assignToId });
         }
 
         if (status) {

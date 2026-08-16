@@ -8,6 +8,7 @@ import { getLang } from 'src/common/helpers/lang.helper';
 import {parseJson} from "../../common/helpers/parse-json.helper";
 import {RoundMenuResponse} from "./dto/responses/round-menu.response";
 import {StudentMenuResponse} from "./dto/responses/student-menu.response";
+import {StaffMenuResponse} from "./dto/responses/staff-menu.response";
 
 @Injectable()
 export class MenuService {
@@ -47,6 +48,21 @@ export class MenuService {
         courseId: round.courseId,
       };
     });
-    
+
+  }
+
+  async getStaffMenu(): Promise<StaffMenuResponse[]> {
+    const staff = await this.userRepository.find({
+      where: [
+        { userType: UserTypeEnum.SALES },
+        { userType: UserTypeEnum.SUPPORT },
+      ],
+      select: ['id', 'firstName', 'lastName'],
+    });
+
+    return staff.map((user) => ({
+      id: user.id,
+      name: `${user.firstName} ${user.lastName}`.trim(),
+    }));
   }
 }
