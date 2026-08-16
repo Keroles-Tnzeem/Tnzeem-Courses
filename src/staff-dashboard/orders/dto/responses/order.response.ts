@@ -64,6 +64,12 @@ export class OrderResponse {
     @ApiPropertyOptional()
     assignToId?: number;
 
+    @ApiPropertyOptional({ description: 'Assigned staff basic info' })
+    assignTo?: {
+        firstName: string;
+        lastName: string;
+    };
+
     @ApiPropertyOptional()
     notes?: string;
 
@@ -124,6 +130,13 @@ export class OrderResponse {
         response.createdBy = entity.createdBy;
         response.createdById = entity.createdById;
         response.assignToId = entity.assignToId;
+
+        if (entity.assignTo) {
+            response.assignTo = {
+                firstName: entity.assignTo.firstName,
+                lastName: entity.assignTo.lastName,
+            };
+        }
         response.notes = entity.notes;
         response.createdAt = entity.createdAt;
         response.updatedAt = entity.updatedAt;
