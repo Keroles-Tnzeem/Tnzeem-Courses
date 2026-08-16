@@ -68,7 +68,7 @@ export class OrdersService {
 
         const withRelations = await this.ordersRepository.findOne({
             where: { id: saved.id },
-            relations: { student: true, trainer: true, round: true, course: true },
+            relations: { student: true, trainer: true, round: true, course: true, assignTo: true },
         });
 
         return OrderResponse.fromEntity(withRelations!, getLang());
@@ -99,7 +99,8 @@ export class OrdersService {
             .leftJoinAndSelect('order.student', 'student')
             .leftJoinAndSelect('order.trainer', 'trainer')
             .leftJoinAndSelect('order.round', 'round')
-            .leftJoinAndSelect('order.course', 'course');
+            .leftJoinAndSelect('order.course', 'course')
+            .leftJoinAndSelect('order.assignTo', 'assignTo');
 
         if (keyword) {
             qb.andWhere(
@@ -165,7 +166,7 @@ export class OrdersService {
     async findOne(id: string): Promise<OrderResponse> {
         const order = await this.ordersRepository.findOne({
             where: { id },
-            relations: { student: true, trainer: true, round: true, course: true },
+            relations: { student: true, trainer: true, round: true, course: true, assignTo: true },
         });
 
         if (!order) {
@@ -220,12 +221,13 @@ export class OrdersService {
         if (dto.paymentNotes !== undefined) order.paymentNotes = dto.paymentNotes;
         if (dto.paidAt !== undefined) order.paidAt = new Date(dto.paidAt);
         if (transferBankImgUrl !== undefined) order.transferBankImg = transferBankImgUrl;
+        if (dto.assignToId !== undefined) order.assignToId = dto.assignToId;
 
         const updated = await this.ordersRepository.save(order);
 
         const withRelations = await this.ordersRepository.findOne({
             where: { id: updated.id },
-            relations: { student: true, trainer: true, round: true, course: true },
+            relations: { student: true, trainer: true, round: true, course: true, assignTo: true },
         });
 
         return OrderResponse.fromEntity(withRelations!, getLang());

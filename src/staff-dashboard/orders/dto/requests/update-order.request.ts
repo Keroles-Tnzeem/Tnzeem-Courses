@@ -2,6 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
     IsDateString,
     IsEnum,
+    IsNumber,
     IsOptional,
     IsString,
 } from 'class-validator';
@@ -48,4 +49,9 @@ export class UpdateOrderRequest {
 
     @ApiPropertyOptional({ type: 'string', format: 'binary', description: 'Bank transfer receipt image' })
     transferBankImg?: any;
+
+    @ApiPropertyOptional({ description: 'Staff user ID to assign this order to' })
+    @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
+    @IsOptional()
+    assignToId?: number;
 }
