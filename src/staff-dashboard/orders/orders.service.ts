@@ -155,7 +155,7 @@ export class OrdersService {
         // Sorting
         const sortColumn = sortBy === 'finalPrice'
             ? 'order.finalPrice'
-            : 'order.createdAt';
+            : 'order.audit.createdAt';
         qb.orderBy(sortColumn, sortOrder);
 
         const [entities, total] = await qb
