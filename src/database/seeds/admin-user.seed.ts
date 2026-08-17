@@ -54,7 +54,11 @@ export const seedAdminUserAndPermissions = async (dataSource: DataSource) => {
         { name: 'enrollments.view', module: 'enrollments', description: { en: 'View Enrollments', ar: 'عرض التسجيلات' } },
         { name: 'enrollments.create', module: 'enrollments', description: { en: 'Create Enrollment', ar: 'إنشاء تسجيل' } },
         { name: 'enrollments.update', module: 'enrollments', description: { en: 'Update Enrollment', ar: 'تحديث تسجيل' } },
-        { name: 'enrollments.delete', module: 'enrollments', description: { en: 'Delete Enrollment', ar: 'حذف تسجيل' } }
+        { name: 'enrollments.delete', module: 'enrollments', description: { en: 'Delete Enrollment', ar: 'حذف تسجيل' } },
+        { name: 'orders.view', module: 'orders', description: { en: 'View Orders', ar: 'عرض الطلبات' } },
+        { name: 'orders.create', module: 'orders', description: { en: 'Create Order', ar: 'إنشاء طلب' } },
+        { name: 'orders.update', module: 'orders', description: { en: 'Update Order', ar: 'تحديث طلب' } },
+        { name: 'orders.delete', module: 'orders', description: { en: 'Delete Order', ar: 'حذف طلب' } }
     ];
 
     const savedPermissions: PermissionEntity[] = [];

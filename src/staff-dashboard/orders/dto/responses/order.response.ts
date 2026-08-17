@@ -138,8 +138,8 @@ export class OrderResponse {
             };
         }
         response.notes = entity.notes;
-        response.createdAt = entity.createdAt;
-        response.updatedAt = entity.updatedAt;
+        response.createdAt = entity.audit.createdAt;
+        response.updatedAt = entity.audit.updatedAt;
 
         if (entity.student) {
             response.student = {

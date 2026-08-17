@@ -6,8 +6,8 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryColumn,
-    UpdateDateColumn,
 } from 'typeorm';
+import { AuditColumns } from '../../../common/entities/audit-columns';
 import { UserEntity } from '../../user/entities/user.entity';
 import { RoundEntity } from '../../../staff-dashboard/rounds/entities/round.entity';
 import { CourseEntity } from '../../../staff-dashboard/courses/entities/course.entity';
@@ -116,15 +116,18 @@ export class OrderEntity {
     @Column({ name: 'created_by_id', nullable: true })
     createdById?: number;
 
-    // ── Timestamps 
+    @Column({ name: 'last_comment_id', nullable: true })
+    lastCommentId?: number;
 
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
+    @Column({ name: 'last_comment_date', type: 'timestamp', nullable: true })
+    lastCommentDate?: Date;
 
-    @UpdateDateColumn({ name: 'updated_at' })
-    updatedAt: Date;
+    // Timestamps 
 
-    // ── Relations 
+    @Column(() => AuditColumns, { prefix: false })
+    audit: AuditColumns;
+
+    // Relations 
 
     @ManyToOne(() => UserEntity, { onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'student_id' })

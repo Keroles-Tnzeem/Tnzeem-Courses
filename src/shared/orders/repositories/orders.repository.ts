@@ -20,7 +20,7 @@ export class OrdersRepository {
         return this.repo.find({
             where: { studentId },
             relations: { round: true, trainer: true },
-            order: { createdAt: 'DESC' },
+            order: { audit: { createdAt: 'DESC' } },
         });
     }
 
@@ -29,7 +29,7 @@ export class OrdersRepository {
         return this.repo.find({
             where: { roundId },
             relations: { student: true, trainer: true },
-            order: { createdAt: 'DESC' },
+            order: { audit: { createdAt: 'DESC' } },
         });
     }
 
@@ -38,7 +38,7 @@ export class OrdersRepository {
         return this.repo.find({
             where: { trainerId },
             relations: { student: true, round: true },
-            order: { createdAt: 'DESC' },
+            order: { audit: { createdAt: 'DESC' } },
         });
     }
 
@@ -47,7 +47,7 @@ export class OrdersRepository {
         return this.repo.find({
             where: { status: OrderStatusEnum.PENDING },
             relations: { student: true, round: true, trainer: true },
-            order: { createdAt: 'ASC' },
+            order: { audit: { createdAt: 'ASC' } },
         });
     }
 

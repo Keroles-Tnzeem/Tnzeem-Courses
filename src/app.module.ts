@@ -30,6 +30,7 @@ import { WebsiteMenuModule } from "./website/shared/menu/menu.module";
 import { EnrollmentsModule } from './shared/enrollments/enrollments.module';
 import { CertificatesModule } from './website/shared/certificates/certificates.module';
 import { StaffEnrollmentsModule } from './staff-dashboard/enrollments/enrollments.module';
+import { OrderCommentsModule } from './staff-dashboard/order-comments/order-comments.module';
 
 const i18nPath = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, '..', 'i18n')
@@ -84,6 +85,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
     EnrollmentsModule,
     StaffEnrollmentsModule,
     CertificatesModule,
+    OrderCommentsModule,
   ],
   controllers: [],
   providers: [],
