@@ -33,6 +33,7 @@ import { CreateOrderRequest } from './dto/requests/create-order.request';
 import { UpdateOrderRequest } from './dto/requests/update-order.request';
 import { QueryOrderRequest } from './dto/requests/query-order.request';
 import { OrderResponse } from './dto/responses/order.response';
+import { OrderDetailsResponse } from './dto/responses/order-details.response';
 
 @ApiTags('Staff Dashboard — Orders')
 @ApiBearerAuth()
@@ -78,21 +79,21 @@ export class OrdersController {
         return await this.ordersService.findAll(query);
     }
 
-    // ── Find One ──────────────────────────────────────────────────────────────
+    // Find One 
 
     @Get(':id')
     @ApiOperation({ summary: 'Get a single order by ULID' })
     @ApiParam({ name: 'id', type: String, description: 'Order ULID' })
-    @ApiResponse({ status: 200, type: OrderResponse })
+    @ApiResponse({ status: 200, type: OrderDetailsResponse })
     @ApiResponse({ status: 404, description: 'Order not found' })
     async findOne(
         @Param('id') id: string,
-    ): Promise<ApiResponseDto<OrderResponse>> {
+    ): Promise<ApiResponseDto<OrderDetailsResponse>> {
         const order = await this.ordersService.findOne(id);
         return ApiResponseDto.success(order);
     }
 
-    // ── Update ────────────────────────────────────────────────────────────────
+    // Update 
 
     @Patch(':id')
     @ApiOperation({ summary: 'Update an order (status, payment info, etc.)' })

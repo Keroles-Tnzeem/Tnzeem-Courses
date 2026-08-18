@@ -15,6 +15,7 @@ import { CreateOrderRequest } from './dto/requests/create-order.request';
 import { UpdateOrderRequest } from './dto/requests/update-order.request';
 import { QueryOrderRequest } from './dto/requests/query-order.request';
 import { OrderResponse } from './dto/responses/order.response';
+import { OrderDetailsResponse } from './dto/responses/order-details.response';
 import { getLang } from '../../common/helpers/lang.helper';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -201,7 +202,7 @@ export class OrdersService {
     }
 
 
-    async findOne(id: string): Promise<OrderResponse> {
+    async findOne(id: string): Promise<OrderDetailsResponse> {
         const order = await this.ordersRepository.createQueryBuilder('order')
             .leftJoinAndSelect('order.student', 'student')
             .leftJoinAndSelect('order.trainer', 'trainer')
@@ -220,7 +221,13 @@ export class OrdersService {
         const lastCommentText = await this.fetchLastCommentText(order.lastCommentId);
         (order as any).lastComment = lastCommentText ? { comment: lastCommentText } : undefined;
 
-        return OrderResponse.fromEntity(order, getLang());
+        const comments = await this.orderCommentRepository.find({
+            where: { orderId: id },
+            relations: ['staff'],
+            order: { id: 'DESC' },
+        });
+
+        return OrderDetailsResponse.fromEntityWithComments(order, comments, getLang());
     }
 
 
