@@ -79,6 +79,15 @@ export class OrderResponse {
     @ApiProperty()
     updatedAt: Date;
 
+    @ApiPropertyOptional()
+    lastCommentId?: number;
+
+    @ApiPropertyOptional()
+    lastCommentDate?: Date;
+
+    @ApiPropertyOptional({ description: 'Last comment basic info' })
+    lastComment?: any;
+
     @ApiPropertyOptional({ description: 'Student basic info' })
     student?: {
         id: number;
@@ -138,8 +147,18 @@ export class OrderResponse {
             };
         }
         response.notes = entity.notes;
+        response.lastCommentId = entity.lastCommentId;
+        response.lastCommentDate = entity.lastCommentDate;
         response.createdAt = entity.audit.createdAt;
         response.updatedAt = entity.audit.updatedAt;
+
+        if ((entity as any).lastComment) {
+            response.lastComment = {
+                id: (entity as any).lastComment.id,
+                comment: (entity as any).lastComment.comment,
+                staffId: (entity as any).lastComment.staffId,
+            };
+        }
 
         if (entity.student) {
             response.student = {

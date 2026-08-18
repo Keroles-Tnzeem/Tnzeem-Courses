@@ -34,16 +34,22 @@ export class OrderCommentsService {
 
         const savedComment = await this.orderCommentRepository.save(comment);
 
+        const commentWithStaff = await this.orderCommentRepository.findOne({
+            where: { id: savedComment.id },
+            relations: ['staff'],
+        });
+
         await this.orderRepository.update(dto.orderId, {
             lastCommentId: savedComment.id,
             lastCommentDate: savedComment.audit.createdAt,
         });
 
-        return new OrderCommentResponse(savedComment);
+        return OrderCommentResponse.fromEntity(commentWithStaff!);
     }
 
     async findAll(query: QueryOrderCommentRequest): Promise<PaginationResponseDto<OrderCommentResponse>> {
-        const qb = this.orderCommentRepository.createQueryBuilder('comment');
+        const qb = this.orderCommentRepository.createQueryBuilder('comment')
+            .leftJoinAndSelect('comment.staff', 'staff');
 
         if (query.orderId) {
             qb.andWhere('comment.orderId = :orderId', { orderId: query.orderId });
@@ -61,20 +67,26 @@ export class OrderCommentsService {
             .take(limit)
             .getManyAndCount();
 
-        const mappedItems = items.map(item => new OrderCommentResponse(item));
+        const mappedItems = items.map(item => OrderCommentResponse.fromEntity(item));
         return new PaginationResponseDto(true, mappedItems, total, page, limit);
     }
 
     async findOne(id: number): Promise<OrderCommentResponse> {
-        const comment = await this.orderCommentRepository.findOne({ where: { id } });
+        const comment = await this.orderCommentRepository.findOne({ 
+            where: { id },
+            relations: ['staff'],
+        });
         if (!comment) {
             throw new NotFoundException(this.i18n.t('order_comments.not_found', { defaultValue: 'Order comment not found' }));
         }
-        return new OrderCommentResponse(comment);
+        return OrderCommentResponse.fromEntity(comment);
     }
 
     async update(id: number, dto: UpdateOrderCommentRequest): Promise<OrderCommentResponse> {
-        const comment = await this.orderCommentRepository.findOne({ where: { id } });
+        const comment = await this.orderCommentRepository.findOne({ 
+            where: { id },
+            relations: ['staff'],
+        });
         if (!comment) {
             throw new NotFoundException(this.i18n.t('order_comments.not_found', { defaultValue: 'Order comment not found' }));
         }
@@ -82,7 +94,7 @@ export class OrderCommentsService {
         comment.comment = dto.comment;
         const updated = await this.orderCommentRepository.save(comment);
         
-        return new OrderCommentResponse(updated);
+        return OrderCommentResponse.fromEntity(updated);
     }
 
     async remove(id: number): Promise<void> {

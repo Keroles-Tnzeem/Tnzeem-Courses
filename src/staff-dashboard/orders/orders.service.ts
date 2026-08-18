@@ -15,7 +15,10 @@ import { CreateOrderRequest } from './dto/requests/create-order.request';
 import { UpdateOrderRequest } from './dto/requests/update-order.request';
 import { QueryOrderRequest } from './dto/requests/query-order.request';
 import { OrderResponse } from './dto/responses/order.response';
-import {getLang} from "../../common/helpers/lang.helper";
+import { getLang } from '../../common/helpers/lang.helper';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { OrderCommentEntity } from '../order-comments/entities/order-comment.entity';
 
 @Injectable()
 export class OrdersService {
@@ -24,7 +27,16 @@ export class OrdersService {
         private readonly roundsService: RoundsService,
         private readonly enrollmentsService: EnrollmentsService,
         private readonly i18n: I18nService,
+        @InjectRepository(OrderCommentEntity)
+        private readonly orderCommentRepository: Repository<OrderCommentEntity>,
     ) {}
+
+    /** Fetch the last comment text for a given comment id */
+    private async fetchLastCommentText(lastCommentId?: number): Promise<string | null> {
+        if (!lastCommentId) return null;
+        const comment = await this.orderCommentRepository.findOne({ where: { id: lastCommentId } });
+        return comment?.comment ?? null;
+    }
 
 
     async create(
@@ -66,10 +78,18 @@ export class OrdersService {
 
         const saved = await this.ordersRepository.save(order);
 
-        const withRelations = await this.ordersRepository.findOne({
-            where: { id: saved.id },
-            relations: { student: true, trainer: true, round: true, course: true, assignTo: true },
-        });
+        const withRelations = await this.ordersRepository
+            .createQueryBuilder('order')
+            .leftJoinAndSelect('order.student', 'student')
+            .leftJoinAndSelect('order.trainer', 'trainer')
+            .leftJoinAndSelect('order.round', 'round')
+            .leftJoinAndSelect('order.course', 'course')
+            .leftJoinAndSelect('order.assignTo', 'assignTo')
+            .where('order.id = :id', { id: saved.id })
+            .getOne();
+
+        const lastCommentText = await this.fetchLastCommentText(withRelations?.lastCommentId);
+        (withRelations as any).lastComment = lastCommentText ? { comment: lastCommentText } : undefined;
 
         return OrderResponse.fromEntity(withRelations!, getLang());
     }
@@ -163,22 +183,42 @@ export class OrdersService {
             .take(limit)
             .getManyAndCount();
 
+        // Attach last comment text for each order
+        const commentIds = entities.map(e => e.lastCommentId).filter(Boolean) as number[];
+        const comments = commentIds.length
+            ? await this.orderCommentRepository.findByIds(commentIds)
+            : [];
+        const commentMap = new Map(comments.map(c => [c.id, c.comment]));
+
+        for (const entity of entities) {
+            if (entity.lastCommentId) {
+                (entity as any).lastComment = { comment: commentMap.get(entity.lastCommentId) ?? null };
+            }
+        }
+
         const data = entities.map(e => OrderResponse.fromEntity(e, getLang()));
         return PaginationResponse.success(data, total, page, limit);
     }
 
 
     async findOne(id: string): Promise<OrderResponse> {
-        const order = await this.ordersRepository.findOne({
-            where: { id },
-            relations: { student: true, trainer: true, round: true, course: true, assignTo: true },
-        });
+        const order = await this.ordersRepository.createQueryBuilder('order')
+            .leftJoinAndSelect('order.student', 'student')
+            .leftJoinAndSelect('order.trainer', 'trainer')
+            .leftJoinAndSelect('order.round', 'round')
+            .leftJoinAndSelect('order.course', 'course')
+            .leftJoinAndSelect('order.assignTo', 'assignTo')
+            .where('order.id = :id', { id })
+            .getOne();
 
         if (!order) {
             throw new NotFoundException(
                 this.i18n.t('errors.ORDER_NOT_FOUND', { lang: getLang() }),
             );
         }
+
+        const lastCommentText = await this.fetchLastCommentText(order.lastCommentId);
+        (order as any).lastComment = lastCommentText ? { comment: lastCommentText } : undefined;
 
         return OrderResponse.fromEntity(order, getLang());
     }
@@ -230,10 +270,18 @@ export class OrdersService {
 
         const updated = await this.ordersRepository.save(order);
 
-        const withRelations = await this.ordersRepository.findOne({
-            where: { id: updated.id },
-            relations: { student: true, trainer: true, round: true, course: true, assignTo: true },
-        });
+        const withRelations = await this.ordersRepository
+            .createQueryBuilder('order')
+            .leftJoinAndSelect('order.student', 'student')
+            .leftJoinAndSelect('order.trainer', 'trainer')
+            .leftJoinAndSelect('order.round', 'round')
+            .leftJoinAndSelect('order.course', 'course')
+            .leftJoinAndSelect('order.assignTo', 'assignTo')
+            .where('order.id = :id', { id: updated.id })
+            .getOne();
+
+        const lastCommentText = await this.fetchLastCommentText(withRelations?.lastCommentId);
+        (withRelations as any).lastComment = lastCommentText ? { comment: lastCommentText } : undefined;
 
         return OrderResponse.fromEntity(withRelations!, getLang());
     }
