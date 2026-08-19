@@ -24,6 +24,7 @@ import { PaymentModule } from './shared/payment/payment.module';
 import { StaffOrdersModule } from './staff-dashboard/orders/orders.module';
 import { GuestCourseCategoriesModule } from './website/shared/course-categories/course-categories.module';
 import { GuestCourseRoundsModule } from './website/shared/course-rounds/course-rounds.module';
+import { GuestCoursesModule } from './website/shared/courses/courses.module';
 import { MenuModule } from './staff-dashboard/menu/menu.module';
 import { ContactUsModule } from "./website/guest/countact-us/contact-us.module";
 import { WebsiteMenuModule } from "./website/shared/menu/menu.module";
@@ -79,6 +80,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
     StaffOrdersModule,
     GuestCourseCategoriesModule,
     GuestCourseRoundsModule,
+    GuestCoursesModule,
     MenuModule,
     ContactUsModule,
     WebsiteMenuModule,

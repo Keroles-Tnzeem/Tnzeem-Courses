@@ -4,13 +4,17 @@ import { Repository } from 'typeorm';
 import { getLang } from 'src/common/helpers/lang.helper';
 import {RoundMenuResponse} from "./dto/responses/round-menu.response";
 import {RoundEntity} from "../../../staff-dashboard/rounds/entities/round.entity";
+import {CourseEntity} from "../../../staff-dashboard/courses/entities/course.entity";
+import {CourseMenuResponse} from "./dto/responses/course-menu.response";
 import {parseJson} from "../../../common/helpers/parse-json.helper";
 
 @Injectable()
 export class MenuService {
   constructor(
     @InjectRepository(RoundEntity)
-    private readonly roundRepository: Repository<RoundEntity>
+    private readonly roundRepository: Repository<RoundEntity>,
+    @InjectRepository(CourseEntity)
+    private readonly courseRepository: Repository<CourseEntity>
   ) {}
 
 
@@ -33,5 +37,22 @@ export class MenuService {
       };
     });
     
+    
+  }
+
+  async getCoursesMenu(): Promise<CourseMenuResponse[]> {
+    const courses = await this.courseRepository.find({
+      select: ['id', 'name'],
+    });
+
+    const lang = getLang();
+
+    return courses.map((course) => {
+      const nameObj = parseJson<Record<string, string>>(course.name);
+      return {
+        id: course.id,
+        name: nameObj[lang] ?? nameObj['en'] ?? course.name ?? null,
+      };
+    });
   }
 }

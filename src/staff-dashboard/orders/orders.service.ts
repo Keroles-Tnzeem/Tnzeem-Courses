@@ -20,6 +20,8 @@ import { getLang } from '../../common/helpers/lang.helper';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderCommentEntity } from '../order-comments/entities/order-comment.entity';
+import { CourseEntity } from '../courses/entities/course.entity';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class OrdersService {
@@ -30,6 +32,8 @@ export class OrdersService {
         private readonly i18n: I18nService,
         @InjectRepository(OrderCommentEntity)
         private readonly orderCommentRepository: Repository<OrderCommentEntity>,
+        @InjectRepository(CourseEntity)
+        private readonly courseRepository: Repository<CourseEntity>,
     ) {}
 
     /** Fetch the last comment text for a given comment id */
@@ -45,18 +49,35 @@ export class OrdersService {
         staffId: number,
         transferBankImgUrl?: string,
     ): Promise<OrderResponse> {
-        // Fetch the round (with its course) to pull the price snapshot
-        const round = await this.roundsService.findOne(dto.roundId);
-
-        if (!round.course) {
-            throw new NotFoundException(
-                this.i18n.t('errors.COURSE_NOT_FOUND', { lang: getLang() }),
-            );
+        if (!dto.roundId && !dto.courseId) {
+            throw new BadRequestException('Either roundId or courseId must be provided');
         }
 
-        const coursePrice = Number(round.course.price);
-        const trainerId = round.course.trainerId;
-        const courseId = round.courseId;
+        let coursePrice = 0;
+        let trainerId = 0;
+        let courseId = 0;
+
+        if (dto.roundId) {
+            const round = await this.roundsService.findOne(dto.roundId);
+            if (!round.course) {
+                throw new NotFoundException(
+                    this.i18n.t('errors.COURSE_NOT_FOUND', { lang: getLang() }),
+                );
+            }
+            coursePrice = Number(round.course.price);
+            trainerId = round.course.trainerId;
+            courseId = round.courseId;
+        } else if (dto.courseId) {
+            const course = await this.courseRepository.findOne({ where: { id: dto.courseId } });
+            if (!course) {
+                throw new NotFoundException(
+                    this.i18n.t('errors.COURSE_NOT_FOUND', { lang: getLang() }),
+                );
+            }
+            coursePrice = Number(course.price);
+            trainerId = course.trainerId;
+            courseId = course.id;
+        }
 
         // priceAfterDiscount is set equal to finalPrice (discount feature skipped for now)
         const order = this.ordersRepository.create({
@@ -256,7 +277,7 @@ export class OrdersService {
                 if (!order.hasEnrollment) {
                     await this.enrollmentsService.create({
                         studentId: order.studentId,
-                        roundId: order.roundId,
+                        ...(order.roundId != null && { roundId: order.roundId }),
                         orderId: order.id,
                         status: EnrollmentStatusEnum.PENDING,
                     });
@@ -274,6 +295,18 @@ export class OrdersService {
         if (dto.paidAt !== undefined) order.paidAt = new Date(dto.paidAt);
         if (transferBankImgUrl !== undefined) order.transferBankImg = transferBankImgUrl;
         if (dto.assignToId !== undefined) order.assignToId = dto.assignToId;
+
+        if (dto.roundId !== undefined) {
+            const round = await this.roundsService.findOne(dto.roundId);
+            if (!round.course) {
+                throw new NotFoundException(
+                    this.i18n.t('errors.COURSE_NOT_FOUND', { lang: getLang() }),
+                );
+            }
+            order.roundId = dto.roundId;
+            order.courseId = round.courseId;
+            order.trainerId = round.course.trainerId;
+        }
 
         const updated = await this.ordersRepository.save(order);
 

@@ -97,13 +97,16 @@ export class EnrollmentsService {
 
     async create(dto: CreateEnrollmentRequest): Promise<EnrollmentEntity> {
         await this.ensureStudentExists(dto.studentId);
-        await this.ensureRoundExists(dto.roundId);
 
-        const alreadyEnrolled = await this.enrollmentsRepository.exists(dto.studentId, dto.roundId);
-        if (alreadyEnrolled) {
-            throw new ConflictException(
-                this.i18n.t('errors.ENROLLMENT_ALREADY_EXISTS', { lang: getLang() }),
-            );
+        if (dto.roundId != null) {
+            await this.ensureRoundExists(dto.roundId);
+
+            const alreadyEnrolled = await this.enrollmentsRepository.exists(dto.studentId, dto.roundId);
+            if (alreadyEnrolled) {
+                throw new ConflictException(
+                    this.i18n.t('errors.ENROLLMENT_ALREADY_EXISTS', { lang: getLang() }),
+                );
+            }
         }
 
         const enrollment = this.enrollmentsRepository.create({

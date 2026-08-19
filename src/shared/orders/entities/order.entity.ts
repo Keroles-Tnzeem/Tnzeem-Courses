@@ -34,11 +34,11 @@ export class OrderEntity {
     @Column({ name: 'student_id' })
     studentId: number;
 
-    @Column({ name: 'round_id' })
-    roundId: number;
+    @Column({ name: 'round_id', nullable: true })
+    roundId: number | null;
 
     @Column({ name: 'course_id', nullable: true })
-    courseId: number;
+    courseId: number | null;
 
     @Column({ name: 'trainer_id' })
     trainerId: number;

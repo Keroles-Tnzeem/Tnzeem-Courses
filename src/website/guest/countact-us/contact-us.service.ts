@@ -32,7 +32,8 @@ export class ContactUsService {
         return this.ordersService.create(
             {
                 studentId: student.id,
-                roundId: dto.roundId,
+                roundId: undefined,
+                courseId: dto.courseId,
                 paymentMethod: PaymentMethodEnum.CASH,
                 paymentStatus: PaymentStatusEnum.PENDING,
                 status: OrderStatusEnum.PENDING,

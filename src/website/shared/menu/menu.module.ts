@@ -4,9 +4,10 @@ import { MenuController } from './menu.controller';
 import { MenuService } from './menu.service';
 import {UserEntity} from "../../../shared/user/entities/user.entity";
 import {RoundEntity} from "../../../staff-dashboard/rounds/entities/round.entity";
+import {CourseEntity} from "../../../staff-dashboard/courses/entities/course.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity, RoundEntity])],
+  imports: [TypeOrmModule.forFeature([UserEntity, RoundEntity, CourseEntity])],
   controllers: [MenuController],
   providers: [MenuService]
 })

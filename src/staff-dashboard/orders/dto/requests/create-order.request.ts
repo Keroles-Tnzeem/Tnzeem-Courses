@@ -22,12 +22,19 @@ export class CreateOrderRequest {
     @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
     studentId: number;
 
-    @ApiProperty({ example: 3, description: 'Round ID to enroll in' })
+    @ApiPropertyOptional({ example: 3, description: 'Round ID to enroll in' })
     @Type(() => Number)
     @IsInt({ message: i18nValidationMessage('validation.IS_NUMBER') })
     @Min(1, { message: i18nValidationMessage('validation.MIN') })
-    @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
-    roundId: number;
+    @IsOptional()
+    roundId?: number;
+
+    @ApiPropertyOptional({ example: 1, description: 'Course ID to enroll in' })
+    @Type(() => Number)
+    @IsInt({ message: i18nValidationMessage('validation.IS_NUMBER') })
+    @Min(1, { message: i18nValidationMessage('validation.MIN') })
+    @IsOptional()
+    courseId?: number;
 
     @ApiPropertyOptional({ enum: PaymentTypeEnum, description: 'Payment type: MANUAL or ONLINE' })
     @IsEnum(PaymentTypeEnum, { message: i18nValidationMessage('validation.IS_ENUM') })

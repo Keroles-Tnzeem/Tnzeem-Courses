@@ -2,9 +2,11 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
     IsDateString,
     IsEnum,
+    IsInt,
     IsNumber,
     IsOptional,
     IsString,
+    Min,
 } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { OrderStatusEnum } from '../../../../shared/orders/enums/order-status.enum';
@@ -19,6 +21,14 @@ export class UpdateOrderRequest {
     @IsEnum(OrderStatusEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
     @IsOptional()
     status?: OrderStatusEnum;
+
+    // Round
+
+    @ApiPropertyOptional({ example: 3, description: 'Round ID to associate with this order' })
+    @IsInt({ message: i18nValidationMessage('validation.IS_NUMBER') })
+    @Min(1, { message: i18nValidationMessage('validation.MIN') })
+    @IsOptional()
+    roundId?: number;
 
     // Payment
 

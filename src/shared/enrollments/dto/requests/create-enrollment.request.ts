@@ -17,11 +17,11 @@ export class CreateEnrollmentRequest {
     @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
     studentId: number;
 
-    @ApiProperty({ example: 5, description: 'ID of the round to enroll in' })
+    @ApiProperty({ example: 5, description: 'ID of the round to enroll in', required: false })
     @Type(() => Number)
     @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
-    @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
-    roundId: number;
+    @IsOptional()
+    roundId?: number;
 
     @ApiProperty({ example: '01J4ZB4XYZQWERYT1234567891', description: 'Associated order ID (optional)', required: false })
     @Type(() => String)

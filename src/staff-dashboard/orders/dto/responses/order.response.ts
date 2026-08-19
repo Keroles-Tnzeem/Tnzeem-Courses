@@ -13,11 +13,11 @@ export class OrderResponse {
     @ApiProperty()
     studentId: number;
 
-    @ApiProperty()
-    roundId: number;
+    @ApiPropertyOptional()
+    roundId: number | null;
 
-    @ApiProperty()
-    courseId: number;
+    @ApiPropertyOptional()
+    courseId: number | null;
 
     @ApiProperty()
     trainerId: number;

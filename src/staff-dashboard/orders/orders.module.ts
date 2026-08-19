@@ -7,10 +7,11 @@ import { EnrollmentsModule } from '../../shared/enrollments/enrollments.module';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { OrderCommentEntity } from '../order-comments/entities/order-comment.entity';
+import { CourseEntity } from '../courses/entities/course.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([OrderCommentEntity]),
+        TypeOrmModule.forFeature([OrderCommentEntity, CourseEntity]),
         SharedOrdersModule, // provides OrdersRepository
         StorageModule,      // provides StorageService
         RoundsModule,       // provides RoundsService (round → course → price)

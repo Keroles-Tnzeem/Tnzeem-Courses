@@ -40,7 +40,7 @@ export class CreateGuestOrderRequest {
     @ApiProperty({ example: 12 })
     @IsInt()
     @IsPositive()
-    roundId: number;
+    courseId: number;
 
     @ApiPropertyOptional({ example: 'order notes' })
     @IsOptional()
