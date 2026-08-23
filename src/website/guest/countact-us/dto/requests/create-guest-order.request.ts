@@ -28,9 +28,10 @@ export class CreateGuestOrderRequest {
     @IsSaudiPhoneNumber()
     phone: string;
 
-    @ApiProperty({ example: 'ahmed@example.com' })
+    @ApiPropertyOptional({ example: 'ahmed@example.com' })
     @IsEmail()
-    email: string;
+    @IsOptional()
+    email?: string;
 
     @ApiPropertyOptional({ enum: GenderEnum })
     @IsOptional()

@@ -6,6 +6,7 @@ import {
     OneToOne,
     ManyToOne,
     JoinColumn,
+    Index,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { UserTypeEnum } from '../enums/user-type.enum';
@@ -26,7 +27,8 @@ export class UserEntity {
     @Column({ name: 'last_name' })
     lastName: string;
 
-    @Column({ unique: true })
+    @Index()
+    @Column({ nullable: true })
     email: string;
 
     @Column({ nullable: true, unique: true })

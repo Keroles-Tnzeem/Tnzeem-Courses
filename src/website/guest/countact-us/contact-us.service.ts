@@ -47,34 +47,13 @@ export class ContactUsService {
     private async findOrCreateStudent(dto: CreateGuestOrderRequest): Promise<UserEntity> {
         const phone = normalizeSaudiPhone(dto.phone);
 
-        // Look up any student that shares this phone OR this email
+        // Look up any student that shares this phone
         const existing = await this.userRepository.findOne({
-            where: [
-                { phone },
-                { email: dto.email },
-            ],
+            where: { phone },
         });
 
         if (existing) {
-            const phoneMatch = existing.phone === phone;
-            const emailMatch = existing.email === dto.email;
-
-            if (phoneMatch && emailMatch) {
-                // Same student — proceed
-                return existing;
-            }
-
-            if (phoneMatch && !emailMatch) {
-                throw new ConflictException(
-                    this.i18n.t('errors.PHONE_TAKEN_DIFFERENT_EMAIL', { lang: getLang() }),
-                );
-            }
-
-            if (emailMatch && !phoneMatch) {
-                throw new ConflictException(
-                    this.i18n.t('errors.EMAIL_TAKEN_DIFFERENT_PHONE', { lang: getLang() }),
-                );
-            }
+            return existing;
         }
 
         const randomPassword = Math.random().toString(36).slice(-12);
@@ -91,7 +70,6 @@ export class ContactUsService {
         const newStudent = this.userRepository.create({
             firstName: dto.firstName,
             lastName: dto.lastName,
-            email: dto.email,
             phone,
             ...(dto.gender && { gender: dto.gender }),
             userType: UserTypeEnum.STUDENT,
