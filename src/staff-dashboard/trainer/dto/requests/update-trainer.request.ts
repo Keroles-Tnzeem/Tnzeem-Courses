@@ -21,6 +21,10 @@ export class UpdateTrainerRequest {
     phone?: string;
 
     @IsOptional()
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+    password?: string;
+
+    @IsOptional()
     @IsEnum(GenderEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
     gender?: GenderEnum;
 

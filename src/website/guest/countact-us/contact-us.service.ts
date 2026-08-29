@@ -26,7 +26,7 @@ export class ContactUsService {
         private readonly i18n: I18nService,
     ) { }
 
-    async createGuestOrder(dto: CreateGuestOrderRequest): Promise<OrderResponse> {
+    async createGuestOrder(dto: CreateGuestOrderRequest, lang: string): Promise<OrderResponse> {
         const student = await this.findOrCreateStudent(dto);
 
         return this.ordersService.create(
@@ -41,6 +41,7 @@ export class ContactUsService {
                 notes: dto.notes,
             } as any,
             student.id,
+            lang,
         );
     }
 

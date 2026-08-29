@@ -17,5 +17,7 @@
     "ENROLLMENT_ALREADY_EXISTS": "Student is already enrolled in this round",
     "ORDER_NOT_FOUND": "Order not found",
     "CERTIFICATE_NOT_FOUND": "Certificate not found",
-    "CERTIFICATE_NOT_COMPLETE_YET": "Certificate not complete yet"
+    "CERTIFICATE_NOT_COMPLETE_YET": "Certificate not complete yet",
+    "ONLY_INSTRUCTORS": "Only instructors can perform this action",
+    "INSUFFICIENT_PERMISSIONS": "Insufficient permissions"
 }

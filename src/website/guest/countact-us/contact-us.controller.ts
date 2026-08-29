@@ -5,6 +5,7 @@ import {CreateGuestOrderRequest} from "./dto/requests/create-guest-order.request
 import {ApiResponseDto} from "../../../common/dto/responses/api.response";
 import {ContactUsService} from "./contact-us.service";
 import { NoFilesInterceptor } from "@nestjs/platform-express";
+import { Lang } from "../../../common/decorators/lang.decorator";
 
 @ApiTags('Website - Contact Us')
 @Controller('website/contact-us')
@@ -14,8 +15,11 @@ export class ContactUsController {
     @Post()
     @ApiOkResponse({ type: OrderResponse })
     @UseInterceptors(NoFilesInterceptor())
-    async createOrder(@Body() dto: CreateGuestOrderRequest): Promise<ApiResponseDto<OrderResponse>> {
-        const order = await this.contactUsService.createGuestOrder(dto);
+    async createOrder(
+        @Body() dto: CreateGuestOrderRequest,
+        @Lang() lang: string,
+    ): Promise<ApiResponseDto<OrderResponse>> {
+        const order = await this.contactUsService.createGuestOrder(dto, lang);
         return ApiResponseDto.success(order);
     }
 }

@@ -73,8 +73,8 @@ export class TrainerService {
             }
         }
 
-        const randomDummyPassword = Math.random().toString(36).slice(-10);
-        const hashed = await bcrypt.hash(randomDummyPassword, 10);
+        const password = dto.password || Math.random().toString(36).slice(-10);
+        const hashed = await bcrypt.hash(password, 10);
 
         const trainerInfo = this.trainerInfoRepo.create({
             age: dto.age,
@@ -121,9 +121,13 @@ export class TrainerService {
             }
         }
 
-        const { age, numExperience, experience, numCourses, ...userFields } = dto;
+        const { age, numExperience, experience, numCourses, password, ...userFields } = dto;
         
         Object.assign(trainer, userFields);
+
+        if (password) {
+            trainer.password = await bcrypt.hash(password, 10);
+        }
 
         if (img) {
             trainer.img = img;

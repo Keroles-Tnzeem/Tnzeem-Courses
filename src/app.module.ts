@@ -1,3 +1,4 @@
+import { InstructorDashboardModule } from "./instructor-dashboard/instructor-dashboard.module";
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -88,6 +89,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
     StaffEnrollmentsModule,
     CertificatesModule,
     OrderCommentsModule,
+    InstructorDashboardModule,
   ],
   controllers: [],
   providers: [],

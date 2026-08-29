@@ -1,5 +1,11 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { I18nContext } from 'nestjs-i18n';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 import { JwtPayload } from '../../shared/auth/services/jwt.service';
 
@@ -19,26 +25,30 @@ import { JwtPayload } from '../../shared/auth/services/jwt.service';
  */
 @Injectable()
 export class PermissionsGuard implements CanActivate {
-    constructor(private readonly reflector: Reflector) {}
+  constructor(private readonly reflector: Reflector) {}
 
-    canActivate(context: ExecutionContext): boolean {
-        const required = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
-            context.getHandler(),
-            context.getClass(),
-        ]);
+  canActivate(context: ExecutionContext): boolean {
+    const required = this.reflector.getAllAndOverride<string[]>(
+      PERMISSIONS_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
-        // No @Permissions() declared — route is accessible to any authenticated user
-        if (!required?.length) return true;
+    // No @Permissions() declared — route is accessible to any authenticated user
+    if (!required?.length) return true;
 
-        const user = context.switchToHttp().getRequest<{ user: JwtPayload }>().user;
-        const userPermissions: string[] = user?.permissions ?? [];        
+    const user = context.switchToHttp().getRequest<{ user: JwtPayload }>().user;
+    const userPermissions: string[] = user?.permissions ?? [];
 
-        const hasAll = required.every((p) => userPermissions.includes(p));
+    const hasAll = required.every((p) => userPermissions.includes(p));
 
-        if (!hasAll) {
-            throw new ForbiddenException('Insufficient permissions');
-        }
-
-        return true;
+    if (!hasAll) {
+      const i18n = I18nContext.current();
+      const message = i18n
+        ? i18n.t('errors.INSUFFICIENT_PERMISSIONS')
+        : 'Insufficient permissions';
+      throw new ForbiddenException(message);
     }
+
+    return true;
+  }
 }

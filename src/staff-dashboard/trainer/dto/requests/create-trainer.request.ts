@@ -20,6 +20,10 @@ export class CreateTrainerRequest {
     @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
     phone?: string;
 
+    @IsOptional()
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+    password?: string;
+
     @IsEnum(GenderEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
     @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
     gender: GenderEnum;
