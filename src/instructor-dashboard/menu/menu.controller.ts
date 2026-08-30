@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { InstructorMenuService } from './menu.service';
 import { CourseMenuResponse } from './dto/responses/course-menu.response';
 import { RoundMenuResponse } from './dto/responses/round-menu.response';
+import { CourseCategoryMenuResponse } from './dto/responses/course-category-menu.response';
 import { ApiResponseDto } from '../../common/dto/responses/api.response';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { TrainerGuard } from '../../common/guards/trainer.guard';
@@ -34,6 +35,15 @@ export class InstructorMenuController {
     @Lang() lang: string,
   ): Promise<ApiResponseDto<RoundMenuResponse[]>> {
     const data = await this.menuService.getRoundsMenu(trainer.sub, lang);
+    return ApiResponseDto.success(data);
+  }
+
+  @Get('course-categories')
+  @ApiOkResponse({ type: CourseCategoryMenuResponse, isArray: true })
+  async getCourseCategoriesMenu(
+    @Lang() lang: string,
+  ): Promise<ApiResponseDto<CourseCategoryMenuResponse[]>> {
+    const data = await this.menuService.getCourseCategoriesMenu(lang);
     return ApiResponseDto.success(data);
   }
 }

@@ -5,14 +5,14 @@ import { CourseCategoryEntity } from '../../../staff-dashboard/course-categories
 
 @Injectable()
 export class GuestCourseCategoriesService {
-    constructor(
-        @InjectRepository(CourseCategoryEntity)
-        private readonly courseCategoryRepository: Repository<CourseCategoryEntity>,
-    ) {}
+  constructor(
+    @InjectRepository(CourseCategoryEntity)
+    private readonly courseCategoryRepository: Repository<CourseCategoryEntity>,
+  ) {}
 
-    async findAll(): Promise<CourseCategoryEntity[]> {
-        return await this.courseCategoryRepository.find({
-            order: { id: 'DESC' },
-        });
-    }
+  async findAll(): Promise<CourseCategoryEntity[]> {
+    return await this.courseCategoryRepository.find({
+      order: { id: 'DESC' },
+    });
+  }
 }

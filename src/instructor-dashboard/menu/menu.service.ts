@@ -3,9 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CourseEntity } from '../../staff-dashboard/courses/entities/course.entity';
 import { RoundEntity } from '../../staff-dashboard/rounds/entities/round.entity';
+import { CourseCategoryEntity } from '../../staff-dashboard/course-categories/entities/course-category.entity';
 import { parseJson } from '../../common/helpers/parse-json.helper';
 import { CourseMenuResponse } from './dto/responses/course-menu.response';
 import { RoundMenuResponse } from './dto/responses/round-menu.response';
+import { CourseCategoryMenuResponse } from './dto/responses/course-category-menu.response';
 
 @Injectable()
 export class InstructorMenuService {
@@ -14,6 +16,8 @@ export class InstructorMenuService {
     private readonly courseRepository: Repository<CourseEntity>,
     @InjectRepository(RoundEntity)
     private readonly roundRepository: Repository<RoundEntity>,
+    @InjectRepository(CourseCategoryEntity)
+    private readonly courseCategoryRepository: Repository<CourseCategoryEntity>,
   ) {}
 
   async getCoursesMenu(trainerId: number, lang: string): Promise<CourseMenuResponse[]> {
@@ -51,6 +55,20 @@ export class InstructorMenuService {
         name: `Round ${round.roundNumber}`,
         courseName: nameObj[lang] ?? nameObj['en'] ?? round.course?.name ?? null,
         courseId: round.courseId,
+      };
+    });
+  }
+
+  async getCourseCategoriesMenu(lang: string): Promise<CourseCategoryMenuResponse[]> {
+    const categories = await this.courseCategoryRepository.find({
+      order: { id: 'DESC' },
+    });
+
+    return categories.map((category) => {
+      const nameObj = parseJson<Record<string, string>>(category.name);
+      return {
+        id: category.id,
+        name: nameObj[lang] ?? nameObj['en'] ?? (category.name as unknown as string),
       };
     });
   }
