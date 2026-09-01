@@ -5,6 +5,7 @@ import { InstructorSessionsModule } from './sessions/sessions.module';
 import { InstructorEnrollmentsModule } from './enrollments/enrollments.module';
 import { InstructorMenuModule } from './menu/menu.module';
 import { InstructorStudentsModule } from './students/students.module';
+import { InstructorHomepageModule } from './homepage/homepage.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { InstructorStudentsModule } from './students/students.module';
     InstructorEnrollmentsModule,
     InstructorMenuModule,
     InstructorStudentsModule,
+    InstructorHomepageModule,
   ],
 })
 export class InstructorDashboardModule {}

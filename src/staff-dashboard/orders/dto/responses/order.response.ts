@@ -7,193 +7,193 @@ import { PaymentStatusEnum } from '../../../../shared/payment/enums/payment-stat
 import { PaymentTypeEnum } from '../../../../shared/payment/enums/payment-type.enum';
 
 export class OrderResponse {
-    @ApiProperty()
-    id: string;
+  @ApiProperty()
+  id: string;
 
-    @ApiProperty()
-    studentId: number;
+  @ApiProperty()
+  studentId: number;
 
-    @ApiPropertyOptional()
-    roundId: number | null;
+  @ApiPropertyOptional()
+  roundId: number | null;
 
-    @ApiPropertyOptional()
-    courseId: number | null;
+  @ApiPropertyOptional()
+  courseId: number | null;
 
-    @ApiProperty()
-    trainerId: number;
+  @ApiProperty()
+  trainerId: number;
 
-    @ApiProperty()
-    mainPrice: number;
+  @ApiProperty()
+  mainPrice: number;
 
-    @ApiProperty()
-    priceAfterDiscount: number;
+  @ApiProperty()
+  priceAfterDiscount: number;
 
-    @ApiProperty()
-    finalPrice: number;
+  @ApiProperty()
+  finalPrice: number;
 
-    @ApiProperty({ enum: OrderStatusEnum })
-    status: OrderStatusEnum;
+  @ApiProperty({ enum: OrderStatusEnum })
+  status: OrderStatusEnum;
 
-    @ApiPropertyOptional({ enum: PaymentTypeEnum })
-    paymentType?: PaymentTypeEnum;
+  @ApiPropertyOptional({ enum: PaymentTypeEnum })
+  paymentType?: PaymentTypeEnum;
 
-    @ApiPropertyOptional({ enum: PaymentMethodEnum })
-    paymentMethod?: PaymentMethodEnum;
+  @ApiPropertyOptional({ enum: PaymentMethodEnum })
+  paymentMethod?: PaymentMethodEnum;
 
-    @ApiPropertyOptional({ enum: PaymentStatusEnum })
-    paymentStatus?: PaymentStatusEnum;
+  @ApiPropertyOptional({ enum: PaymentStatusEnum })
+  paymentStatus?: PaymentStatusEnum;
 
-    @ApiPropertyOptional()
-    paymentReference?: string;
+  @ApiPropertyOptional()
+  paymentReference?: string;
 
-    @ApiPropertyOptional()
-    paymentNotes?: string;
+  @ApiPropertyOptional()
+  paymentNotes?: string;
 
-    @ApiPropertyOptional()
-    paidAt?: Date;
+  @ApiPropertyOptional()
+  paidAt?: Date;
 
-    @ApiPropertyOptional()
-    transferBankImg?: string;
+  @ApiPropertyOptional()
+  transferBankImg?: string;
 
-    @ApiProperty({ enum: OrderCreatorTypeEnum })
-    createdBy: OrderCreatorTypeEnum;
+  @ApiProperty({ enum: OrderCreatorTypeEnum })
+  createdBy: OrderCreatorTypeEnum;
 
-    @ApiPropertyOptional()
-    createdById?: number;
+  @ApiPropertyOptional()
+  createdById?: number;
 
-    @ApiPropertyOptional()
-    assignToId?: number;
+  @ApiPropertyOptional()
+  assignToId?: number;
 
-    @ApiPropertyOptional({ description: 'Assigned staff basic info' })
-    assignTo?: {
-        firstName: string;
-        lastName: string;
-    };
+  @ApiPropertyOptional({ description: 'Assigned staff basic info' })
+  assignTo?: {
+    firstName: string;
+    lastName: string;
+  };
 
-    @ApiPropertyOptional()
-    notes?: string;
+  @ApiPropertyOptional()
+  notes?: string;
 
-    @ApiProperty()
-    createdAt: Date;
+  @ApiProperty()
+  createdAt: Date;
 
-    @ApiProperty()
-    updatedAt: Date;
+  @ApiProperty()
+  updatedAt: Date;
 
-    @ApiPropertyOptional()
-    lastCommentId?: number;
+  @ApiPropertyOptional()
+  lastCommentId?: number;
 
-    @ApiPropertyOptional()
-    lastCommentDate?: Date;
+  @ApiPropertyOptional()
+  lastCommentDate?: Date;
 
-    @ApiPropertyOptional({ description: 'Last comment basic info' })
-    lastComment?: any;
+  @ApiPropertyOptional({ description: 'Last comment basic info' })
+  lastComment?: any;
 
-    @ApiPropertyOptional({ description: 'Student basic info' })
-    student?: {
-        id: number;
-        firstName: string;
-        lastName: string;
-        email: string;
-        phone?: string;
-    };
+  @ApiPropertyOptional({ description: 'Student basic info' })
+  student?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+  };
 
-    @ApiPropertyOptional({ description: 'Trainer basic info' })
-    trainer?: {
-        id: number;
-        firstName: string;
-        lastName: string;
-        email: string;
-    };
+  @ApiPropertyOptional({ description: 'Trainer basic info' })
+  trainer?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 
-    @ApiPropertyOptional({ description: 'Round basic info' })
-    round?: {
-        id: number;
-        startDate?: Date;
-        endDate?: Date;
-    };
+  @ApiPropertyOptional({ description: 'Round basic info' })
+  round?: {
+    id: number;
+    startDate?: Date;
+    endDate?: Date;
+  };
 
-    @ApiPropertyOptional({ description: 'Course basic info' })
-    course?: {
-        id: number;
-        name: string;
-    };
+  @ApiPropertyOptional({ description: 'Course basic info' })
+  course?: {
+    id: number;
+    name: string;
+  };
 
-    static fromEntity(entity: OrderEntity, lang: string = 'en'): OrderResponse {
-        const response = new OrderResponse();
-        response.id = entity.id;
-        response.studentId = entity.studentId;
-        response.roundId = entity.roundId;
-        response.courseId = entity.courseId;
-        response.trainerId = entity.trainerId;
-        response.mainPrice = Number(entity.mainPrice);
-        response.priceAfterDiscount = Number(entity.priceAfterDiscount);
-        response.finalPrice = Number(entity.finalPrice);
-        response.status = entity.status;
-        response.paymentType = entity.paymentType;
-        response.paymentMethod = entity.paymentMethod;
-        response.paymentStatus = entity.paymentStatus;
-        response.paymentReference = entity.paymentReference;
-        response.paymentNotes = entity.paymentNotes;
-        response.paidAt = entity.paidAt;
-        response.transferBankImg = entity.transferBankImg;
-        response.createdBy = entity.createdBy;
-        response.createdById = entity.createdById;
-        response.assignToId = entity.assignToId;
+  static fromEntity(entity: OrderEntity, lang: string = 'en'): OrderResponse {
+    const response = new OrderResponse();
+    response.id = entity.id;
+    response.studentId = entity.studentId;
+    response.roundId = entity.roundId;
+    response.courseId = entity.courseId;
+    response.trainerId = entity.trainerId;
+    response.mainPrice = Number(entity.mainPrice);
+    response.priceAfterDiscount = Number(entity.priceAfterDiscount);
+    response.finalPrice = Number(entity.finalPrice);
+    response.status = entity.status;
+    response.paymentType = entity.paymentType;
+    response.paymentMethod = entity.paymentMethod;
+    response.paymentStatus = entity.paymentStatus;
+    response.paymentReference = entity.paymentReference;
+    response.paymentNotes = entity.paymentNotes;
+    response.paidAt = entity.paidAt;
+    response.transferBankImg = entity.transferBankImg;
+    response.createdBy = entity.createdBy;
+    response.createdById = entity.createdById;
+    response.assignToId = entity.assignToId;
 
-        if (entity.assignTo) {
-            response.assignTo = {
-                firstName: entity.assignTo.firstName,
-                lastName: entity.assignTo.lastName,
-            };
-        }
-        response.notes = entity.notes;
-        response.lastCommentId = entity.lastCommentId;
-        response.lastCommentDate = entity.lastCommentDate;
-        response.createdAt = entity.audit.createdAt;
-        response.updatedAt = entity.audit.updatedAt;
-
-        if ((entity as any).lastComment) {
-            response.lastComment = {
-                id: (entity as any).lastComment.id,
-                comment: (entity as any).lastComment.comment,
-                staffId: (entity as any).lastComment.staffId,
-            };
-        }
-
-        if (entity.student) {
-            response.student = {
-                id: entity.student.id,
-                firstName: entity.student.firstName,
-                lastName: entity.student.lastName,
-                email: entity.student.email,
-                phone: entity.student.phone,
-            };
-        }
-
-        if (entity.trainer) {
-            response.trainer = {
-                id: entity.trainer.id,
-                firstName: entity.trainer.firstName,
-                lastName: entity.trainer.lastName,
-                email: entity.trainer.email,
-            };
-        }
-
-        if (entity.round) {
-            response.round = {
-                id: entity.round.id,
-                startDate: entity.round.startDate,
-                endDate: entity.round.endDate,
-            };
-        }
-
-        if (entity.course) {
-            response.course = {
-                id: entity.course.id,
-                name: entity.course.name?.[lang] || entity.course.name?.en || '',
-            };
-        }
-
-        return response;
+    if (entity.assignTo) {
+      response.assignTo = {
+        firstName: entity.assignTo.firstName,
+        lastName: entity.assignTo.lastName,
+      };
     }
+    response.notes = entity.notes;
+    response.lastCommentId = entity.lastCommentId;
+    response.lastCommentDate = entity.lastCommentDate;
+    response.createdAt = entity.audit.createdAt;
+    response.updatedAt = entity.audit.updatedAt;
+
+    if ((entity as any).lastComment) {
+      response.lastComment = {
+        id: (entity as any).lastComment.id,
+        comment: (entity as any).lastComment.comment,
+        staffId: (entity as any).lastComment.staffId,
+      };
+    }
+
+    if (entity.student) {
+      response.student = {
+        id: entity.student.id,
+        firstName: entity.student.firstName,
+        lastName: entity.student.lastName,
+        email: entity.student.email,
+        phone: entity.student.phone,
+      };
+    }
+
+    if (entity.trainer) {
+      response.trainer = {
+        id: entity.trainer.id,
+        firstName: entity.trainer.firstName,
+        lastName: entity.trainer.lastName,
+        email: entity.trainer.email,
+      };
+    }
+
+    if (entity.round) {
+      response.round = {
+        id: entity.round.id,
+        startDate: entity.round.startDate,
+        endDate: entity.round.endDate,
+      };
+    }
+
+    if (entity.course) {
+      response.course = {
+        id: entity.course.id,
+        name: entity.course.name?.[lang] || entity.course.name?.en || '',
+      };
+    }
+
+    return response;
+  }
 }
