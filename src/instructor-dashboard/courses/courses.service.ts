@@ -27,7 +27,7 @@ export class InstructorCoursesService {
   private toResponse(course: CourseEntity): CourseResponse {
     const level = this.i18n.t(courseLevelTranslationKey(course.level), {
       lang: getLang(),
-    });
+    }) as string;
     return CourseResponse.fromEntity(course, level, getLang());
   }
 
