@@ -25,6 +25,7 @@ import { PaginationResponseDto } from '../../common/dto/responses/pagination.res
 import { PaginationRequest } from '../../common/dto/requests/pagination.request';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AssignStaffToStudentRequest } from './dto/requests/assign-staff.request';
+import { FilterStudentRequest } from './dto/requests/filter-student.request';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
 @ApiTags('Staff Dashboard - Students')
@@ -46,7 +47,7 @@ export class StudentController {
     @Get()
     @ApiOperation({ summary: 'List students with pagination and search' })
     @ApiOkResponse({ description: 'Students returned successfully', type: StudentResponse, isArray: true })
-    async findAll(@Query() query: PaginationRequest) {
+    async findAll(@Query() query: FilterStudentRequest) {
         const { data, total } = await this.studentService.findAll(query);
         const limit = query.limit || 10;
         const page = query.page || 1;
@@ -67,7 +68,7 @@ export class StudentController {
     @ApiOkResponse({ description: 'Students returned successfully', type: StudentResponse, isArray: true })
     async findMyStudents(
         @CurrentUser('sub') userId: number,
-        @Query() query: PaginationRequest,
+        @Query() query: FilterStudentRequest,
     ) {
         const { data, total } = await this.studentService.findMyStudents(userId, query);
         const limit = query.limit || 10;

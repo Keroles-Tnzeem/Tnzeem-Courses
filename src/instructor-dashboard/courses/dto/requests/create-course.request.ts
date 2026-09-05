@@ -46,21 +46,23 @@ export class CreateCourseRequest {
   @Type(() => MultiLingualPropertyDto)
   description: MultiLingualPropertyDto;
 
-  @ApiPropertyOptional({
-    description: 'HTML content produced by the CKEditor requirements editor',
-    example: '<ul><li>Basic JavaScript knowledge</li></ul>',
-  })
+  @ApiPropertyOptional({ type: MultiLingualPropertyDto })
+  @ValidateNested()
+  @Transform(({ value }) =>
+    typeof value === 'string' ? JSON.parse(value) : value,
+  )
+  @Type(() => MultiLingualPropertyDto)
   @IsOptional()
-  @IsString()
-  requirements?: string;
+  requirements?: MultiLingualPropertyDto;
 
-  @ApiPropertyOptional({
-    description: 'HTML content produced by the CKEditor benefits editor',
-    example: '<ul><li>Build a complete API</li></ul>',
-  })
+  @ApiPropertyOptional({ type: MultiLingualPropertyDto })
+  @ValidateNested()
+  @Transform(({ value }) =>
+    typeof value === 'string' ? JSON.parse(value) : value,
+  )
+  @Type(() => MultiLingualPropertyDto)
   @IsOptional()
-  @IsString()
-  benefits?: string;
+  benefits?: MultiLingualPropertyDto;
 
   @ApiProperty({ example: 'node-js-course' })
   @IsNotEmpty()

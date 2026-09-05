@@ -8,6 +8,7 @@ export class StudentResponse {
   email: string;
   phone: string;
   gender: GenderEnum;
+  createdAt: Date;
   img: string;
   sourceId?: number;
   sourceName?: string;
@@ -36,6 +37,7 @@ export class StudentResponse {
     const appUrl = process.env.APP_URL || 'http://localhost:3000';
     const imgPath = user.img || '/images/empty-user.jpeg';
     response.img = `${appUrl}${imgPath}`;
+    response.createdAt = user.audit.createdAt;
     return response;
   }
 }

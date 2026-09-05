@@ -41,8 +41,8 @@ export class CourseResponse {
 
     response.name = nameObj[lang] ?? nameObj['en'] ?? entity.name;
     response.description = descObj[lang] ?? descObj['en'] ?? entity.description;
-    response.requirements = reqObj[lang] ?? reqObj['en'] ?? entity.requirements;
-    response.benefits = benObj[lang] ?? benObj['en'] ?? entity.benefits;
+    response.requirements = reqObj[lang] ?? reqObj['en'] ?? '';
+    response.benefits = benObj[lang] ?? benObj['en'] ?? '';
 
     response.slug = entity.slug;
     response.image = entity.image;

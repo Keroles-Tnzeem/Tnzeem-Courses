@@ -27,7 +27,7 @@ export class InstructorCoursesService {
   private toResponse(course: CourseEntity): CourseResponse {
     const level = this.i18n.t(courseLevelTranslationKey(course.level), {
       lang: getLang(),
-    }) as string;
+    });
     return CourseResponse.fromEntity(course, level, getLang());
   }
 
@@ -49,12 +49,6 @@ export class InstructorCoursesService {
     }
 
     const courseData: any = { ...dto, image, introVideo };
-    if (dto.requirements && typeof dto.requirements !== 'string') {
-      courseData.requirements = JSON.stringify(dto.requirements);
-    }
-    if (dto.benefits && typeof dto.benefits !== 'string') {
-      courseData.benefits = JSON.stringify(dto.benefits);
-    }
     courseData.trainerId = trainerId;
     courseData.status = CourseStatusEnum.PENDING; // Pending approval by staff
 
@@ -70,7 +64,8 @@ export class InstructorCoursesService {
     });
     if (!entity) {
       throw new NotFoundException(
-        this.i18n.t('errors.NOT_FOUND', { lang: getLang() }) || 'Course not found',
+        this.i18n.t('errors.NOT_FOUND', { lang: getLang() }) ||
+          'Course not found',
       );
     }
     return this.toResponse(entity);
@@ -123,15 +118,19 @@ export class InstructorCoursesService {
 
     if (!entity) {
       throw new NotFoundException(
-        this.i18n.t('errors.NOT_FOUND', { lang: getLang() }) || 'Course not found',
+        this.i18n.t('errors.NOT_FOUND', { lang: getLang() }) ||
+          'Course not found',
       );
     }
 
     if (dto.slug && dto.slug !== entity.slug) {
-      const duplicate = await this.courseRepo.findOne({ where: { slug: dto.slug } });
+      const duplicate = await this.courseRepo.findOne({
+        where: { slug: dto.slug },
+      });
       if (duplicate) {
         throw new ConflictException(
-          this.i18n.t('errors.SLUG_TAKEN', { lang: getLang() }) || 'Slug already taken',
+          this.i18n.t('errors.SLUG_TAKEN', { lang: getLang() }) ||
+            'Slug already taken',
         );
       }
       entity.slug = dto.slug;
@@ -140,24 +139,22 @@ export class InstructorCoursesService {
     if (dto.categoryId !== undefined) entity.categoryId = dto.categoryId;
     if (dto.name !== undefined) entity.name = dto.name;
     if (dto.description !== undefined) entity.description = dto.description;
-    
+
     if (dto.requirements !== undefined) {
-      entity.requirements = typeof dto.requirements === 'string' 
-        ? dto.requirements 
-        : JSON.stringify(dto.requirements);
+      entity.requirements = dto.requirements;
     }
-    
+
     if (dto.benefits !== undefined) {
-      entity.benefits = typeof dto.benefits === 'string'
-        ? dto.benefits
-        : JSON.stringify(dto.benefits);
+      entity.benefits = dto.benefits;
     }
-    
-    if (dto.sessionsCount !== undefined) entity.sessionsCount = dto.sessionsCount;
-    if (dto.durationHours !== undefined) entity.durationHours = dto.durationHours;
+
+    if (dto.sessionsCount !== undefined)
+      entity.sessionsCount = dto.sessionsCount;
+    if (dto.durationHours !== undefined)
+      entity.durationHours = dto.durationHours;
     if (dto.price !== undefined) entity.price = dto.price;
     if (dto.level !== undefined) entity.level = dto.level;
-    
+
     if (image !== undefined) entity.image = image;
     if (introVideo !== undefined) entity.introVideo = introVideo;
 

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { UserEntity } from '../../shared/user/entities/user.entity';
@@ -13,9 +13,9 @@ import { SourceEntity } from '../sources/entities/source.entity';
 import { CreateStudentRequest } from './dto/requests/create-student.request';
 import { UpdateStudentRequest } from './dto/requests/update-student.request';
 import { AssignStaffToStudentRequest } from './dto/requests/assign-staff.request';
-import { PaginationRequest } from '../../common/dto/requests/pagination.request';
+import { FilterStudentRequest } from './dto/requests/filter-student.request';
 import { OrdersRepository } from '../../shared/orders/repositories/orders.repository';
-import {getLang} from "../../common/helpers/lang.helper";
+import { getLang } from '../../common/helpers/lang.helper';
 
 @Injectable()
 export class StudentService {
@@ -27,8 +27,6 @@ export class StudentService {
     private readonly ordersRepository: OrdersRepository,
     private readonly i18n: I18nService,
   ) {}
-
-
 
   private readonly relations = { source: true, assignTo: true };
 
@@ -46,14 +44,34 @@ export class StudentService {
   }
 
   async findAll(
-    query: PaginationRequest,
+    query: FilterStudentRequest,
   ): Promise<{ data: UserEntity[]; total: number }> {
-    const { page = 1, limit = 10, search } = query;
+    const { page = 1, limit = 10, search, assignToId, from, to } = query;
     const skip = (page - 1) * limit;
 
     const where: any = { userType: UserTypeEnum.STUDENT };
     if (search) {
       where.firstName = search; // adjust if ILike needed
+    }
+    if (assignToId) {
+      where.assignToId = assignToId;
+    }
+    if (from || to) {
+      where.audit = {};
+      if (from && to) {
+        where.audit.createdAt = Between(
+          new Date(`${from}T00:00:00.000Z`),
+          new Date(`${to}T23:59:59.999Z`),
+        );
+      } else if (from) {
+        where.audit.createdAt = MoreThanOrEqual(
+          new Date(`${from}T00:00:00.000Z`),
+        );
+      } else if (to) {
+        where.audit.createdAt = LessThanOrEqual(
+          new Date(`${to}T23:59:59.999Z`),
+        );
+      }
     }
 
     const [data, total] = await this.userRepo.findAndCount({
@@ -69,9 +87,9 @@ export class StudentService {
 
   async findMyStudents(
     userId: number,
-    query: PaginationRequest,
+    query: FilterStudentRequest,
   ): Promise<{ data: UserEntity[]; total: number }> {
-    const { page = 1, limit = 10, search } = query;
+    const { page = 1, limit = 10, search, from, to } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {
@@ -81,6 +99,24 @@ export class StudentService {
 
     if (search) {
       where.firstName = search;
+    }
+    if (from || to) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      where.audit = {};
+      if (from && to) {
+        where.audit.createdAt = Between(
+          new Date(`${from}T00:00:00.000Z`),
+          new Date(`${to}T23:59:59.999Z`),
+        );
+      } else if (from) {
+        where.audit.createdAt = MoreThanOrEqual(
+          new Date(`${from}T00:00:00.000Z`),
+        );
+      } else if (to) {
+        where.audit.createdAt = LessThanOrEqual(
+          new Date(`${to}T23:59:59.999Z`),
+        );
+      }
     }
 
     const [data, total] = await this.userRepo.findAndCount({
@@ -94,7 +130,7 @@ export class StudentService {
     return { data, total };
   }
 
-  // ── Single 
+  // ── Single
   async findOne(id: number): Promise<UserEntity> {
     const student = await this.userRepo.findOne({
       where: { id },
@@ -119,7 +155,9 @@ export class StudentService {
     }
 
     if (dto.phone) {
-      const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
+      const phoneExists = await this.userRepo.findOne({
+        where: { phone: dto.phone },
+      });
       if (phoneExists) {
         throw new ConflictException(
           this.i18n.t('errors.PHONE_TAKEN', { lang: getLang() }),
@@ -148,10 +186,7 @@ export class StudentService {
     return this.findOne(saved.id);
   }
 
-  async update(
-    id: number,
-    dto: UpdateStudentRequest,
-  ): Promise<UserEntity> {
+  async update(id: number, dto: UpdateStudentRequest): Promise<UserEntity> {
     const student = await this.findOne(id);
 
     if (dto.email && dto.email !== student.email) {
@@ -166,7 +201,9 @@ export class StudentService {
     }
 
     if (dto.phone && dto.phone !== student.phone) {
-      const phoneExists = await this.userRepo.findOne({ where: { phone: dto.phone } });
+      const phoneExists = await this.userRepo.findOne({
+        where: { phone: dto.phone },
+      });
       if (phoneExists) {
         throw new ConflictException(
           this.i18n.t('errors.PHONE_TAKEN', { lang: getLang() }),
@@ -199,7 +236,9 @@ export class StudentService {
     });
 
     if (!staffUser) {
-      throw new NotFoundException(this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }));
+      throw new NotFoundException(
+        this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }),
+      );
     }
 
     student.assignToId = dto.assignToId;
@@ -210,7 +249,7 @@ export class StudentService {
     // Update all existing orders for this student to be assigned to this staff member
     await this.ordersRepository.update(
       { studentId },
-      { assignToId: dto.assignToId }
+      { assignToId: dto.assignToId },
     );
 
     return this.findOne(studentId);
