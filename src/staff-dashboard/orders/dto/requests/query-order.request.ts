@@ -34,6 +34,11 @@ export class QueryOrderRequest {
     @IsOptional()
     keyword?: string;
 
+    @ApiPropertyOptional({ example: '01000000000', description: 'Filter by student phone' })
+    @IsString()
+    @IsOptional()
+    phone?: string;
+
     @ApiPropertyOptional({ example: 1, description: 'Filter by student ID' })
     @Type(() => Number)
     @IsInt({ message: i18nValidationMessage('validation.IS_NUMBER') })

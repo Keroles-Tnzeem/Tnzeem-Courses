@@ -146,6 +146,7 @@ export class OrdersService {
       sortBy = 'createdAt',
       sortOrder = 'DESC',
       assignToId,
+      phone,
     } = query;
 
     const qb = this.ordersRepository
@@ -165,6 +166,10 @@ export class OrdersService {
 
     if (studentId) {
       qb.andWhere('order.student_id = :studentId', { studentId });
+    }
+
+    if (phone) {
+      qb.andWhere('student.phone ILIKE :phone', { phone: `%${phone}%` });
     }
 
     if (roundId) {

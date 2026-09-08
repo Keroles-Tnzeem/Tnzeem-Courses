@@ -6,6 +6,7 @@ import {StudentMenuResponse} from "./dto/responses/student-menu.response";
 import {ApiResponseDto} from "../../common/dto/responses/api.response";
 import {RoundMenuResponse} from "./dto/responses/round-menu.response";
 import {StaffMenuResponse} from "./dto/responses/staff-menu.response";
+import {TrainerMenuResponse} from "./dto/responses/trainer-menu.response";
 
 @Controller('staff-dashboard/menu')
 export class MenuController {
@@ -29,6 +30,13 @@ export class MenuController {
   @ApiOkResponse({ type: StaffMenuResponse, isArray: true })
   async getStaffMenu(): Promise<ApiResponseDto<StaffMenuResponse[]>> {
     const data = await this.menuService.getStaffMenu();
+    return ApiResponseDto.success(data);
+  }
+
+  @Get('trainers')
+  @ApiOkResponse({ type: TrainerMenuResponse, isArray: true })
+  async getTrainersMenu(): Promise<ApiResponseDto<TrainerMenuResponse[]>> {
+    const data = await this.menuService.getTrainersMenu();
     return ApiResponseDto.success(data);
   }
 }

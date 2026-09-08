@@ -9,6 +9,7 @@ import {parseJson} from "../../common/helpers/parse-json.helper";
 import {RoundMenuResponse} from "./dto/responses/round-menu.response";
 import {StudentMenuResponse} from "./dto/responses/student-menu.response";
 import {StaffMenuResponse} from "./dto/responses/staff-menu.response";
+import {TrainerMenuResponse} from "./dto/responses/trainer-menu.response";
 
 @Injectable()
 export class MenuService {
@@ -63,6 +64,18 @@ export class MenuService {
     return staff.map((user) => ({
       id: user.id,
       name: `${user.firstName} ${user.lastName}`.trim(),
+    }));
+  }
+
+  async getTrainersMenu(): Promise<TrainerMenuResponse[]> {
+    const trainers = await this.userRepository.find({
+      where: { userType: UserTypeEnum.TRAINER },
+      select: ['id', 'firstName', 'lastName'],
+    });
+
+    return trainers.map((trainer) => ({
+      id: trainer.id,
+      name: `${trainer.firstName} ${trainer.lastName}`.trim(),
     }));
   }
 }
