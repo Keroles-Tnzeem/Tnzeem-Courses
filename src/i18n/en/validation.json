@@ -5,6 +5,7 @@
     "IS_NUMBER": "{property} must be a number",
     "IS_STAFF_TYPE": "userType must be either 'sales' or 'support'",
     "IS_ENUM": "{property} must be a valid enum value",
-    "INVALID_SAUDI_PHONE": "Phone must be a valid Saudi mobile number (e.g. 5XXXXXXXX or 05XXXXXXXX)"
+    "INVALID_SAUDI_PHONE": "Phone must be a valid Saudi mobile number (e.g. 5XXXXXXXX or 05XXXXXXXX)",
+    "MIN_LENGTH": "{property} must be at least {constraint1} characters"
 
 }

@@ -19,5 +19,12 @@
     "CERTIFICATE_NOT_FOUND": "Certificate not found",
     "CERTIFICATE_NOT_COMPLETE_YET": "Certificate not complete yet",
     "ONLY_INSTRUCTORS": "Only instructors can perform this action",
-    "INSUFFICIENT_PERMISSIONS": "Insufficient permissions"
+    "INSUFFICIENT_PERMISSIONS": "Insufficient permissions",
+    "OTP_NOT_FOUND": "No OTP was requested for this phone number, or it was already used",
+    "OTP_EXPIRED": "This OTP has expired, please request a new one",
+    "OTP_INVALID": "Invalid OTP code",
+    "OTP_ATTEMPTS_EXCEEDED": "Too many incorrect attempts, please request a new OTP",
+    "NEW_PASSWORD_REQUIRED": "A new password is required to reset your password",
+    "INVALID_GOOGLE_TOKEN": "Invalid or expired Google sign-in token",
+    "INVALID_APPLE_TOKEN": "Invalid or expired Apple sign-in token"
 }

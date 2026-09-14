@@ -19,5 +19,12 @@
     "CERTIFICATE_NOT_FOUND": "الشهادة غير موجودة",
     "CERTIFICATE_NOT_COMPLETE_YET": "الشهادة لم تكتمل بعد",
     "ONLY_INSTRUCTORS": "فقط المدربون يمكنهم القيام بهذا الإجراء",
-    "INSUFFICIENT_PERMISSIONS": "صلاحيات غير كافية"
+    "INSUFFICIENT_PERMISSIONS": "صلاحيات غير كافية",
+    "OTP_NOT_FOUND": "لم يتم طلب رمز تحقق لهذا الرقم، أو تم استخدامه بالفعل",
+    "OTP_EXPIRED": "انتهت صلاحية رمز التحقق، الرجاء طلب رمز جديد",
+    "OTP_INVALID": "رمز التحقق غير صحيح",
+    "OTP_ATTEMPTS_EXCEEDED": "عدد كبير من المحاولات الخاطئة، الرجاء طلب رمز تحقق جديد",
+    "NEW_PASSWORD_REQUIRED": "كلمة مرور جديدة مطلوبة لإعادة تعيين كلمة المرور",
+    "INVALID_GOOGLE_TOKEN": "رمز تسجيل الدخول عبر جوجل غير صالح أو منتهي الصلاحية",
+    "INVALID_APPLE_TOKEN": "رمز تسجيل الدخول عبر آبل غير صالح أو منتهي الصلاحية"
 }

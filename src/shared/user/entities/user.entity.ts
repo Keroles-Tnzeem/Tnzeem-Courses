@@ -34,6 +34,15 @@ export class UserEntity {
     @Column({ nullable: true, unique: true })
     phone: string;
 
+    @Column({ name: 'phone_verified_at', type: 'timestamp', nullable: true })
+    phoneVerifiedAt?: Date | null;
+
+    @Column({ name: 'google_id', nullable: true, unique: true })
+    googleId?: string;
+
+    @Column({ name: 'apple_id', nullable: true, unique: true })
+    appleId?: string;
+
     @Column({ type: 'enum', enum: GenderEnum, nullable: true })
     gender: GenderEnum;
 

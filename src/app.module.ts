@@ -7,6 +7,7 @@ import { AcceptLanguageResolver, HeaderResolver, I18nModule } from 'nestjs-i18n'
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import i18nConfig from './config/i18n.config';
+import oauthConfig from './config/oauth.config';
 import * as path from 'path';
 import { AuthModule } from './shared/auth/auth.module';
 import { UserModule } from './shared/user/user.module';
@@ -33,6 +34,7 @@ import { EnrollmentsModule } from './shared/enrollments/enrollments.module';
 import { CertificatesModule } from './website/shared/certificates/certificates.module';
 import { StaffEnrollmentsModule } from './staff-dashboard/enrollments/enrollments.module';
 import { OrderCommentsModule } from './staff-dashboard/order-comments/order-comments.module';
+import { WebsiteStudentModule } from './website/student/student.module';
 
 const i18nPath = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, '..', 'i18n')
@@ -42,7 +44,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, i18nConfig],
+      load: [appConfig, databaseConfig, i18nConfig, oauthConfig],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -90,6 +92,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
     CertificatesModule,
     OrderCommentsModule,
     InstructorDashboardModule,
+    WebsiteStudentModule,
   ],
   controllers: [],
   providers: [],
