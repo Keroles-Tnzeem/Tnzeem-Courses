@@ -136,16 +136,14 @@ export class StudentAuthService {
 
     // Best-effort: don't fail registration if the OTP dispatch has an issue.
     let expiresInSeconds = 300;
-    let code: string | undefined;
     await this.otpService
       .generateAndSend(saved.phone, OtpPurposeEnum.REGISTER)
       .then((res) => {
         expiresInSeconds = res.expiresInSeconds;
-        code = res.code;
       })
       .catch(() => undefined);
 
-    return { phone: saved.phone, expiresInSeconds, code };
+    return { phone: saved.phone, expiresInSeconds };
   }
 
   private async findOrCreateSocialStudent(params: {
@@ -194,8 +192,9 @@ export class StudentAuthService {
       email,
       password: hashedPassword,
       userType: UserTypeEnum.STUDENT,
+      // Google verifies the user's identity for us, so treat them as phone-verified by default.
       ...(idColumn === 'googleId'
-        ? { googleId: providerId }
+        ? { googleId: providerId, phoneVerifiedAt: new Date() }
         : { appleId: providerId }),
     });
 
@@ -268,7 +267,6 @@ export class StudentAuthService {
     const lang = getLang();
     const user = await this.userRepo.findOne({
       where: { phone: dto.phone, userType: UserTypeEnum.STUDENT },
-      relations: { userPermissions: { permission: true } },
     });
 
     if (!user) {
@@ -284,6 +282,12 @@ export class StudentAuthService {
     if (!passwordMatches) {
       throw new UnauthorizedException(
         this.i18n.t('errors.INVALID_CREDENTIALS', { lang }),
+      );
+    }
+
+    if (!user.phoneVerifiedAt) {
+      throw new UnauthorizedException(
+        this.i18n.t('errors.PHONE_NOT_VERIFIED', { lang }),
       );
     }
 

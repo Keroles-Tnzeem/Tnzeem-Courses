@@ -26,5 +26,6 @@
     "OTP_ATTEMPTS_EXCEEDED": "Too many incorrect attempts, please request a new OTP",
     "NEW_PASSWORD_REQUIRED": "A new password is required to reset your password",
     "INVALID_GOOGLE_TOKEN": "Invalid or expired Google sign-in token",
-    "INVALID_APPLE_TOKEN": "Invalid or expired Apple sign-in token"
+    "INVALID_APPLE_TOKEN": "Invalid or expired Apple sign-in token",
+    "PHONE_NOT_VERIFIED": "Please verify your phone number before logging in"
 }

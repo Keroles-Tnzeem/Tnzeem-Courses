@@ -1,84 +1,89 @@
 import {
-    Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    OneToMany,
-    OneToOne,
-    ManyToOne,
-    JoinColumn,
-    Index,
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  OneToOne,
+  ManyToOne,
+  JoinColumn,
+  Index,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { UserTypeEnum } from '../enums/user-type.enum';
 import { GenderEnum } from '../enums/gender.enum';
 import { UserPermissionEntity } from './user-permission.entity';
 import { TrainerInfoEntity } from './trainer-info.entity';
-import { AuditColumns } from "../../../common/entities/audit-columns";
+import { AuditColumns } from '../../../common/entities/audit-columns';
 import { SourceEntity } from '../../../staff-dashboard/sources/entities/source.entity';
 
 @Entity('users')
 export class UserEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ name: 'first_name' })
-    firstName: string;
+  @Column({ name: 'first_name' })
+  firstName: string;
 
-    @Column({ name: 'last_name' })
-    lastName: string;
+  @Column({ name: 'last_name' })
+  lastName: string;
 
-    @Index()
-    @Column({ nullable: true })
-    email: string;
+  @Index()
+  @Column({ nullable: true })
+  email: string;
 
-    @Column({ nullable: true, unique: true })
-    phone: string;
+  @Column({ nullable: true, unique: true })
+  phone: string;
 
-    @Column({ name: 'phone_verified_at', type: 'timestamp', nullable: true })
-    phoneVerifiedAt?: Date | null;
+  @Column({ name: 'phone_verified_at', type: 'timestamp', nullable: true })
+  phoneVerifiedAt?: Date | null;
 
-    @Column({ name: 'google_id', nullable: true, unique: true })
-    googleId?: string;
+  @Column({ name: 'google_id', nullable: true, unique: true })
+  googleId?: string;
 
-    @Column({ name: 'apple_id', nullable: true, unique: true })
-    appleId?: string;
+  @Column({ name: 'apple_id', nullable: true, unique: true })
+  appleId?: string;
 
-    @Column({ type: 'enum', enum: GenderEnum, nullable: true })
-    gender: GenderEnum;
+  @Column({ type: 'enum', enum: GenderEnum, nullable: true })
+  gender: GenderEnum;
 
-    @Column({ type: 'text', nullable: true })
-    img: string;
+  @Column({ type: 'text', nullable: true })
+  img: string;
 
-    @Exclude()
-    @Column()
-    password: string; // stored hashed (bcrypt)
+  @Exclude()
+  @Column()
+  password: string; // stored hashed (bcrypt)
 
-    @Column({ name: 'user_type', type: 'enum', enum: UserTypeEnum })
-    userType: UserTypeEnum;
+  @Column({ name: 'user_type', type: 'enum', enum: UserTypeEnum })
+  userType: UserTypeEnum;
 
-    @OneToMany(() => UserPermissionEntity, (up) => up.user, { cascade: true, eager: true })
-    userPermissions?: UserPermissionEntity[];
+  @OneToMany(() => UserPermissionEntity, (up) => up.user, {
+    cascade: true,
+    eager: true,
+  })
+  userPermissions?: UserPermissionEntity[];
 
-    @OneToOne(() => TrainerInfoEntity, trainerInfo => trainerInfo.user, { cascade: true })
-    trainerInfo?: TrainerInfoEntity;
+  @OneToOne(() => TrainerInfoEntity, (trainerInfo) => trainerInfo.user, {
+    cascade: true,
+  })
+  trainerInfo?: TrainerInfoEntity;
 
-    @Column({ name: 'source_id', nullable: true })
-    sourceId?: number;
+  @Column({ name: 'source_id', nullable: true })
+  sourceId?: number;
 
-    @ManyToOne(() => SourceEntity, { nullable: true })
-    @JoinColumn({ name: 'source_id' })
-    source?: SourceEntity;
+  @ManyToOne(() => SourceEntity, { nullable: true })
+  @JoinColumn({ name: 'source_id' })
+  source?: SourceEntity;
 
-    @Column({ name: 'assign_to_id', nullable: true })
-    assignToId?: number;
+  @Column({ name: 'assign_to_id', nullable: true })
+  assignToId?: number;
 
-    @ManyToOne(() => UserEntity, { nullable: true })
-    @JoinColumn({ name: 'assign_to_id' })
-    assignTo?: UserEntity;
+  @ManyToOne(() => UserEntity, { nullable: true })
+  @JoinColumn({ name: 'assign_to_id' })
+  assignTo?: UserEntity;
 
-    @Column({ name: 'assign_at', type: 'timestamp', nullable: true })
-    assignAt?: Date;
+  @Column({ name: 'assign_at', type: 'timestamp', nullable: true })
+  assignAt?: Date;
 
-    @Column(() => AuditColumns, { prefix: false })
-    audit: AuditColumns;
+  @Column(() => AuditColumns, { prefix: false })
+  audit: AuditColumns;
 }
