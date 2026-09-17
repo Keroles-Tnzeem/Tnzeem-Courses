@@ -14,7 +14,7 @@ import { GenderEnum } from '../enums/gender.enum';
 import { UserPermissionEntity } from './user-permission.entity';
 import { TrainerInfoEntity } from './trainer-info.entity';
 import { AuditColumns } from '../../../common/entities/audit-columns';
-import { SourceEntity } from '../../../staff-dashboard/sources/entities/source.entity';
+import { SourceEntity } from '../../../staff/staff-dashboard/sources/entities/source.entity';
 
 @Entity('users')
 export class UserEntity {

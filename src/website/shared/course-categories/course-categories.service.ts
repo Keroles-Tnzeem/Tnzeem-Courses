@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CourseCategoryEntity } from '../../../staff-dashboard/course-categories/entities/course-category.entity';
+import { CourseCategoryEntity } from '../../../staff/staff-dashboard/course-categories/entities/course-category.entity';
 
 @Injectable()
 export class GuestCourseCategoriesService {

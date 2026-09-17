@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { CourseEntity } from '../../../../../staff-dashboard/courses/entities/course.entity';
+import { CourseEntity } from '../../../../../staff/staff-dashboard/courses/entities/course.entity';
 import { CourseLevelEnum } from '../../../../../common/enums/course-level.enum';
-import { CourseStatusEnum } from '../../../../../staff-dashboard/courses/enums/course-status.enum';
+import { CourseStatusEnum } from '../../../../../staff/staff-dashboard/courses/enums/course-status.enum';
 
 export class GuestCourseResponse {
   @ApiProperty()

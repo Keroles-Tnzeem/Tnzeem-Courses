@@ -19,6 +19,7 @@
     "CERTIFICATE_NOT_FOUND": "Certificate not found",
     "CERTIFICATE_NOT_COMPLETE_YET": "Certificate not complete yet",
     "ONLY_INSTRUCTORS": "Only instructors can perform this action",
+    "ONLY_STUDENTS": "Only students can perform this action",
     "INSUFFICIENT_PERMISSIONS": "Insufficient permissions",
     "OTP_NOT_FOUND": "No OTP was requested for this phone number, or it was already used",
     "OTP_EXPIRED": "This OTP has expired, please request a new one",

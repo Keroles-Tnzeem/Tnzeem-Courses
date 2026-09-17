@@ -1,6 +1,6 @@
 import {ApiOkResponse, ApiTags} from "@nestjs/swagger";
 import {Body, Controller, Post, UseInterceptors} from "@nestjs/common";
-import {OrderResponse} from "../../../staff-dashboard/orders/dto/responses/order.response";
+import {OrderResponse} from "../../../staff/staff-dashboard/orders/dto/responses/order.response";
 import {CreateGuestOrderRequest} from "./dto/requests/create-guest-order.request";
 import {ApiResponseDto} from "../../../common/dto/responses/api.response";
 import {ContactUsService} from "./contact-us.service";

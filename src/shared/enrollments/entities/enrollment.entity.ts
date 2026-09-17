@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { AuditColumns } from '../../../common/entities/audit-columns';
 import { UserEntity } from '../../user/entities/user.entity';
-import { RoundEntity } from '../../../staff-dashboard/rounds/entities/round.entity';
+import { RoundEntity } from '../../../staff/staff-dashboard/rounds/entities/round.entity';
 import { OrderEntity } from '../../orders/entities/order.entity';
 import { EnrollmentStatusEnum } from '../enums/enrollment-status.enum';
 import { generateUlid } from '../../../common/helpers/ulid.helper';

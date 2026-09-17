@@ -5,7 +5,7 @@ import { EnrollmentsRepository } from './repositories/enrollments.repository';
 import { EnrollmentsService } from './enrollments.service';
 import { EnrollmentsController } from './enrollments.controller';
 import { UserEntity } from '../user/entities/user.entity';
-import { RoundEntity } from '../../staff-dashboard/rounds/entities/round.entity';
+import { RoundEntity } from '../../staff/staff-dashboard/rounds/entities/round.entity';
 import { OrderEntity } from '../orders/entities/order.entity';
 
 @Module({

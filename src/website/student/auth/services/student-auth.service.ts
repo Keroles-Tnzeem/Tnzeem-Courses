@@ -17,7 +17,7 @@ import { UserEntity } from '../../../../shared/user/entities/user.entity';
 import { UserTypeEnum } from '../../../../shared/user/enums/user-type.enum';
 import { UserService } from '../../../../shared/user/user.service';
 import { JwtTokenService } from '../../../../shared/auth/services/jwt.service';
-import { SourcesService } from '../../../../staff-dashboard/sources/sources.service';
+import { SourcesService } from '../../../../staff/staff-dashboard/sources/sources.service';
 import { getLang } from '../../../../common/helpers/lang.helper';
 import { OtpService } from './otp.service';
 import { OtpPurposeEnum } from '../enums/otp-purpose.enum';

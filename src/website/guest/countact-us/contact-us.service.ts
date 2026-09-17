@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { I18nService } from 'nestjs-i18n';
 import { UserEntity } from "../../../shared/user/entities/user.entity";
-import { OrdersService } from "../../../staff-dashboard/orders/orders.service";
-import { OrderResponse } from "../../../staff-dashboard/orders/dto/responses/order.response";
+import { OrdersService } from "../../../staff/staff-dashboard/orders/orders.service";
+import { OrderResponse } from "../../../staff/staff-dashboard/orders/dto/responses/order.response";
 import { getLang } from "../../../common/helpers/lang.helper";
 import { CreateGuestOrderRequest } from "./dto/requests/create-guest-order.request";
 import { PaymentMethodEnum } from "../../../shared/payment/enums/payment-method.enum";
@@ -14,7 +14,7 @@ import { OrderStatusEnum } from "../../../shared/orders/enums/order-status.enum"
 import { OrderCreatorTypeEnum } from "../../../shared/orders/enums/order-creator-type.enum";
 import { normalizeSaudiPhone } from "../../../common/validators/saudi-phone.validator";
 import { UserTypeEnum } from "../../../shared/user/enums/user-type.enum";
-import { SourcesService } from "../../../staff-dashboard/sources/sources.service";
+import { SourcesService } from "../../../staff/staff-dashboard/sources/sources.service";
 
 @Injectable()
 export class ContactUsService {

@@ -8,8 +8,8 @@ import {
 } from 'typeorm';
 import { AuditColumns } from '../../../common/entities/audit-columns';
 import { UserEntity } from '../../user/entities/user.entity';
-import { RoundEntity } from '../../../staff-dashboard/rounds/entities/round.entity';
-import { CourseEntity } from '../../../staff-dashboard/courses/entities/course.entity';
+import { RoundEntity } from '../../../staff/staff-dashboard/rounds/entities/round.entity';
+import { CourseEntity } from '../../../staff/staff-dashboard/courses/entities/course.entity';
 import { OrderStatusEnum } from '../enums/order-status.enum';
 import { PaymentTypeEnum } from '../../payment/enums/payment-type.enum';
 import { PaymentMethodEnum } from '../../payment/enums/payment-method.enum';

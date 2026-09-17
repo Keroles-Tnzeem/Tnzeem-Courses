@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RoundEntity } from '../../../staff-dashboard/rounds/entities/round.entity';
+import { RoundEntity } from '../../../staff/staff-dashboard/rounds/entities/round.entity';
 import {QueryCourseRoundsRequest} from "./dto/reauests/query-course-rounds.request";
 
 @Injectable()

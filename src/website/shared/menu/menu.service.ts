@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { getLang } from 'src/common/helpers/lang.helper';
 import {RoundMenuResponse} from "./dto/responses/round-menu.response";
-import {RoundEntity} from "../../../staff-dashboard/rounds/entities/round.entity";
-import {CourseEntity} from "../../../staff-dashboard/courses/entities/course.entity";
+import {RoundEntity} from "../../../staff/staff-dashboard/rounds/entities/round.entity";
+import {CourseEntity} from "../../../staff/staff-dashboard/courses/entities/course.entity";
 import {CourseMenuResponse} from "./dto/responses/course-menu.response";
 import {parseJson} from "../../../common/helpers/parse-json.helper";
 

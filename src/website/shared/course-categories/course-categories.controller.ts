@@ -2,7 +2,7 @@ import { Controller, Get, Query, Headers } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags, ApiQuery } from '@nestjs/swagger';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { GuestCourseCategoriesService } from './course-categories.service';
-import { CourseCategoryResponse } from '../../../staff-dashboard/course-categories/dto/responses/course-category.response';
+import { CourseCategoryResponse } from '../../../staff/staff-dashboard/course-categories/dto/responses/course-category.response';
 import { ApiResponseDto } from '../../../common/dto/responses/api.response';
 import { getLang } from 'src/common/helpers/lang.helper';
 

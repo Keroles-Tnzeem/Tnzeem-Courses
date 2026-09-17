@@ -9,7 +9,7 @@ import * as crypto from 'crypto';
 import { I18nService } from 'nestjs-i18n';
 import { EnrollmentsRepository } from './repositories/enrollments.repository';
 import { EnrollmentEntity } from './entities/enrollment.entity';
-import { RoundEntity } from '../../staff-dashboard/rounds/entities/round.entity';
+import { RoundEntity } from '../../staff/staff-dashboard/rounds/entities/round.entity';
 import { UserEntity } from '../user/entities/user.entity';
 import { UserTypeEnum } from '../user/enums/user-type.enum';
 import { CreateEnrollmentRequest } from './dto/requests/create-enrollment.request';

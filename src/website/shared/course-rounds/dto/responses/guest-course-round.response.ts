@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { RoundEntity } from '../../../../../staff-dashboard/rounds/entities/round.entity';
-import { RoundStatusEnum } from '../../../../../staff-dashboard/rounds/enums/round-status.enum';
+import { RoundEntity } from '../../../../../staff/staff-dashboard/rounds/entities/round.entity';
+import { RoundStatusEnum } from '../../../../../staff/staff-dashboard/rounds/enums/round-status.enum';
 
 export class GuestCourseRoundResponse {
   @ApiProperty()
