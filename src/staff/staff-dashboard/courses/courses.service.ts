@@ -186,28 +186,32 @@ export class CoursesService {
       );
     }
 
+    // Validate & cache trainer to avoid a second fetch below
+    let resolvedTrainer: UserEntity | null = null;
     if (dto.trainerId && dto.trainerId !== course.trainerId) {
-      const trainer = await this.trainerRepo.findOne({
+      resolvedTrainer = await this.trainerRepo.findOne({
         where: { id: dto.trainerId },
       });
-      if (!trainer) {
+      if (!resolvedTrainer) {
         throw new NotFoundException(
           this.i18n.t('errors.TRAINER_NOT_FOUND', { lang }) ||
             'Trainer not found',
         );
       }
-      if (trainer.userType !== UserTypeEnum.TRAINER) {
+      if (resolvedTrainer.userType !== UserTypeEnum.TRAINER) {
         throw new BadRequestException(
-        this.i18n.t('errors.NOT_A_TRAINER', { lang }),
-      );
+          this.i18n.t('errors.NOT_A_TRAINER', { lang }),
+        );
       }
     }
 
+    // Validate & cache category to avoid a second fetch below
+    let resolvedCategory: CourseCategoryEntity | null = null;
     if (dto.categoryId && dto.categoryId !== course.categoryId) {
-      const category = await this.categoryRepo.findOne({
+      resolvedCategory = await this.categoryRepo.findOne({
         where: { id: dto.categoryId },
       });
-      if (!category) {
+      if (!resolvedCategory) {
         throw new NotFoundException(
           this.i18n.t('errors.CATEGORY_NOT_FOUND', { lang }) ||
             'Category not found',
@@ -227,25 +231,20 @@ export class CoursesService {
       }
     }
 
-    const courseData: any = { ...dto };
-    if (dto.trainerId) {
-      const trainer = await this.trainerRepo.findOne({
-        where: { id: dto.trainerId },
-      });
-      if (trainer) {
-        courseData.trainerId = trainer.id;
-        course.trainer = trainer;
-      }
+    // Strip Multer file objects from DTO — use resolved URL strings instead
+    const { image: _img, introVideo: _vid, ...safeDto } = dto as any;
+    const courseData: any = { ...safeDto };
+
+    // Apply already-fetched entities — no extra DB round trips
+    if (resolvedTrainer) {
+      courseData.trainerId = resolvedTrainer.id;
+      course.trainer = resolvedTrainer;
     }
-    if (dto.categoryId) {
-      const category = await this.categoryRepo.findOne({
-        where: { id: dto.categoryId },
-      });
-      if (category) {
-        courseData.categoryId = category.id;
-        course.category = category;
-      }
+    if (resolvedCategory) {
+      courseData.categoryId = resolvedCategory.id;
+      course.category = resolvedCategory;
     }
+
     if (image !== undefined) courseData.image = image;
     if (introVideo !== undefined) courseData.introVideo = introVideo;
 
