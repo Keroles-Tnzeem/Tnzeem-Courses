@@ -41,34 +41,54 @@ export class CreateCourseRequest {
 
   @ApiProperty({ type: MultiLingualPropertyDto })
   @ValidateNested()
-  @Transform(({ value }) =>
-    typeof value === 'string' ? JSON.parse(value) : value,
-  )
+  @Transform(({ value }) => {
+    if (typeof value !== 'string') return value;
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  })
   @Type(() => MultiLingualPropertyDto)
   name: MultiLingualPropertyDto;
 
   @ApiProperty({ type: MultiLingualPropertyDto })
   @ValidateNested()
-  @Transform(({ value }) =>
-    typeof value === 'string' ? JSON.parse(value) : value,
-  )
+  @Transform(({ value }) => {
+    if (typeof value !== 'string') return value;
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  })
   @Type(() => MultiLingualPropertyDto)
   description: MultiLingualPropertyDto;
 
   @ApiPropertyOptional({ type: MultiLingualPropertyDto })
   @ValidateNested()
-  @Transform(({ value }) =>
-    typeof value === 'string' ? JSON.parse(value) : value,
-  )
+  @Transform(({ value }) => {
+    if (typeof value !== 'string') return value;
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  })
   @Type(() => MultiLingualPropertyDto)
   @IsOptional()
   requirements?: MultiLingualPropertyDto;
 
   @ApiPropertyOptional({ type: MultiLingualPropertyDto })
   @ValidateNested()
-  @Transform(({ value }) =>
-    typeof value === 'string' ? JSON.parse(value) : value,
-  )
+  @Transform(({ value }) => {
+    if (typeof value !== 'string') return value;
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  })
   @Type(() => MultiLingualPropertyDto)
   @IsOptional()
   benefits?: MultiLingualPropertyDto;
@@ -76,8 +96,12 @@ export class CreateCourseRequest {
   @ApiProperty({ example: 'node-js-course' })
   @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value))
-  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: i18nValidationMessage('validation.INVALID_SLUG') })
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.trim().toLowerCase() : value,
+  )
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+    message: i18nValidationMessage('validation.INVALID_SLUG'),
+  })
   @MaxLength(100, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   slug: string;
 
@@ -119,6 +143,8 @@ export class CreateCourseRequest {
     description: 'Course difficulty level',
     example: CourseLevelEnum.BEGINNER,
   })
-  @IsEnum(CourseLevelEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
+  @IsEnum(CourseLevelEnum, {
+    message: i18nValidationMessage('validation.IS_ENUM'),
+  })
   level: CourseLevelEnum;
 }
