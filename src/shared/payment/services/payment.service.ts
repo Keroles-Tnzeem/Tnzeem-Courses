@@ -1,3 +1,4 @@
+import { translate } from '../../../common/helpers/lang.helper';
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PaymentStrategyFactory } from '../factories/payment-strategy.factory';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
@@ -26,15 +27,15 @@ export class PaymentService {
         });
 
         if (!order) {
-            throw new NotFoundException('Order not found');
+            throw new NotFoundException(translate('errors.ORDER_NOT_FOUND', 'Order not found'));
         }
 
         if (order.status === OrderStatusEnum.CANCELLED) {
-            throw new BadRequestException('Cannot process payment for a cancelled order.');
+            throw new BadRequestException(translate('errors.PAYMENT_ORDER_CANCELLED', 'Cannot process payment for a cancelled order.'));
         }
 
         if (order.paymentStatus === PaymentStatusEnum.COMPLETED) {
-            throw new BadRequestException('Payment is already completed for this order.');
+            throw new BadRequestException(translate('errors.PAYMENT_ALREADY_COMPLETED', 'Payment is already completed for this order.'));
         }
 
         // Resolve the correct strategy
@@ -52,10 +53,10 @@ export class PaymentService {
      */
     async confirmPayment(orderId: string, notes?: string): Promise<OrderEntity> {
         const order = await this.ordersRepository.findOne({ where: { id: orderId } });
-        if (!order) throw new NotFoundException('Order not found');
+        if (!order) throw new NotFoundException(translate('errors.ORDER_NOT_FOUND', 'Order not found'));
 
         if (order.paymentStatus === PaymentStatusEnum.COMPLETED) {
-            throw new BadRequestException('Payment is already completed.');
+            throw new BadRequestException(translate('errors.PAYMENT_ALREADY_COMPLETED', 'Payment is already completed.'));
         }
 
         order.paymentStatus = PaymentStatusEnum.COMPLETED;
@@ -78,7 +79,7 @@ export class PaymentService {
      */
     async failPayment(orderId: string, notes?: string): Promise<OrderEntity> {
         const order = await this.ordersRepository.findOne({ where: { id: orderId } });
-        if (!order) throw new NotFoundException('Order not found');
+        if (!order) throw new NotFoundException(translate('errors.ORDER_NOT_FOUND', 'Order not found'));
 
         order.paymentStatus = PaymentStatusEnum.FAILED;
         
@@ -94,10 +95,10 @@ export class PaymentService {
      */
     async cancelPayment(orderId: string, notes?: string): Promise<OrderEntity> {
         const order = await this.ordersRepository.findOne({ where: { id: orderId } });
-        if (!order) throw new NotFoundException('Order not found');
+        if (!order) throw new NotFoundException(translate('errors.ORDER_NOT_FOUND', 'Order not found'));
 
         if (order.paymentStatus === PaymentStatusEnum.COMPLETED) {
-            throw new BadRequestException('Cannot cancel a completed payment. A refund is required instead.');
+            throw new BadRequestException(translate('errors.PAYMENT_CANNOT_CANCEL_COMPLETED', 'Cannot cancel a completed payment. A refund is required instead.'));
         }
 
         order.paymentStatus = PaymentStatusEnum.CANCELLED;

@@ -1,4 +1,4 @@
-import {Injectable, UnauthorizedException} from "@nestjs/common";
+import {ForbiddenException, Injectable, UnauthorizedException} from "@nestjs/common";
 import {UserTypeEnum} from "../../user/enums/user-type.enum";
 import {UserService} from "../../user/user.service";
 import {JwtPayload, JwtTokenService} from "./jwt.service";
@@ -7,8 +7,6 @@ import {LoginRequest} from "../dto/requests/login.request";
 import {RefreshTokenRequest} from "../dto/requests/refresh-token.request";
 import {TokenResponse} from "../dto/responses/token.response";
 import { I18nService, I18nContext } from 'nestjs-i18n';
-
-const STAFF_TYPES = [UserTypeEnum.ADMIN, UserTypeEnum.SALES];
 
 @Injectable()
 export class AuthService {
@@ -33,6 +31,15 @@ export class AuthService {
 
         if (!passwordMatches) {
             throw new UnauthorizedException(this.i18n.t('errors.INVALID_CREDENTIALS', { lang: I18nContext.current()?.lang }));
+        }
+
+        // Students sign in from the student app (phone + password / OTP), never here.
+        if (user.userType === UserTypeEnum.STUDENT) {
+            throw new ForbiddenException(this.i18n.t('errors.STUDENT_LOGIN_NOT_ALLOWED', { lang: I18nContext.current()?.lang }));
+        }
+
+        if (!user.isActive) {
+            throw new ForbiddenException(this.i18n.t('errors.ACCOUNT_DISABLED', { lang: I18nContext.current()?.lang }));
         }
 
         const payload = {
@@ -69,7 +76,7 @@ export class AuthService {
             const payload = await this.jwtTokenService.verifyRefreshToken(dto.refreshToken);
             
             const user = await this.userService.findById(payload.sub);
-            if (!user) {
+            if (!user || !user.isActive) {
                 throw new UnauthorizedException(this.i18n.t('errors.INVALID_CREDENTIALS', { lang: I18nContext.current()?.lang }));
             }
 

@@ -9,10 +9,12 @@ import {
   Post,
   Query,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
+  ApiBearerAuth,
   ApiConsumes,
   ApiOperation,
   ApiParam,
@@ -30,8 +32,13 @@ import { PaginationResponseDto as PaginationResponse } from '../../../common/dto
 import { StorageService } from '../../../shared/storage/storage.service';
 import { UploadType } from '../../../shared/storage/enums/upload-type.enum';
 import { Lang } from '../../../common/decorators/lang.decorator';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../../common/guards/permissions.guard';
+import { Permissions } from '../../../common/decorators/permissions.decorator';
 
 @ApiTags('Courses')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('staff-dashboard/courses')
 export class CoursesController {
   constructor(
@@ -39,6 +46,7 @@ export class CoursesController {
     private readonly storageService: StorageService,
   ) {}
 
+  @Permissions('courses.create')
   @Post()
   @ApiOperation({ summary: 'Create Course' })
   @ApiConsumes('multipart/form-data')
@@ -84,6 +92,7 @@ export class CoursesController {
     return ApiResponseDto.success(course);
   }
 
+  @Permissions('courses.view')
   @Get()
   @ApiOperation({ summary: 'Return paginated courses' })
   @ApiResponse({ status: 200, type: CourseResponse, isArray: true })
@@ -94,6 +103,7 @@ export class CoursesController {
     return await this.coursesService.findAll(query, lang);
   }
 
+  @Permissions('courses.view')
   @Get(':id')
   @ApiOperation({
     summary: 'Return a single course with its trainer and category',
@@ -108,6 +118,7 @@ export class CoursesController {
     return ApiResponseDto.success(course);
   }
 
+  @Permissions('courses.update')
   @Patch(':id')
   @ApiOperation({ summary: 'Update course' })
   @ApiConsumes('multipart/form-data')
@@ -156,6 +167,7 @@ export class CoursesController {
     return ApiResponseDto.success(course);
   }
 
+  @Permissions('courses.delete')
   @Delete(':id')
   @ApiOperation({ summary: 'Soft delete course' })
   @ApiParam({ name: 'id', type: Number })

@@ -14,7 +14,7 @@ export class CreateEnrollmentRequest {
   @ApiProperty({ example: 5, description: 'ID of the round to enroll the student in' })
   @Type(() => Number)
   @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
-  @Min(1)
+  @Min(1, { message: i18nValidationMessage('validation.MIN') })
   @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
   roundId: number;
 

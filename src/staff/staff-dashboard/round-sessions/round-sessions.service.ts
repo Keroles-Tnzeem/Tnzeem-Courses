@@ -1,3 +1,4 @@
+import { assertSessionWithinRound } from '../../../common/helpers/round-dates.helper';
 import {
     BadRequestException,
     Injectable,
@@ -37,6 +38,10 @@ export class RoundSessionsService {
             throw new NotFoundException(
                 this.i18n.t('errors.ROUND_NOT_FOUND', { lang: getLang() }),
             );
+        }
+
+        if (dto.scheduledAt) {
+            assertSessionWithinRound(new Date(dto.scheduledAt), round);
         }
 
         const duplicate = await this.sessionRepository.findOne({
@@ -137,6 +142,11 @@ export class RoundSessionsService {
                     this.i18n.t('errors.SESSION_NUMBER_TAKEN', { lang: getLang() }),
                 );
             }
+        }
+
+        if (dto.scheduledAt) {
+            const round = await this.roundRepository.findOne({ where: { id: entity.roundId } });
+            if (round) assertSessionWithinRound(new Date(dto.scheduledAt), round);
         }
 
         if (dto.scheduledAt !== undefined) {

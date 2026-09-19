@@ -5,6 +5,8 @@ import {
   IsString,
   MinLength,
   ValidateIf,
+  Matches,
+  MaxLength,
 } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiProperty } from '@nestjs/swagger';
@@ -22,6 +24,7 @@ export class VerifyOtpRequest {
   @ApiProperty({ example: '123456' })
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
   @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
+  @Matches(/^\d{6}$/, { message: i18nValidationMessage('validation.INVALID_OTP_CODE') })
   code: string;
 
   @ApiProperty({ enum: OtpPurposeEnum })
@@ -40,6 +43,8 @@ export class VerifyOtpRequest {
   )
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
   @MinLength(8, { message: i18nValidationMessage('validation.MIN_LENGTH') })
+  @MaxLength(72, { message: i18nValidationMessage('validation.MAX_LENGTH') })
+  @Matches(/(?=.*[A-Za-z])(?=.*\d)/, { message: i18nValidationMessage('validation.WEAK_PASSWORD') })
   @IsOptional()
   newPassword?: string;
 }

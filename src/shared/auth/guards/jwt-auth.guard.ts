@@ -1,3 +1,4 @@
+import { translate } from '../../../common/helpers/lang.helper';
 import {
     CanActivate,
     ExecutionContext,
@@ -17,7 +18,7 @@ export class JwtAuthGuard implements CanActivate {
         const token = this.extractTokenFromHeader(request);
 
         if (!token) {
-            throw new UnauthorizedException('Missing bearer token');
+            throw new UnauthorizedException(translate('errors.MISSING_TOKEN', 'Missing bearer token'));
         }
 
         try {
@@ -26,7 +27,7 @@ export class JwtAuthGuard implements CanActivate {
             request.user = payload; // available afterwards via @CurrentUser()
             return true;
         } catch {
-            throw new UnauthorizedException('Invalid or expired token');
+            throw new UnauthorizedException(translate('errors.INVALID_TOKEN', 'Invalid or expired token'));
         }
     }
 

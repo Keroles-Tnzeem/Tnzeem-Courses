@@ -1,3 +1,4 @@
+import { translate } from '../../../common/helpers/lang.helper';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PaymentStrategy } from '../interfaces/payment-strategy.interface';
 import { PaymentMethodEnum } from '../enums/payment-method.enum';
@@ -14,7 +15,7 @@ export class BankTransferPaymentStrategy implements PaymentStrategy {
 
     async processPayment(order: OrderEntity, dto: CreatePaymentDto): Promise<OrderEntity> {
         if (!dto.referenceNumber) {
-            throw new BadRequestException('Bank transfer requires a reference number.');
+            throw new BadRequestException(translate('errors.PAYMENT_BANK_REFERENCE_REQUIRED', 'Bank transfer requires a reference number.'));
         }
 
         order.paymentType = PaymentTypeEnum.MANUAL;

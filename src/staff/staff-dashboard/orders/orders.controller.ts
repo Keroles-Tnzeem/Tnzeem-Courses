@@ -22,6 +22,8 @@ import {
 } from '@nestjs/swagger';
 import { Express } from 'express';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../../common/guards/permissions.guard';
+import { Permissions } from '../../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { Lang } from '../../../common/decorators/lang.decorator';
 import { JwtPayload } from '../../../shared/auth/services/jwt.service';
@@ -38,7 +40,7 @@ import { OrderDetailsResponse } from './dto/responses/order-details.response';
 
 @ApiTags('Staff Dashboard — Orders')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('staff-dashboard/orders')
 export class OrdersController {
   constructor(
@@ -48,6 +50,7 @@ export class OrdersController {
 
   // ── Create ────────────────────────────────────────────────────────────────
 
+  @Permissions('orders.create')
   @Post()
   @ApiOperation({ summary: 'Create a new order (staff)' })
   @ApiConsumes('multipart/form-data')
@@ -77,6 +80,7 @@ export class OrdersController {
 
   // ── Find All ──────────────────────────────────────────────────────────────
 
+  @Permissions('orders.view')
   @Get()
   @ApiOperation({ summary: 'List all orders (paginated, filtered, sortable)' })
   @ApiResponse({ status: 200, type: OrderResponse, isArray: true })
@@ -89,6 +93,7 @@ export class OrdersController {
 
   // Find One
 
+  @Permissions('orders.view')
   @Get(':id')
   @ApiOperation({ summary: 'Get a single order by ULID' })
   @ApiParam({ name: 'id', type: String, description: 'Order ULID' })
@@ -104,6 +109,7 @@ export class OrdersController {
 
   // Update
 
+  @Permissions('orders.update')
   @Patch(':id')
   @ApiOperation({ summary: 'Update an order (status, payment info, etc.)' })
   @ApiConsumes('multipart/form-data')
@@ -135,6 +141,7 @@ export class OrdersController {
 
   // ── Cancel ────────────────────────────────────────────────────────────────
 
+  @Permissions('orders.delete')
   @Delete(':id')
   @ApiOperation({ summary: 'Cancel an order (sets status to CANCELLED)' })
   @ApiParam({ name: 'id', type: String, description: 'Order ULID' })

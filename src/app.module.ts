@@ -28,13 +28,15 @@ import { GuestCourseCategoriesModule } from './website/shared/course-categories/
 import { GuestCourseRoundsModule } from './website/shared/course-rounds/course-rounds.module';
 import { GuestCoursesModule } from './website/shared/courses/courses.module';
 import { MenuModule } from './staff/staff-dashboard/menu/menu.module';
-import { ContactUsModule } from "./website/guest/countact-us/contact-us.module";
 import { WebsiteMenuModule } from "./website/shared/menu/menu.module";
 import { EnrollmentsModule } from './shared/enrollments/enrollments.module';
 import { CertificatesModule } from './website/shared/certificates/certificates.module';
 import { StaffEnrollmentsModule } from './staff/staff-dashboard/enrollments/enrollments.module';
 import { OrderCommentsModule } from './staff/staff-dashboard/order-comments/order-comments.module';
 import { WebsiteStudentModule } from './website/student/student.module';
+
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 const i18nPath = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, '..', 'i18n')
@@ -66,6 +68,8 @@ const i18nPath = process.env.NODE_ENV === 'production'
         AcceptLanguageResolver,
       ],
     }),
+    // Global safety net; stricter @Throttle() limits are set on auth/OTP/contact endpoints.
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
     AuthModule,
     UserModule,
     StaffModule,
@@ -85,7 +89,6 @@ const i18nPath = process.env.NODE_ENV === 'production'
     GuestCourseRoundsModule,
     GuestCoursesModule,
     MenuModule,
-    ContactUsModule,
     WebsiteMenuModule,
     EnrollmentsModule,
     StaffEnrollmentsModule,
@@ -95,7 +98,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
     WebsiteStudentModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

@@ -16,7 +16,12 @@ export const AppDataSource = new DataSource({
         process.env.NODE_ENV === 'production'
             ? { rejectUnauthorized: false }
             : false,
-    synchronize: process.env.TYPEORM_SYNC === 'true' || process.env.NODE_ENV !== 'production',
+    // Schema auto-sync is opt-in: on by default only for NODE_ENV=development.
+    // TYPEORM_SYNC=true/false overrides. Staging/production use migrations.
+    synchronize:
+        process.env.TYPEORM_SYNC !== undefined
+            ? process.env.TYPEORM_SYNC === 'true'
+            : process.env.NODE_ENV === 'development',
     entities: [path.join(__dirname, '../**/*.entity.{ts,js}')],
     migrations: [path.join(__dirname, 'migrations/*.{ts,js}')],
     migrationsTableName: 'typeorm_migrations',

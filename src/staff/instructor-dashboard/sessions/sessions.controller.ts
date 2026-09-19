@@ -78,8 +78,7 @@ export class InstructorSessionsController {
     @Param('roundId', ParseIntPipe) roundId: number,
     @Query() query: QuerySessionRequest,
   ) {
-    query.roundId = roundId;
-    const res = await this.sessionsService.findAll(trainer.sub, query);
+    const res = await this.sessionsService.findByRound(trainer.sub, roundId, query);
     res.message = this.i18n.t('common.success', { lang: getLang() });
     return res;
   }

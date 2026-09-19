@@ -1,3 +1,4 @@
+import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsOptional, IsString } from 'class-validator';
 import { PaginationRequest } from '../../../../../common/dto/requests/pagination.request';
@@ -5,7 +6,7 @@ import { PaginationRequest } from '../../../../../common/dto/requests/pagination
 export class QueryOrderCommentRequest extends PaginationRequest {
     @ApiPropertyOptional()
     @IsOptional()
-    @IsString()
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
     orderId?: string;
 
     @ApiPropertyOptional({ enum: ['createdAt'] })

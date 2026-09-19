@@ -1,3 +1,4 @@
+import { assertRoundDatesValid } from '../../../common/helpers/round-dates.helper';
 import {
     BadRequestException,
     Injectable,
@@ -45,6 +46,8 @@ export class RoundsService {
                 this.i18n.t('errors.ROUND_NUMBER_TAKEN', { lang: getLang() }),
             );
         }
+
+        assertRoundDatesValid(dto.startDate, dto.endDate);
 
         const entity = this.roundRepository.create({
             courseId: dto.courseId,
@@ -148,6 +151,8 @@ export class RoundsService {
         if (dto.endDate !== undefined) {
             entity.endDate = dto.endDate ? new Date(dto.endDate) : null as unknown as Date;
         }
+        assertRoundDatesValid(entity.startDate, entity.endDate);
+
         if (dto.roundNumber !== undefined) entity.roundNumber = dto.roundNumber;
         if (dto.status !== undefined) entity.status = dto.status;
         if (dto.notes !== undefined) entity.notes = dto.notes;

@@ -1,3 +1,4 @@
+import { assertSessionWithinRound } from '../../../common/helpers/round-dates.helper';
 import {
   BadRequestException,
   Injectable,
@@ -42,7 +43,10 @@ export class InstructorSessionsService {
   }
 
   async create(trainerId: number, dto: CreateSessionRequest): Promise<SessionResponse> {
-    await this.verifyRoundOwnership(dto.roundId, trainerId);
+    const round = await this.verifyRoundOwnership(dto.roundId, trainerId);
+    if (dto.scheduledAt) {
+      assertSessionWithinRound(new Date(dto.scheduledAt), round);
+    }
 
     const duplicate = await this.sessionRepo.findOne({
       where: { roundId: dto.roundId, sessionNumber: dto.sessionNumber },
@@ -66,6 +70,17 @@ export class InstructorSessionsService {
 
     const saved = await this.sessionRepo.save(entity);
     return SessionResponse.fromEntity(saved);
+  }
+
+  /** Sessions of one round; 404 when the round is not the trainer's own. */
+  async findByRound(
+    trainerId: number,
+    roundId: number,
+    query: QuerySessionRequest,
+  ): Promise<PaginationResponse<SessionResponse>> {
+    await this.verifyRoundOwnership(roundId, trainerId);
+    query.roundId = roundId;
+    return this.findAll(trainerId, query);
   }
 
   async findAll(
@@ -141,6 +156,11 @@ export class InstructorSessionsService {
         );
       }
       entity.sessionNumber = dto.sessionNumber;
+    }
+
+    if (dto.scheduledAt) {
+      const round = await this.roundRepo.findOne({ where: { id: entity.roundId } });
+      if (round) assertSessionWithinRound(new Date(dto.scheduledAt), round);
     }
 
     if (dto.scheduledAt !== undefined) {

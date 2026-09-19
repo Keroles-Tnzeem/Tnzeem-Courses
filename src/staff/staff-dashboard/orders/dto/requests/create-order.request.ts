@@ -61,7 +61,7 @@ export class CreateOrderRequest {
 
     @ApiPropertyOptional({ example: 'order notes' })
     @IsOptional()
-    @IsString()
-    @MaxLength(500)
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+    @MaxLength(500, { message: i18nValidationMessage('validation.MAX_LENGTH') })
     notes?: string;
 }

@@ -1,9 +1,12 @@
+import { i18nValidationMessage } from 'nestjs-i18n';
 import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  Matches,
+  MaxLength,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -13,20 +16,20 @@ import { CourseLevelEnum } from '../../../../../common/enums/course-level.enum';
 
 class MultiLingualPropertyDto {
   @ApiProperty({ example: 'دورة نود جي إس' })
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
+  @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
   ar: string;
 
   @ApiProperty({ example: 'Node.js Course' })
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
+  @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
   en: string;
 }
 
 export class CreateCourseRequest {
   @ApiProperty({ example: 1 })
-  @IsNotEmpty()
-  @IsNumber()
+  @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
+  @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
   @Type(() => Number)
   categoryId: number;
 
@@ -65,8 +68,11 @@ export class CreateCourseRequest {
   benefits?: MultiLingualPropertyDto;
 
   @ApiProperty({ example: 'node-js-course' })
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
+  @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value))
+  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: i18nValidationMessage('validation.INVALID_SLUG') })
+  @MaxLength(100, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   slug: string;
 
   @ApiPropertyOptional({
@@ -84,20 +90,20 @@ export class CreateCourseRequest {
   introVideo?: any;
 
   @ApiProperty({ example: 10 })
-  @IsNumber()
-  @Min(0)
+  @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
+  @Min(0, { message: i18nValidationMessage('validation.MIN') })
   @Type(() => Number)
   sessionsCount: number;
 
   @ApiProperty({ example: 20 })
-  @IsNumber()
-  @Min(1)
+  @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
+  @Min(1, { message: i18nValidationMessage('validation.MIN') })
   @Type(() => Number)
   durationHours: number;
 
   @ApiProperty({ example: 99.99 })
-  @IsNumber()
-  @Min(0)
+  @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
+  @Min(0, { message: i18nValidationMessage('validation.MIN') })
   @Type(() => Number)
   price: number;
 
@@ -107,6 +113,6 @@ export class CreateCourseRequest {
     description: 'Course difficulty level',
     example: CourseLevelEnum.BEGINNER,
   })
-  @IsEnum(CourseLevelEnum)
+  @IsEnum(CourseLevelEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
   level: CourseLevelEnum;
 }

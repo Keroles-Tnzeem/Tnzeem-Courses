@@ -1,3 +1,4 @@
+import { Throttle } from '@nestjs/throttler';
 import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -23,6 +24,7 @@ export class StudentAuthController {
     private readonly i18n: I18nService,
   ) {}
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('register')
   @UseInterceptors(AnyFilesInterceptor())
   @ApiOperation({
@@ -43,6 +45,7 @@ export class StudentAuthController {
     );
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @UseInterceptors(AnyFilesInterceptor())
   @ApiOperation({ summary: 'Authenticate a student with email/password' })
@@ -60,6 +63,7 @@ export class StudentAuthController {
     );
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('google')
   @UseInterceptors(AnyFilesInterceptor())
   @ApiOperation({
@@ -80,6 +84,7 @@ export class StudentAuthController {
     );
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('apple')
   @UseInterceptors(AnyFilesInterceptor())
   @ApiOperation({
@@ -100,6 +105,7 @@ export class StudentAuthController {
     );
   }
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('forget-password')
   @UseInterceptors(AnyFilesInterceptor())
   @ApiOperation({ summary: "Request an OTP to reset a student's password" })
@@ -117,6 +123,7 @@ export class StudentAuthController {
     );
   }
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('send-otp')
   @UseInterceptors(AnyFilesInterceptor())
   @ApiOperation({
@@ -137,6 +144,7 @@ export class StudentAuthController {
     );
   }
 
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('verify-otp')
   @UseInterceptors(AnyFilesInterceptor())
   @ApiOperation({

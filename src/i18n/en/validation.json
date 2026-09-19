@@ -3,9 +3,23 @@
     "IS_NOT_EMPTY": "The {property} field should not be empty",
     "IS_STRING": "{property} must be a string",
     "IS_NUMBER": "{property} must be a number",
+    "IS_BOOLEAN": "{property} must be a boolean",
     "IS_STAFF_TYPE": "userType must be either 'sales' or 'support'",
     "IS_ENUM": "{property} must be a valid enum value",
     "INVALID_SAUDI_PHONE": "Phone must be a valid Saudi mobile number (e.g. 5XXXXXXXX or 05XXXXXXXX)",
-    "MIN_LENGTH": "{property} must be at least {constraint1} characters"
-
+    "MIN_LENGTH": "{property} must be at least {constraints.0} characters",
+    "IS_INT": "{property} must be an integer",
+    "IS_POSITIVE": "{property} must be a positive number",
+    "IS_ARRAY": "{property} must be an array",
+    "IS_OBJECT": "{property} must be an object",
+    "IS_URL": "{property} must be a valid URL",
+    "IS_DATE": "{property} must be a valid date",
+    "IS_DATE_STRING": "{property} must be a valid ISO date string",
+    "IS_UUID": "{property} must be a valid UUID",
+    "MIN": "{property} must not be less than {constraints.0}",
+    "MAX": "{property} must not be greater than {constraints.0}",
+    "MAX_LENGTH": "{property} must be at most {constraints.0} characters",
+    "INVALID_SLUG": "{property} may only contain lowercase letters, numbers and single hyphens (e.g. node-js-course)",
+    "INVALID_OTP_CODE": "The verification code must be 6 digits",
+    "WEAK_PASSWORD": "{property} must contain at least one letter and one number"
 }

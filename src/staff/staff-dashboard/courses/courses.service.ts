@@ -54,7 +54,9 @@ export class CoursesService {
       );
     }
     if (trainer.userType !== UserTypeEnum.TRAINER) {
-      throw new BadRequestException('Assigned user is not a trainer');
+      throw new BadRequestException(
+        this.i18n.t('errors.NOT_A_TRAINER', { lang }),
+      );
     }
 
     // Verify Category
@@ -185,7 +187,9 @@ export class CoursesService {
         );
       }
       if (trainer.userType !== UserTypeEnum.TRAINER) {
-        throw new BadRequestException('Assigned user is not a trainer');
+        throw new BadRequestException(
+        this.i18n.t('errors.NOT_A_TRAINER', { lang }),
+      );
       }
     }
 

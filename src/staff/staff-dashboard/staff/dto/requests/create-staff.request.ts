@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsArray, IsNumber } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsArray, IsNumber, MinLength } from 'class-validator';
 import { Type } from 'class-transformer';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { UserTypeEnum } from '../../../../../shared/user/enums/user-type.enum';
@@ -27,6 +27,7 @@ export class CreateStaffRequest {
 
     @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
     @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
+    @MinLength(6, { message: i18nValidationMessage('validation.MIN_LENGTH') })
     password: string;
 
     @IsEnum([UserTypeEnum.SALES, UserTypeEnum.SUPPORT], {
@@ -35,8 +36,8 @@ export class CreateStaffRequest {
     userType: UserTypeEnum.SALES | UserTypeEnum.SUPPORT;
 
     @IsOptional()
-    @IsArray()
+    @IsArray({ message: i18nValidationMessage('validation.IS_ARRAY') })
     @Type(() => Number)
-    @IsNumber({}, { each: true })
+    @IsNumber({}, { each: true, message: i18nValidationMessage('validation.IS_NUMBER') })
     permissionIds?: number[];
 }

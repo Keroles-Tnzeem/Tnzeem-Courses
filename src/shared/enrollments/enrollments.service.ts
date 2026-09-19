@@ -93,6 +93,10 @@ export class EnrollmentsService {
         return enrollment;
     }
 
+    async findByOrderId(orderId: string): Promise<EnrollmentEntity | null> {
+        return this.enrollmentsRepository.findOne({ where: { orderId } });
+    }
+
     // Create
 
     async create(dto: CreateEnrollmentRequest): Promise<EnrollmentEntity> {

@@ -1,3 +1,4 @@
+import { assertRoundDatesValid } from '../../../common/helpers/round-dates.helper';
 import {
   BadRequestException,
   Injectable,
@@ -56,6 +57,8 @@ export class InstructorRoundsService {
           'Round number already exists for this course',
       );
     }
+
+    assertRoundDatesValid(dto.startDate, dto.endDate);
 
     const entity = this.roundRepo.create({
       courseId: dto.courseId,
@@ -182,6 +185,8 @@ export class InstructorRoundsService {
     if (dto.endDate !== undefined) {
       entity.endDate = dto.endDate ? new Date(dto.endDate) : null as unknown as Date;
     }
+    assertRoundDatesValid(entity.startDate, entity.endDate);
+
     if (dto.status !== undefined) entity.status = dto.status;
     if (dto.showRound !== undefined) entity.showRound = dto.showRound;
     if (dto.notes !== undefined) entity.notes = dto.notes;

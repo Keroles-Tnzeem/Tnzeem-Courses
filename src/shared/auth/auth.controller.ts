@@ -1,3 +1,4 @@
+import { Throttle } from '@nestjs/throttler';
 import { Body, Controller, Post, UseInterceptors } from "@nestjs/common";
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import {AuthService} from "./services/auth.service";
@@ -17,7 +18,8 @@ export class AuthController {
         private readonly i18n: I18nService
     ) {}
 
-    @Post('login')
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post('login')
     @UseInterceptors(AnyFilesInterceptor())
     @ApiOperation({ summary: 'Authenticate a user and return access tokens' })
     @ApiCreatedResponse({ description: 'User authenticated successfully', type: LoginResponse })
@@ -31,7 +33,8 @@ export class AuthController {
         );
     }
 
-    @Post('refresh')
+    @Throttle({ default: { limit: 20, ttl: 60000 } })
+  @Post('refresh')
     @UseInterceptors(AnyFilesInterceptor())
     @ApiOperation({ summary: 'Refresh an access token' })
     @ApiCreatedResponse({ description: 'Access token refreshed successfully', type: TokenResponse })

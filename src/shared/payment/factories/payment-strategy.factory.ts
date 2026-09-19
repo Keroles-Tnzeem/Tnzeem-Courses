@@ -1,3 +1,4 @@
+import { translate } from '../../../common/helpers/lang.helper';
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { PaymentStrategy } from '../interfaces/payment-strategy.interface';
 import { PaymentMethodEnum } from '../enums/payment-method.enum';
@@ -27,7 +28,7 @@ export class PaymentStrategyFactory {
     getStrategy(method: PaymentMethodEnum): PaymentStrategy {
         const strategy = this.strategies.find(s => s.supports(method));
         if (!strategy) {
-            throw new BadRequestException(`No payment strategy found for method: ${method}`);
+            throw new BadRequestException(translate('errors.PAYMENT_METHOD_UNSUPPORTED', `No payment strategy found for method: ${method}`));
         }
         return strategy;
     }

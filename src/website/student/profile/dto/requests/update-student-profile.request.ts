@@ -1,4 +1,10 @@
-import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { GenderEnum } from '../../../../../shared/user/enums/gender.enum';
@@ -7,11 +13,13 @@ export class UpdateStudentProfileRequest {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+  @MaxLength(50, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   firstName?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+  @MaxLength(50, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   lastName?: string;
 
   @ApiPropertyOptional()

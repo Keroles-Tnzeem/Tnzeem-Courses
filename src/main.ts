@@ -14,6 +14,11 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
+
+  // Behind a reverse proxy (nginx/DO) rate limiting needs the real client IP.
+  if (process.env.TRUST_PROXY === 'true') {
+    app.set('trust proxy', 1);
+  }
   const allowedOrigins: string[] = configService.get<string[]>('app.cors.allowedOrigins') ?? [];
 
   // CORS — origins are driven by CORS_ALLOWED_ORIGINS in .env
@@ -22,7 +27,8 @@ async function bootstrap() {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error(`CORS policy: origin "${origin}" is not allowed`));
+        // Reject cleanly (no CORS headers) instead of throwing, which surfaced as a 500.
+        callback(null, false);
       }
     },
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],

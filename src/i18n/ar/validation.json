@@ -3,9 +3,23 @@
     "IS_NOT_EMPTY": "حقل {property} لا يجب أن يكون فارغًا",
     "IS_STRING": "يجب أن يكون {property} نصًا",
     "IS_NUMBER": "يجب أن يكون {property} رقمًا",
+    "IS_BOOLEAN": "يجب أن يكون {property} قيمة منطقية",
     "IS_STAFF_TYPE": "يجب أن يكون نوع المستخدم 'sales' أو 'support' فقط",
     "IS_ENUM": "قيمة {property} غير صالحة",
     "INVALID_SAUDI_PHONE": "رقم الهاتف يجب أن يكون رقم جوال سعودي صحيح (مثال: 5XXXXXXXX أو 05XXXXXXXX)",
-    "MIN_LENGTH": "يجب أن يحتوي {property} على {constraint1} أحرف على الأقل"
-
+    "MIN_LENGTH": "يجب أن يحتوي {property} على {constraints.0} أحرف على الأقل",
+    "IS_INT": "يجب أن يكون {property} عددًا صحيحًا",
+    "IS_POSITIVE": "يجب أن يكون {property} رقمًا موجبًا",
+    "IS_ARRAY": "يجب أن يكون {property} مصفوفة",
+    "IS_OBJECT": "يجب أن يكون {property} كائنًا",
+    "IS_URL": "يجب أن يكون {property} رابطًا صحيحًا",
+    "IS_DATE": "يجب أن يكون {property} تاريخًا صحيحًا",
+    "IS_DATE_STRING": "يجب أن يكون {property} تاريخًا صحيحًا بصيغة ISO",
+    "IS_UUID": "يجب أن يكون {property} معرّفًا (UUID) صحيحًا",
+    "MIN": "يجب ألا يقل {property} عن {constraints.0}",
+    "MAX": "يجب ألا يزيد {property} عن {constraints.0}",
+    "MAX_LENGTH": "يجب ألا يزيد {property} عن {constraints.0} حرفًا",
+    "INVALID_SLUG": "يجب أن يحتوي {property} على أحرف إنجليزية صغيرة وأرقام وشرطات مفردة فقط (مثال: node-js-course)",
+    "INVALID_OTP_CODE": "يجب أن يتكون رمز التحقق من 6 أرقام",
+    "WEAK_PASSWORD": "يجب أن تحتوي {property} على حرف واحد ورقم واحد على الأقل"
 }

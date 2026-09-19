@@ -5,7 +5,8 @@ export class VerifyOtpResponse {
   @ApiProperty({ example: true })
   verified: boolean;
 
-  // Always returned on successful verification (all purposes)
+  // Returned for purposes register and login only. forget_password does not
+  // sign the user in; they must log in with the new password.
   @ApiProperty({ required: false })
   accessToken?: string;
 

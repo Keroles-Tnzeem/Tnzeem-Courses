@@ -30,8 +30,8 @@ npm run migration:run
 npm run migration:revert
 ```
 
-Note: `synchronize` is ON in non-production (`database.config.ts`), so schema auto-syncs from
-entities in dev. Migrations in `src/database/migrations/` are for production/explicit changes
+Note: `synchronize` is ON only when `NODE_ENV=development` (or `TYPEORM_SYNC=true`; `TYPEORM_SYNC=false`
+forces it off), so schema auto-syncs from entities in local dev only. Staging/production must use migrations. Migrations in `src/database/migrations/` are for production/explicit changes
 (e.g. SQL views like `TrainerStatisticsView`). Migration CLI uses `src/database/data-source.ts`.
 
 ## Architecture
@@ -40,7 +40,7 @@ entities in dev. Migrations in `src/database/migrations/` are for production/exp
 Feature modules are grouped by consumer, all wired in `src/app.module.ts`:
 - `src/staff-dashboard/*` — admin/support/sales; RBAC-protected
 - `src/instructor-dashboard/*` — trainer self-service (Phase 2)
-- `src/website/*` — public/guest endpoints (`website/guest`, `website/shared`)
+- `src/website/*` — public and student-facing endpoints (`website/shared`, `website/student`)
 - `src/shared/*` — cross-audience domains: `auth`, `user`, `orders`, `payment`, `enrollments`, `storage`
 - `src/common/*` — decorators, guards, pipes, DTO bases, helpers (no feature logic)
 

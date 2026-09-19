@@ -1,4 +1,12 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsNumber,
+  MinLength,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { GenderEnum } from '../../../../../shared/user/enums/gender.enum';
@@ -22,6 +30,7 @@ export class CreateTrainerRequest {
 
     @IsOptional()
     @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+    @MinLength(6, { message: i18nValidationMessage('validation.MIN_LENGTH') })
     password?: string;
 
     @IsEnum(GenderEnum, { message: i18nValidationMessage('validation.IS_ENUM') })

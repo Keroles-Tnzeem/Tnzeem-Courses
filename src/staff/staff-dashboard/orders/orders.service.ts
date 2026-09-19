@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { OrdersRepository } from '../../../shared/orders/repositories/orders.repository';
 import { OrderCreatorTypeEnum } from '../../../shared/orders/enums/order-creator-type.enum';
@@ -51,7 +55,7 @@ export class OrdersService {
   ): Promise<OrderResponse> {
     if (!dto.roundId && !dto.courseId) {
       throw new BadRequestException(
-        'Either roundId or courseId must be provided',
+        this.i18n.t('errors.ROUND_OR_COURSE_REQUIRED', { lang }),
       );
     }
 
@@ -290,11 +294,37 @@ export class OrdersService {
       );
     }
 
-    if (dto.status !== undefined) {
-      order.status = dto.status;
+    // The round must be settled first: confirming needs the final round.
+    if (dto.roundId !== undefined && dto.roundId !== order.roundId) {
+      // After confirmation the enrollment is tied to the round, so it can't move.
+      if (order.status !== OrderStatusEnum.PENDING) {
+        throw new ConflictException(
+          this.i18n.t('errors.ORDER_ROUND_LOCKED', { lang }),
+        );
+      }
+      const round = await this.roundsService.findOne(dto.roundId);
+      if (!round.course) {
+        throw new NotFoundException(
+          this.i18n.t('errors.COURSE_NOT_FOUND', { lang }),
+        );
+      }
+      order.roundId = dto.roundId;
+      order.courseId = round.courseId;
+      order.trainerId = round.course.trainerId;
+    }
 
-      // Auto-update payment status and paidAt based on order status
+    if (dto.status !== undefined && dto.status !== order.status) {
+      this.assertStatusTransition(order.status, dto.status, lang);
+
       if (dto.status === OrderStatusEnum.CONFIRMED) {
+        // An enrollment always belongs to a round.
+        if (order.roundId == null) {
+          throw new BadRequestException(
+            this.i18n.t('errors.ORDER_ROUND_REQUIRED_TO_CONFIRM', { lang }),
+          );
+        }
+
+        order.status = OrderStatusEnum.CONFIRMED;
         order.paymentStatus = PaymentStatusEnum.COMPLETED;
         order.paidAt = new Date();
 
@@ -302,13 +332,15 @@ export class OrdersService {
         if (!order.hasEnrollment) {
           await this.enrollmentsService.create({
             studentId: order.studentId,
-            ...(order.roundId != null && { roundId: order.roundId }),
+            roundId: order.roundId,
             orderId: order.id,
             status: EnrollmentStatusEnum.PENDING,
           });
           order.hasEnrollment = true;
         }
       } else if (dto.status === OrderStatusEnum.CANCELLED) {
+        await this.removeEnrollmentOf(order, lang);
+        order.status = OrderStatusEnum.CANCELLED;
         order.paymentStatus = PaymentStatusEnum.CANCELLED;
       }
     }
@@ -323,18 +355,6 @@ export class OrdersService {
     if (transferBankImgUrl !== undefined)
       order.transferBankImg = transferBankImgUrl;
     if (dto.assignToId !== undefined) order.assignToId = dto.assignToId;
-
-    if (dto.roundId !== undefined) {
-      const round = await this.roundsService.findOne(dto.roundId);
-      if (!round.course) {
-        throw new NotFoundException(
-          this.i18n.t('errors.COURSE_NOT_FOUND', { lang }),
-        );
-      }
-      order.roundId = dto.roundId;
-      order.courseId = round.courseId;
-      order.trainerId = round.course.trainerId;
-    }
 
     const updated = await this.ordersRepository.save(order);
 
@@ -369,8 +389,55 @@ export class OrdersService {
       );
     }
 
+    // Already cancelled: nothing to do (idempotent).
+    if (order.status === OrderStatusEnum.CANCELLED) return;
+
+    await this.removeEnrollmentOf(order, lang);
     order.status = OrderStatusEnum.CANCELLED;
     order.paymentStatus = PaymentStatusEnum.CANCELLED;
     await this.ordersRepository.save(order);
+  }
+
+  // ── Rules
+
+  /** PENDING -> CONFIRMED | CANCELLED, CONFIRMED -> CANCELLED. CANCELLED is final. */
+  private assertStatusTransition(
+    from: OrderStatusEnum,
+    to: OrderStatusEnum,
+    lang: string,
+  ): void {
+    const allowed: Record<OrderStatusEnum, OrderStatusEnum[]> = {
+      [OrderStatusEnum.PENDING]: [
+        OrderStatusEnum.CONFIRMED,
+        OrderStatusEnum.CANCELLED,
+      ],
+      [OrderStatusEnum.CONFIRMED]: [OrderStatusEnum.CANCELLED],
+      [OrderStatusEnum.CANCELLED]: [],
+    };
+    if (!allowed[from].includes(to)) {
+      throw new ConflictException(
+        this.i18n.t('errors.ORDER_INVALID_STATUS_TRANSITION', { lang }),
+      );
+    }
+  }
+
+  /**
+   * Cancelling an order removes the enrollment it created. A completed
+   * enrollment (certificate issued) blocks the cancellation.
+   */
+  private async removeEnrollmentOf(
+    order: { id: string; hasEnrollment: boolean },
+    lang: string,
+  ): Promise<void> {
+    const enrollment = await this.enrollmentsService.findByOrderId(order.id);
+    if (enrollment) {
+      if (enrollment.status === EnrollmentStatusEnum.COMPLETED) {
+        throw new ConflictException(
+          this.i18n.t('errors.ORDER_CANNOT_CANCEL_COMPLETED', { lang }),
+        );
+      }
+      await this.enrollmentsService.remove(enrollment.id);
+    }
+    order.hasEnrollment = false;
   }
 }

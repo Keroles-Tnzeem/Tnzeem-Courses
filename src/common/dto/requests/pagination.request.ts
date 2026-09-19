@@ -1,3 +1,4 @@
+import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Min } from 'class-validator';
@@ -5,20 +6,20 @@ import { IsInt, IsOptional, IsString, Min } from 'class-validator';
 export class PaginationRequest {
     @ApiPropertyOptional({ default: 1 })
     @Type(() => Number)
-    @IsInt()
-    @Min(1)
+    @IsInt({ message: i18nValidationMessage('validation.IS_INT') })
+    @Min(1, { message: i18nValidationMessage('validation.MIN') })
     @IsOptional()
     page?: number = 1;
 
     @ApiPropertyOptional({ default: 10 })
     @Type(() => Number)
-    @IsInt()
-    @Min(1)
+    @IsInt({ message: i18nValidationMessage('validation.IS_INT') })
+    @Min(1, { message: i18nValidationMessage('validation.MIN') })
     @IsOptional()
     limit?: number = 10;
 
     @ApiPropertyOptional()
-    @IsString()
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
     @IsOptional()
     search?: string;
 }

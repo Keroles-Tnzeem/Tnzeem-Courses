@@ -1,6 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { MenuService } from './menu.service';
-import {ApiOkResponse, ApiResponse} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiOkResponse, ApiResponse} from "@nestjs/swagger";
+import { JwtAuthGuard } from "../../../common/guards/jwt-auth.guard";
+import { StaffGuard } from "../../../common/guards/staff.guard";
 import {CourseResponse} from "../courses/dto/responses/course.response";
 import {StudentMenuResponse} from "./dto/responses/student-menu.response";
 import {ApiResponseDto} from "../../../common/dto/responses/api.response";
@@ -8,6 +10,8 @@ import {RoundMenuResponse} from "./dto/responses/round-menu.response";
 import {StaffMenuResponse} from "./dto/responses/staff-menu.response";
 import {TrainerMenuResponse} from "./dto/responses/trainer-menu.response";
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, StaffGuard)
 @Controller('staff-dashboard/menu')
 export class MenuController {
   constructor(private readonly menuService: MenuService) {}

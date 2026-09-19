@@ -1,3 +1,4 @@
+import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
@@ -7,24 +8,24 @@ import { CourseStatusEnum } from '../../enums/course-status.enum';
 export class QueryCourseRequest extends PaginationRequest {
     @ApiPropertyOptional()
     @IsOptional()
-    @IsString()
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
     keyword?: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @Type(() => Number)
-    @IsNumber()
+    @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
     trainerId?: number;
 
     @ApiPropertyOptional()
     @IsOptional()
     @Type(() => Number)
-    @IsNumber()
+    @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
     categoryId?: number;
 
     @ApiPropertyOptional({ enum: CourseStatusEnum })
     @IsOptional()
-    @IsEnum(CourseStatusEnum)
+    @IsEnum(CourseStatusEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
     status?: CourseStatusEnum;
 
     @ApiPropertyOptional({ enum: ['createdAt', 'price'] })

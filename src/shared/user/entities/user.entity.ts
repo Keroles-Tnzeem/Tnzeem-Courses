@@ -34,6 +34,10 @@ export class UserEntity {
   @Column({ nullable: true, unique: true })
   phone: string;
 
+  // Disabled accounts cannot log in or refresh tokens.
+  @Column({ name: 'is_active', default: true })
+  isActive: boolean;
+
   @Column({ name: 'phone_verified_at', type: 'timestamp', nullable: true })
   phoneVerifiedAt?: Date | null;
 

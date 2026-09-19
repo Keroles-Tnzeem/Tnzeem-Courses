@@ -5,6 +5,8 @@ import {
   IsOptional,
   IsString,
   MinLength,
+  Matches,
+  MaxLength,
 } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiProperty } from '@nestjs/swagger';
@@ -15,11 +17,13 @@ export class RegisterStudentRequest {
   @ApiProperty()
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
   @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
+  @MaxLength(50, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   firstName: string;
 
   @ApiProperty()
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
   @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
+  @MaxLength(50, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   lastName: string;
 
   @ApiProperty()
@@ -37,6 +41,8 @@ export class RegisterStudentRequest {
   @ApiProperty()
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
   @MinLength(8, { message: i18nValidationMessage('validation.MIN_LENGTH') })
+  @MaxLength(72, { message: i18nValidationMessage('validation.MAX_LENGTH') })
+  @Matches(/(?=.*[A-Za-z])(?=.*\d)/, { message: i18nValidationMessage('validation.WEAK_PASSWORD') })
   password: string;
 
   @ApiProperty({ enum: GenderEnum, required: false })

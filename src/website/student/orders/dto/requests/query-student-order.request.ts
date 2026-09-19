@@ -8,14 +8,14 @@ export class QueryStudentOrderRequest {
   @ApiPropertyOptional({ example: 1, description: 'Page number' })
   @Type(() => Number)
   @IsInt({ message: i18nValidationMessage('validation.IS_NUMBER') })
-  @Min(1)
+  @Min(1, { message: i18nValidationMessage('validation.MIN') })
   @IsOptional()
   page?: number;
 
   @ApiPropertyOptional({ example: 10, description: 'Items per page' })
   @Type(() => Number)
   @IsInt({ message: i18nValidationMessage('validation.IS_NUMBER') })
-  @Min(1)
+  @Min(1, { message: i18nValidationMessage('validation.MIN') })
   @IsOptional()
   limit?: number;
 
@@ -31,6 +31,6 @@ export class QueryStudentOrderRequest {
 
   @ApiPropertyOptional({ enum: ['ASC', 'DESC'], example: 'DESC' })
   @IsOptional()
-  @IsEnum(['ASC', 'DESC'])
+  @IsEnum(['ASC', 'DESC'], { message: i18nValidationMessage('validation.IS_ENUM') })
   sortOrder?: 'ASC' | 'DESC';
 }

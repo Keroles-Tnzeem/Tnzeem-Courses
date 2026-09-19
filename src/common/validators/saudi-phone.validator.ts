@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
     registerDecorator,
     ValidationOptions,
@@ -20,6 +21,9 @@ export class IsSaudiPhoneNumberConstraint implements ValidatorConstraintInterfac
 
 export function IsSaudiPhoneNumber(validationOptions?: ValidationOptions) {
     return function (object: Object, propertyName: string) {
+        // Store one canonical form (no leading 0) so 05xxxxxxxx and 5xxxxxxxx are the same user.
+        Transform(({ value }) => (typeof value === 'string' ? normalizeSaudiPhone(value.trim()) : value))(object, propertyName);
+
         registerDecorator({
             target: object.constructor,
             propertyName,
