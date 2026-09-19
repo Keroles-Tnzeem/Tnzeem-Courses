@@ -39,6 +39,7 @@
     "NOT_A_TRAINER": "Assigned user is not a trainer",
     "MISSING_TOKEN": "Missing bearer token",
     "INVALID_TOKEN": "Invalid or expired token",
+    "TOKEN_EXPIRED": "This token has expired",
     "ROUND_OR_COURSE_REQUIRED": "Either roundId or courseId must be provided",
     "PAYMENT_ORDER_CANCELLED": "Cannot process payment for a cancelled order",
     "PAYMENT_ALREADY_COMPLETED": "Payment is already completed for this order",

@@ -39,6 +39,7 @@
     "NOT_A_TRAINER": "المستخدم المحدد ليس مدربًا",
     "MISSING_TOKEN": "رمز المصادقة مفقود",
     "INVALID_TOKEN": "رمز المصادقة غير صالح أو منتهي الصلاحية",
+    "TOKEN_EXPIRED": "انتهت صلاحية هذا الرمز",
     "ROUND_OR_COURSE_REQUIRED": "يجب تحديد roundId أو courseId",
     "PAYMENT_ORDER_CANCELLED": "لا يمكن معالجة الدفع لطلب ملغي",
     "PAYMENT_ALREADY_COMPLETED": "تم إكمال الدفع لهذا الطلب بالفعل",

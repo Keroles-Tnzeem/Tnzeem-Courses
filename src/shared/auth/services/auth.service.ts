@@ -95,6 +95,9 @@ export class AuthService {
                 expireIn: expiresIn,
             };
         } catch (error) {
+            if (error?.name === 'TokenExpiredError') {
+                throw new UnauthorizedException(this.i18n.t('errors.TOKEN_EXPIRED', { lang: I18nContext.current()?.lang }));
+            }
             throw new UnauthorizedException(this.i18n.t('errors.INVALID_CREDENTIALS', { lang: I18nContext.current()?.lang }));
         }
     }
