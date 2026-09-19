@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, QueryFailedError } from 'typeorm';
 import { CourseEntity } from './entities/course.entity';
 import { CreateCourseRequest } from './dto/requests/create-course.request';
 import { UpdateCourseRequest } from './dto/requests/update-course.request';
@@ -85,8 +85,18 @@ export class CoursesService {
     courseData.trainerId = trainer.id; // Use UserEntity ID for the foreign key
 
     const course = this.courseRepo.create(courseData as Partial<CourseEntity>);
-    const saved = await this.courseRepo.save(course);
-    return this.toResponse(saved, lang);
+    try {
+      const saved = await this.courseRepo.save(course);
+      return this.toResponse(saved, lang);
+    } catch (err) {
+      if (err instanceof QueryFailedError && (err as any).code === '23505') {
+        throw new ConflictException(
+          this.i18n.t('errors.SLUG_TAKEN', { lang }) ||
+            'Course with this slug already exists',
+        );
+      }
+      throw err;
+    }
   }
 
   async findAll(
@@ -240,8 +250,18 @@ export class CoursesService {
     if (introVideo !== undefined) courseData.introVideo = introVideo;
 
     Object.assign(course, courseData);
-    const updated = await this.courseRepo.save(course);
-    return this.toResponse(updated, lang);
+    try {
+      const updated = await this.courseRepo.save(course);
+      return this.toResponse(updated, lang);
+    } catch (err) {
+      if (err instanceof QueryFailedError && (err as any).code === '23505') {
+        throw new ConflictException(
+          this.i18n.t('errors.SLUG_TAKEN', { lang }) ||
+            'Course with this slug already exists',
+        );
+      }
+      throw err;
+    }
   }
 
   async remove(id: number, lang: string): Promise<void> {
