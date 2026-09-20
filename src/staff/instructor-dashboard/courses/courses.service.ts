@@ -137,15 +137,21 @@ export class InstructorCoursesService {
     }
 
     if (dto.categoryId !== undefined) entity.categoryId = dto.categoryId;
-    if (dto.name !== undefined) entity.name = dto.name;
-    if (dto.description !== undefined) entity.description = dto.description;
 
-    if (dto.requirements !== undefined) {
-      entity.requirements = dto.requirements;
-    }
-
-    if (dto.benefits !== undefined) {
-      entity.benefits = dto.benefits;
+    // Merge partial bilingual objects — only the provided lang keys are overwritten.
+    const translatableFields = [
+      'name',
+      'description',
+      'requirements',
+      'benefits',
+    ] as const;
+    for (const field of translatableFields) {
+      if (dto[field] !== undefined) {
+        entity[field] = {
+          ...(entity[field] ?? {}),
+          ...dto[field], // spread only the provided lang keys
+        } as any;
+      }
     }
 
     if (dto.sessionsCount !== undefined)

@@ -245,6 +245,25 @@ export class CoursesService {
       course.category = resolvedCategory;
     }
 
+    // Merge partial bilingual objects into the stored JSONB fields.
+    // The DTO carries only the language keys the client provided (e.g. { ar: "..." }).
+    // Spreading them preserves every key that was NOT sent.
+    const translatableFields = [
+      'name',
+      'description',
+      'requirements',
+      'benefits',
+    ] as const;
+    for (const field of translatableFields) {
+      if (courseData[field] !== undefined) {
+        course[field] = {
+          ...(course[field] ?? {}),
+          ...courseData[field], // spread only the provided lang keys
+        } as any;
+        delete courseData[field];
+      }
+    }
+
     if (image !== undefined) courseData.image = image;
     if (introVideo !== undefined) courseData.introVideo = introVideo;
 
