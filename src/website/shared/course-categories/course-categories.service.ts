@@ -11,8 +11,10 @@ export class GuestCourseCategoriesService {
   ) {}
 
   async findAll(): Promise<CourseCategoryEntity[]> {
-    return await this.courseCategoryRepository.find({
-      order: { id: 'DESC' },
-    });
+    return await this.courseCategoryRepository
+      .createQueryBuilder('category')
+      .loadRelationCountAndMap('category.coursesNum', 'category.courses', 'course')
+      .orderBy('category.id', 'DESC')
+      .getMany();
   }
 }
