@@ -39,6 +39,7 @@ async function bootstrap() {
       'Origin',
       'Accept-Language',
       'X-Lang',
+      'Idempotency-Key',
     ],
     credentials: true,
   });
