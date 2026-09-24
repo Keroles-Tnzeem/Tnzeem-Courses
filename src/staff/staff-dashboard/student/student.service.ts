@@ -242,6 +242,7 @@ export class StudentService {
     }
 
     student.assignToId = dto.assignToId;
+    student.assignTo = staffUser;
     student.assignAt = new Date();
 
     await this.userRepo.save(student);
