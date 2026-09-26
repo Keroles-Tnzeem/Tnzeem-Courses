@@ -7,7 +7,6 @@ import { StudentAuthService } from './services/student-auth.service';
 import { RegisterStudentRequest } from './dto/requests/register-student.request';
 import { LoginStudentRequest } from './dto/requests/login-student.request';
 import { GoogleLoginRequest } from './dto/requests/google-login.request';
-import { AppleLoginRequest } from './dto/requests/apple-login.request';
 import { SendOtpRequest } from './dto/requests/send-otp.request';
 import { VerifyOtpRequest } from './dto/requests/verify-otp.request';
 import { ForgetPasswordRequest } from './dto/requests/forget-password.request';
@@ -78,27 +77,6 @@ export class StudentAuthController {
     @Body() request: GoogleLoginRequest,
   ): Promise<ApiResponseDto<LoginResponse>> {
     const response = await this.studentAuthService.loginWithGoogle(request);
-    return ApiResponseDto.success(
-      response,
-      this.i18n.t('common.success', { lang: I18nContext.current()?.lang }),
-    );
-  }
-
-  @Throttle({ default: { limit: 10, ttl: 60000 } })
-  @Post('apple')
-  @UseInterceptors(AnyFilesInterceptor())
-  @ApiOperation({
-    summary:
-      'Register or log in a student using an Apple ID token (verified server-side)',
-  })
-  @ApiCreatedResponse({
-    description: 'Student authenticated successfully',
-    type: LoginResponse,
-  })
-  async loginWithApple(
-    @Body() request: AppleLoginRequest,
-  ): Promise<ApiResponseDto<LoginResponse>> {
-    const response = await this.studentAuthService.loginWithApple(request);
     return ApiResponseDto.success(
       response,
       this.i18n.t('common.success', { lang: I18nContext.current()?.lang }),
