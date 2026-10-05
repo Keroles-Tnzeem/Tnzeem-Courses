@@ -98,7 +98,7 @@ export class EnrollmentsController {
     // Update 
     @Permissions('enrollments.update')
     @Patch(':id')
-    @ApiOperation({ summary: 'Update enrollment status or certificate' })
+    @ApiOperation({ summary: 'Update enrollment status' })
     @ApiConsumes('multipart/form-data')
     @ApiParam({ name: 'id', type: String })
     @ApiResponse({ status: 200, type: EnrollmentResponse })

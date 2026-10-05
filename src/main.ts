@@ -44,8 +44,12 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Serve static assets
-  app.useStaticAssets(join(process.cwd(), 'public'), { prefix: '/public/' });
+  // Serve static assets. maxAge is short (not immutable) because filenames here
+  // aren't content-hashed, so a redeploy can change a file's contents in place.
+  app.useStaticAssets(join(process.cwd(), 'public'), {
+    prefix: '/public/',
+    maxAge: '1d',
+  });
 
   // Additional parsers for urlencoded bodies
   app.use(express.urlencoded({ extended: true }));
@@ -53,8 +57,9 @@ async function bootstrap() {
   // i18n-aware validation: translates messages based on request language header
   app.useGlobalPipes(
     new MultipartJsonPipe(),
-    new I18nValidationPipe({ 
-      whitelist: true, 
+    new I18nValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
       transform: true,
       transformOptions: { enableImplicitConversion: true }
     })

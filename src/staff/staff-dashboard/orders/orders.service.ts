@@ -339,7 +339,7 @@ export class OrdersService {
           order.hasEnrollment = true;
         }
       } else if (dto.status === OrderStatusEnum.CANCELLED) {
-        await this.removeEnrollmentOf(order, lang);
+        await this.guardAgainstCancellingCompletedEnrollment(order, lang);
         order.status = OrderStatusEnum.CANCELLED;
         order.paymentStatus = PaymentStatusEnum.CANCELLED;
       }
@@ -392,7 +392,7 @@ export class OrdersService {
     // Already cancelled: nothing to do (idempotent).
     if (order.status === OrderStatusEnum.CANCELLED) return;
 
-    await this.removeEnrollmentOf(order, lang);
+    await this.guardAgainstCancellingCompletedEnrollment(order, lang);
     order.status = OrderStatusEnum.CANCELLED;
     order.paymentStatus = PaymentStatusEnum.CANCELLED;
     await this.ordersRepository.save(order);
@@ -422,22 +422,19 @@ export class OrdersService {
   }
 
   /**
-   * Cancelling an order removes the enrollment it created. A completed
-   * enrollment (certificate issued) blocks the cancellation.
+   * Cancelling an order only changes its status — the enrollment it created
+   * is left untouched (never deleted), so cancellation stays reversible.
+   * A completed enrollment (certificate issued) still blocks cancellation.
    */
-  private async removeEnrollmentOf(
-    order: { id: string; hasEnrollment: boolean },
+  private async guardAgainstCancellingCompletedEnrollment(
+    order: { id: string },
     lang: string,
   ): Promise<void> {
     const enrollment = await this.enrollmentsService.findByOrderId(order.id);
-    if (enrollment) {
-      if (enrollment.status === EnrollmentStatusEnum.COMPLETED) {
-        throw new ConflictException(
-          this.i18n.t('errors.ORDER_CANNOT_CANCEL_COMPLETED', { lang }),
-        );
-      }
-      await this.enrollmentsService.remove(enrollment.id);
+    if (enrollment?.status === EnrollmentStatusEnum.COMPLETED) {
+      throw new ConflictException(
+        this.i18n.t('errors.ORDER_CANNOT_CANCEL_COMPLETED', { lang }),
+      );
     }
-    order.hasEnrollment = false;
   }
 }

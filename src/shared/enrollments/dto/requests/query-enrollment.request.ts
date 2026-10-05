@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiProperty } from '@nestjs/swagger';
@@ -8,13 +8,15 @@ export class QueryEnrollmentRequest {
     @ApiProperty({ example: 1, description: 'Page number', required: false })
     @IsOptional()
     @Type(() => Number)
-    @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
+    @IsInt({ message: i18nValidationMessage('validation.IS_INT') })
+    @Min(1, { message: i18nValidationMessage('validation.MIN') })
     page?: number;
 
     @ApiProperty({ example: 10, description: 'Number of items per page', required: false })
     @IsOptional()
     @Type(() => Number)
-    @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
+    @IsInt({ message: i18nValidationMessage('validation.IS_INT') })
+    @Min(1, { message: i18nValidationMessage('validation.MIN') })
     limit?: number;
 
     @ApiProperty({ example: 'John', description: 'Search query', required: false })

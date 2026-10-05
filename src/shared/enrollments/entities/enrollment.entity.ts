@@ -47,7 +47,7 @@ export class EnrollmentEntity {
 
     // Certificate 
     @Column({ name: 'certificate_serial_num', type: 'varchar', nullable: true, unique: true })
-    certificateSerialNum?: string;
+    certificateSerialNum?: string | null;
 
 
     // Timestamps 

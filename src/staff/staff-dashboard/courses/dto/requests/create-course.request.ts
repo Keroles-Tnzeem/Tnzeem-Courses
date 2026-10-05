@@ -18,11 +18,13 @@ class MultiLingualPropertyDto {
   @ApiProperty({ example: 'دورة نود جي إس' })
   @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+  @MaxLength(5000, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   ar: string;
 
   @ApiProperty({ example: 'Node.js Course' })
   @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+  @MaxLength(5000, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   en: string;
 }
 

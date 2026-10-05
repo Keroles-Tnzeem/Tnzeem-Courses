@@ -49,7 +49,7 @@ export class TrainerService {
 
         if (!trainer || trainer.userType !== UserTypeEnum.TRAINER) {
             throw new NotFoundException(
-                this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }),
+                this.i18n.t('errors.TRAINER_NOT_FOUND', { lang: getLang() }),
             );
         }
 

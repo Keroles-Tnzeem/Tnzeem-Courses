@@ -132,10 +132,16 @@ export class EnrollmentsService {
         if (dto.status !== undefined) {
             enrollment.status = dto.status;
 
-            // Auto-generate certificate serial number if marked completed and doesn't have one
-            if (dto.status === EnrollmentStatusEnum.COMPLETED && !enrollment.certificateSerialNum) {
-                const randomStr = crypto.randomBytes(4).toString('hex').toUpperCase();
-                enrollment.certificateSerialNum = `CERT-${randomStr}`;
+            if (dto.status === EnrollmentStatusEnum.COMPLETED) {
+                // Auto-generate certificate serial number if marked completed and doesn't have one
+                if (!enrollment.certificateSerialNum) {
+                    const randomStr = crypto.randomBytes(4).toString('hex').toUpperCase();
+                    enrollment.certificateSerialNum = `CERT-${randomStr}`;
+                }
+            } else {
+                // Certificate is only valid while completed — clear it if the enrollment leaves that status.
+                // (explicit null, not undefined, so TypeORM's save() actually clears the DB column)
+                enrollment.certificateSerialNum = null;
             }
         }
 

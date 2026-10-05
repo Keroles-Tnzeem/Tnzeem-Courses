@@ -77,8 +77,8 @@ export class GuestCourseResponse {
     response.id = entity.id;
     response.trainerId = entity.trainerId;
     response.categoryId = entity.categoryId;
-    response.name = nameObj[lang] ?? nameObj['en'] ?? entity.name;
-    response.description = descObj[lang] ?? descObj['en'] ?? entity.description;
+    response.name = nameObj[lang] ?? nameObj['en'] ?? '';
+    response.description = descObj[lang] ?? descObj['en'] ?? '';
     response.requirements = reqObj[lang] ?? reqObj['en'] ?? '';
     response.benefits = benObj[lang] ?? benObj['en'] ?? '';
     response.slug = entity.slug;
@@ -103,7 +103,7 @@ export class GuestCourseResponse {
       const catNameObj = parseJson(entity.category.name);
       response.category = {
         id: entity.category.id,
-        name: catNameObj[lang] ?? catNameObj['en'] ?? entity.category.name,
+        name: catNameObj[lang] ?? catNameObj['en'] ?? '',
       };
     }
 

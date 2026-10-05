@@ -139,7 +139,7 @@ export class StudentService {
 
     if (!student || student.userType !== UserTypeEnum.STUDENT) {
       throw new NotFoundException(
-        this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }),
+        this.i18n.t('errors.STUDENT_NOT_FOUND', { lang: getLang() }),
       );
     }
 

@@ -8,6 +8,7 @@ import {
     IsNotEmpty,
     IsOptional,
     IsString,
+    MaxLength,
     Min,
 } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
@@ -54,7 +55,9 @@ export class CreateRoundRequest {
     showRound?: boolean;
 
     @ApiPropertyOptional({ example: 'First run of the course in 2025' })
+    @Transform(({ value }) => (typeof value === 'string' ? value : value))
     @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+    @MaxLength(2000, { message: i18nValidationMessage('validation.MAX_LENGTH') })
     @IsOptional()
     notes?: string;
 }

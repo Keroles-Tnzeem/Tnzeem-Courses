@@ -40,6 +40,7 @@
     "CATEGORY_NOT_FOUND": "التصنيف غير موجود",
     "SLUG_TAKEN": "هذا المعرّف (slug) مستخدم بالفعل",
     "TRAINER_NOT_FOUND": "المدرب غير موجود",
+    "STUDENT_NOT_FOUND": "الطالب غير موجود",
     "NOT_A_TRAINER": "المستخدم المحدد ليس مدربًا",
     "MISSING_TOKEN": "رمز المصادقة مفقود",
     "INVALID_TOKEN": "رمز المصادقة غير صالح أو منتهي الصلاحية",

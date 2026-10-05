@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CourseEntity } from '../../../staff/staff-dashboard/courses/entities/course.entity';
+import { CourseStatusEnum } from '../../../staff/staff-dashboard/courses/enums/course-status.enum';
 import { QueryCoursesRequest } from './dto/requests/query-courses.request';
 
 @Injectable()
@@ -17,7 +18,8 @@ export class GuestCoursesService {
         const qb = this.courseRepository
             .createQueryBuilder('course')
             .leftJoinAndSelect('course.trainer', 'trainer')
-            .leftJoinAndSelect('course.category', 'category');
+            .leftJoinAndSelect('course.category', 'category')
+            .where('course.status = :status', { status: CourseStatusEnum.PUBLISHED });
 
         if (categoryId) {
             qb.andWhere('course.category_id = :categoryId', { categoryId });
@@ -30,7 +32,7 @@ export class GuestCoursesService {
 
     async findOneBySlug(slug: string): Promise<CourseEntity | null> {
         return await this.courseRepository.findOne({
-            where: { slug },
+            where: { slug, status: CourseStatusEnum.PUBLISHED },
             relations: ['trainer', 'category'],
         });
     }

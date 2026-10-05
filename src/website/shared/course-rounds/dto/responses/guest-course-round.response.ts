@@ -56,9 +56,9 @@ export class GuestCourseRoundResponse {
       response.course = {
         id: entity.course.id,
         category_id: entity.course.categoryId,
-        name: nameObj[lang] ?? nameObj['en'] ?? entity.course.name,
+        name: nameObj[lang] ?? nameObj['en'] ?? '',
         description:
-          descObj[lang] ?? descObj['en'] ?? entity.course.description,
+          descObj[lang] ?? descObj['en'] ?? '',
         requirements: reqObj[lang] ?? reqObj['en'] ?? '',
         benefits: benObj[lang] ?? benObj['en'] ?? '',
         slug: entity.course.slug,

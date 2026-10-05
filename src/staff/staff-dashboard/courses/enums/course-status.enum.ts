@@ -1,5 +1,5 @@
 export enum CourseStatusEnum {
-    PENDING = 'pending',
-    PUBLISHED = 'published',
-    DRAFT = 'draft',
+  PENDING = 'pending',
+  PUBLISHED = 'published',
+  DRAFT = 'draft',
 }

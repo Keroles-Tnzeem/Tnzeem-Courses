@@ -45,6 +45,8 @@ export class DigitalOceanStorageStrategy implements StorageProvider {
             Body: file.buffer,
             ContentType: file.mimetype,
             ACL: 'public-read',
+            // Keys include a unique suffix per upload, so a given key's content never changes.
+            CacheControl: 'public, max-age=31536000, immutable',
         });
 
         await this.s3Client.send(command);

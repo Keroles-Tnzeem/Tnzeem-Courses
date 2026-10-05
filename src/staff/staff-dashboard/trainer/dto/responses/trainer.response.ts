@@ -1,5 +1,6 @@
 import { UserEntity } from '../../../../../shared/user/entities/user.entity';
 import { GenderEnum } from '../../../../../shared/user/enums/gender.enum';
+import { buildUserImageUrl } from '../../../../../common/utils/user-image.util';
 
 export class TrainerResponse {
     id: number;
@@ -22,9 +23,7 @@ export class TrainerResponse {
         response.email = user.email;
         response.phone = user.phone;
         response.gender = user.gender;
-        const appUrl = process.env.APP_URL || 'http://localhost:3000';
-        const imgPath = user.img || '/images/empty-user.jpeg';
-        response.img = imgPath.startsWith('http') ? imgPath : `${appUrl}${imgPath}`;
+        response.img = buildUserImageUrl(user.img);
 
         if (user.trainerInfo) {
             response.age = user.trainerInfo.age;

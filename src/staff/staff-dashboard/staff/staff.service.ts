@@ -35,14 +35,24 @@ export class StaffService {
         const { page = 1, limit = 10, search } = query;
         const skip = (page - 1) * limit;
 
-        const where: any[] = [{ userType: UserTypeEnum.SALES }, { userType: UserTypeEnum.SUPPORT }];
-        // Note: Real search logic could be added here if needed by mapping over `where` array
-        
-        const [data, total] = await this.userRepo.findAndCount({
-            where: [{ userType: UserTypeEnum.SALES }, { userType: UserTypeEnum.SUPPORT }],
-            relations: { userPermissions: { permission: true } },
-            order: { id: 'DESC' },
-        });
+        const qb = this.userRepo
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.userPermissions', 'userPermissions')
+            .leftJoinAndSelect('userPermissions.permission', 'permission')
+            .where('user.userType IN (:...types)', { types: STAFF_TYPES });
+
+        if (search) {
+            qb.andWhere(
+                '(user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.email ILIKE :search)',
+                { search: `%${search}%` },
+            );
+        }
+
+        const [data, total] = await qb
+            .orderBy('user.id', 'DESC')
+            .skip(skip)
+            .take(limit)
+            .getManyAndCount();
 
         return { data, total };
     }

@@ -54,7 +54,7 @@ export class StudentEnrollmentResponse {
     const response = new StudentEnrollmentResponse();
     response.id = entity.id;
     response.status = entity.status;
-    response.certificateSerialNum = entity.certificateSerialNum;
+    response.certificateSerialNum = entity.certificateSerialNum ?? undefined;
     response.createdAt = entity.audit.createdAt;
 
     response.course = entity.round?.course

@@ -1,5 +1,6 @@
 import { CourseStatusEnum } from '../../enums/course-status.enum';
 import { CourseEntity } from '../../entities/course.entity';
+import { CourseLevelEnum } from '../../../../../common/enums/course-level.enum';
 import { parseJson } from '../../../../../common/helpers/parse-json.helper';
 
 export class CourseResponse {
@@ -17,7 +18,8 @@ export class CourseResponse {
   durationHours: number;
   price: number;
   status: CourseStatusEnum;
-  level: string;
+  level: CourseLevelEnum;
+  levelLabel: string;
   createdAt: Date | undefined;
   updatedAt: Date | undefined;
 
@@ -39,8 +41,8 @@ export class CourseResponse {
     const reqObj = parseJson<Record<string, string>>(entity.requirements);
     const benObj = parseJson<Record<string, string>>(entity.benefits);
 
-    response.name = nameObj[lang] ?? nameObj['en'] ?? entity.name;
-    response.description = descObj[lang] ?? descObj['en'] ?? entity.description;
+    response.name = nameObj[lang] ?? nameObj['en'] ?? '';
+    response.description = descObj[lang] ?? descObj['en'] ?? '';
     response.requirements = reqObj[lang] ?? reqObj['en'] ?? '';
     response.benefits = benObj[lang] ?? benObj['en'] ?? '';
     response.slug = entity.slug;
@@ -50,7 +52,8 @@ export class CourseResponse {
     response.durationHours = entity.durationHours;
     response.price = Number(entity.price);
     response.status = entity.status;
-    response.level = localizedLevel;
+    response.level = entity.level;
+    response.levelLabel = localizedLevel;
     response.createdAt = entity.audit?.createdAt;
     response.updatedAt = entity.audit?.updatedAt;
 
@@ -65,7 +68,7 @@ export class CourseResponse {
     if (entity.category) {
       response.category = {
         id: entity.category.id,
-        name: entity.category.name?.[lang] ?? entity.category.name?.['en'],
+        name: entity.category.name?.[lang] ?? entity.category.name?.['en'] ?? '',
       };
     }
 

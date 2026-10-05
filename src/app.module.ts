@@ -3,7 +3,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AcceptLanguageResolver, HeaderResolver, I18nModule } from 'nestjs-i18n';
+import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import i18nConfig from './config/i18n.config';
@@ -65,6 +65,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
       }),
       resolvers: [
         { use: HeaderResolver, options: ['x-lang'] },
+        { use: QueryResolver, options: ['lang'] },
         AcceptLanguageResolver,
       ],
     }),

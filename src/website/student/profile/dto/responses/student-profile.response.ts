@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from '../../../../../shared/user/entities/user.entity';
 import { GenderEnum } from '../../../../../shared/user/enums/gender.enum';
+import { buildUserImageUrl } from '../../../../../common/utils/user-image.util';
 
 export class StudentProfileResponse {
   @ApiProperty()
@@ -37,9 +38,7 @@ export class StudentProfileResponse {
     response.phoneVerified = !!user.phoneVerifiedAt;
     response.gender = user.gender;
 
-    const appUrl = process.env.APP_URL || 'http://localhost:3000';
-    const imgPath = user.img || '/images/empty-user.jpeg';
-    response.img = imgPath.startsWith('http') ? imgPath : `${appUrl}${imgPath}`;
+    response.img = buildUserImageUrl(user.img);
 
     return response;
   }

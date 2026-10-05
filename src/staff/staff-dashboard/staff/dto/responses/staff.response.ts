@@ -1,5 +1,6 @@
 import { UserTypeEnum } from '../../../../../shared/user/enums/user-type.enum';
 import { GenderEnum } from '../../../../../shared/user/enums/gender.enum';
+import { buildUserImageUrl } from '../../../../../common/utils/user-image.util';
 
 export class StaffResponse {
     id: number;
@@ -31,9 +32,7 @@ export class StaffResponse {
         res.phone       = user.phone;
         res.gender      = user.gender;
         
-        const appUrl = process.env.APP_URL || 'http://localhost:3000';
-        const imgPath = user.img || '/images/empty-user.jpeg';
-        res.img = imgPath.startsWith('http') ? imgPath : `${appUrl}${imgPath}`;
+        res.img = buildUserImageUrl(user.img);
 
         res.userType    = user.userType;
         res.permissions = user.userPermissions?.map((up) => up.permission.name) ?? [];

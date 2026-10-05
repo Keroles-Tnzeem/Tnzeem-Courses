@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoundEntity } from '../../../staff/staff-dashboard/rounds/entities/round.entity';
+import { CourseStatusEnum } from '../../../staff/staff-dashboard/courses/enums/course-status.enum';
 import {QueryCourseRoundsRequest} from "./dto/reauests/query-course-rounds.request";
 
 @Injectable()
@@ -19,7 +20,8 @@ export class GuestCourseRoundsService {
         const qb = this.roundRepository
             .createQueryBuilder('round')
             .leftJoinAndSelect('round.course', 'course')
-            .leftJoinAndSelect('course.trainer', 'trainer');
+            .leftJoinAndSelect('course.trainer', 'trainer')
+            .where('course.status = :status', { status: CourseStatusEnum.PUBLISHED });
 
         if (categoryId) {
             qb.andWhere('course.category_id = :categoryId', {
@@ -36,7 +38,7 @@ export class GuestCourseRoundsService {
         return await this.roundRepository.findOne({
             where: {
                 id,
-                course: { slug: courseSlug }
+                course: { slug: courseSlug, status: CourseStatusEnum.PUBLISHED },
             },
             relations: ['course', 'course.trainer', 'sessions'],
         });

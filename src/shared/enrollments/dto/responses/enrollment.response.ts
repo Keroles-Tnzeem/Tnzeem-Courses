@@ -62,7 +62,7 @@ export class EnrollmentResponse {
         response.roundId = enrollment.roundId;
         response.orderId = enrollment.orderId;
         response.status = enrollment.status;
-        response.certificateSerialNum = enrollment.certificateSerialNum;
+        response.certificateSerialNum = enrollment.certificateSerialNum ?? undefined;
         response.createdAt = enrollment.audit?.createdAt;
         response.updatedAt = enrollment.audit?.updatedAt;
 

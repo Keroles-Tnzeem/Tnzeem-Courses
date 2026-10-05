@@ -22,11 +22,13 @@ export class PartialMultiLingualDto {
   @ApiPropertyOptional({ example: 'دورة نود جي إس' })
   @IsOptional()
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+  @MaxLength(5000, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   ar?: string;
 
   @ApiPropertyOptional({ example: 'Node.js Course' })
   @IsOptional()
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+  @MaxLength(5000, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   en?: string;
 }
 

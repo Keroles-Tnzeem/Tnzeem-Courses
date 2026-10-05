@@ -1,5 +1,6 @@
 import { UserEntity } from '../../../../../shared/user/entities/user.entity';
 import { GenderEnum } from '../../../../../shared/user/enums/gender.enum';
+import { buildUserImageUrl } from '../../../../../common/utils/user-image.util';
 
 export class StudentResponse {
   id: number;
@@ -34,9 +35,7 @@ export class StudentResponse {
         lastName: user.assignTo.lastName,
       };
     }
-    const appUrl = process.env.APP_URL || 'http://localhost:3000';
-    const imgPath = user.img || '/images/empty-user.jpeg';
-    response.img = `${appUrl}${imgPath}`;
+    response.img = buildUserImageUrl(user.img);
     response.createdAt = user.audit.createdAt;
     return response;
   }

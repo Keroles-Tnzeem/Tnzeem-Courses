@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { CourseStatusEnum } from '../enums/course-status.enum';
 import { AuditColumns } from '../../../../common/entities/audit-columns';
-import { TrainerInfoEntity } from '../../../../shared/user/entities/trainer-info.entity';
 import { CourseCategoryEntity } from '../../course-categories/entities/course-category.entity';
 import { CourseLevelEnum } from '../../../../common/enums/course-level.enum';
 import { UserEntity } from '../../../../shared/user/entities/user.entity';

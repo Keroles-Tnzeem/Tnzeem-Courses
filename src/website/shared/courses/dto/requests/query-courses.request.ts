@@ -4,11 +4,9 @@ import { Type } from 'class-transformer';
 import { IsNumber, IsOptional } from 'class-validator';
 
 export class QueryCoursesRequest {
-
-    @ApiPropertyOptional()
-    @IsOptional()
-    @Type(() => Number)
-    @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
-    categoryId?: number;
-
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
+  categoryId?: number;
 }
