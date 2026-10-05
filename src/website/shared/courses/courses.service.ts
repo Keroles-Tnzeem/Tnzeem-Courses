@@ -30,6 +30,17 @@ export class GuestCoursesService {
         return qb.getMany();
     }
 
+    async findLatest(limit = 6): Promise<CourseEntity[]> {
+        return this.courseRepository
+            .createQueryBuilder('course')
+            .leftJoinAndSelect('course.trainer', 'trainer')
+            .leftJoinAndSelect('course.category', 'category')
+            .where('course.status = :status', { status: CourseStatusEnum.PUBLISHED })
+            .orderBy('course.id', 'DESC')
+            .take(limit)
+            .getMany();
+    }
+
     async findOneBySlug(slug: string): Promise<CourseEntity | null> {
         return await this.courseRepository.findOne({
             where: { slug, status: CourseStatusEnum.PUBLISHED },

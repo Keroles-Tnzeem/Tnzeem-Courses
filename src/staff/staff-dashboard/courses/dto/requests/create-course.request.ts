@@ -13,6 +13,7 @@ import {
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CourseLevelEnum } from '../../../../../common/enums/course-level.enum';
+import { CourseStatusEnum } from '../../enums/course-status.enum';
 
 class MultiLingualPropertyDto {
   @ApiProperty({ example: 'دورة نود جي إس' })
@@ -149,4 +150,15 @@ export class CreateCourseRequest {
     message: i18nValidationMessage('validation.IS_ENUM'),
   })
   level: CourseLevelEnum;
+
+  @ApiPropertyOptional({
+    enum: CourseStatusEnum,
+    default: CourseStatusEnum.PENDING,
+    description: 'Course status (defaults to pending)',
+  })
+  @IsOptional()
+  @IsEnum(CourseStatusEnum, {
+    message: i18nValidationMessage('validation.IS_ENUM'),
+  })
+  status?: CourseStatusEnum;
 }

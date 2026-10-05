@@ -4,7 +4,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { ILike, In, Raw, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { UserEntity } from '../../../shared/user/entities/user.entity';
@@ -30,8 +30,26 @@ export class TrainerService {
         const { page = 1, limit = 10, search } = query;
         const skip = (page - 1) * limit;
 
+        const base = { userType: UserTypeEnum.TRAINER };
+        const keyword = search?.trim();
+        // Escape LIKE wildcards so the search is a plain substring match.
+        const pattern = keyword ? `%${keyword.replace(/[\\%_]/g, '\\$&')}%` : undefined;
+
         const [data, total] = await this.userRepo.findAndCount({
-            where: { userType: UserTypeEnum.TRAINER },
+            where: pattern
+                ? [
+                      { ...base, email: ILike(pattern) },
+                      { ...base, firstName: ILike(pattern) },
+                      { ...base, lastName: ILike(pattern) },
+                      {
+                          ...base,
+                          firstName: Raw(
+                              (alias) => `CONCAT(${alias}, ' ', "UserEntity"."last_name") ILIKE :fullName`,
+                              { fullName: pattern },
+                          ),
+                      },
+                  ]
+                : base,
             relations: { trainerInfo: true },
             skip,
             take: limit,

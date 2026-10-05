@@ -47,6 +47,26 @@ export class GuestCoursesController {
     );
   }
 
+  // Must stay above 'courses/:courseSlug' so "latest" is not treated as a slug.
+  @Get('courses/latest')
+  @ApiOperation({ summary: 'Get the latest 6 published courses' })
+  @ApiQuery({
+    name: 'lang',
+    required: false,
+    description: 'Language (e.g. ar or en)',
+  })
+  @ApiOkResponse({ type: GuestCourseResponse, isArray: true })
+  async findLatest(
+    @Lang() lang: string,
+  ): Promise<ApiResponseDto<GuestCourseResponse[]>> {
+    const courses = await this.coursesService.findLatest(6);
+    const data = courses.map((c) => GuestCourseResponse.from(c, lang));
+    return ApiResponseDto.success(
+      data,
+      this.i18n.t('common.success', { lang }),
+    );
+  }
+
   @Get('courses/:courseSlug')
   @ApiOperation({ summary: 'Get course details by slug' })
   @ApiParam({

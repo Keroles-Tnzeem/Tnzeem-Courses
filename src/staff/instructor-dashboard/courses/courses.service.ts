@@ -50,7 +50,7 @@ export class InstructorCoursesService {
 
     const courseData: any = { ...dto, image, introVideo };
     courseData.trainerId = trainerId;
-    courseData.status = CourseStatusEnum.PENDING; // Pending approval by staff
+    courseData.status = dto.status ?? CourseStatusEnum.PENDING; // Defaults to pending approval by staff
 
     const course = this.courseRepo.create(courseData as Partial<CourseEntity>);
     const savedCourse = await this.courseRepo.save(course);
@@ -160,6 +160,7 @@ export class InstructorCoursesService {
       entity.durationHours = dto.durationHours;
     if (dto.price !== undefined) entity.price = dto.price;
     if (dto.level !== undefined) entity.level = dto.level;
+    if (dto.status !== undefined) entity.status = dto.status;
 
     if (image !== undefined) entity.image = image;
     if (introVideo !== undefined) entity.introVideo = introVideo;

@@ -12,6 +12,7 @@ import { getLang } from '../../../common/helpers/lang.helper';
 import { StorageService } from '../../../shared/storage/storage.service';
 import { UploadType } from '../../../shared/storage/enums/upload-type.enum';
 import { UpdateStudentProfileRequest } from './dto/requests/update-student-profile.request';
+import { UpdateStudentPhoneRequest } from './dto/requests/update-student-phone.request';
 import { StudentProfileResponse } from './dto/responses/student-profile.response';
 
 @Injectable()
@@ -77,5 +78,42 @@ export class ProfileService {
 
     const saved = await this.userRepo.save(user);
     return StudentProfileResponse.from(saved);
+  }
+
+  async updatePhone(
+    studentId: number,
+    dto: UpdateStudentPhoneRequest,
+  ): Promise<StudentProfileResponse> {
+    const lang = getLang();
+    const user = await this.findStudent(studentId);
+
+    if (dto.phone === user.phone) {
+      return StudentProfileResponse.from(user);
+    }
+
+    const phoneExists = await this.userRepo.findOne({
+      where: { phone: dto.phone },
+      withDeleted: true,
+    });
+    if (phoneExists) {
+      throw new ConflictException(this.i18n.t('errors.PHONE_TAKEN', { lang }));
+    }
+
+    user.phone = dto.phone;
+    // The new number has not been verified yet.
+    user.phoneVerifiedAt = null;
+
+    try {
+      const saved = await this.userRepo.save(user);
+      return StudentProfileResponse.from(saved);
+    } catch (e) {
+      // Unique-violation race between the check above and the save.
+      if ((e as { code?: string }).code === '23505') {
+        throw new ConflictException(
+          this.i18n.t('errors.PHONE_TAKEN', { lang }),
+        );
+      }
+      throw e;
+    }
   }
 }

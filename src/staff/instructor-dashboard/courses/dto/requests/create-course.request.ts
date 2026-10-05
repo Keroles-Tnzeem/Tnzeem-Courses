@@ -1,6 +1,7 @@
 import { i18nValidationMessage } from 'nestjs-i18n';
 import {
   IsEnum,
+  IsIn,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -13,6 +14,13 @@ import {
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CourseLevelEnum } from '../../../../../common/enums/course-level.enum';
+import { CourseStatusEnum } from '../../../../staff-dashboard/courses/enums/course-status.enum';
+
+// Instructors can't publish: PUBLISHED is set by staff after approval.
+export const INSTRUCTOR_COURSE_STATUSES = [
+  CourseStatusEnum.PENDING,
+  CourseStatusEnum.DRAFT,
+];
 
 class MultiLingualPropertyDto {
   @ApiProperty({ example: 'دورة نود جي إس' })
@@ -117,4 +125,15 @@ export class CreateCourseRequest {
   })
   @IsEnum(CourseLevelEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
   level: CourseLevelEnum;
+
+  @ApiPropertyOptional({
+    enum: INSTRUCTOR_COURSE_STATUSES,
+    default: CourseStatusEnum.PENDING,
+    description: 'Course status. Instructors can only use pending or draft; publishing is done by staff.',
+  })
+  @IsOptional()
+  @IsIn(INSTRUCTOR_COURSE_STATUSES, {
+    message: i18nValidationMessage('validation.IS_ENUM'),
+  })
+  status?: CourseStatusEnum;
 }

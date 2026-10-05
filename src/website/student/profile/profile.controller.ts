@@ -7,7 +7,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, NoFilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
@@ -23,6 +23,7 @@ import { getLang } from '../../../common/helpers/lang.helper';
 import { ApiResponseDto } from '../../../common/dto/responses/api.response';
 import { ProfileService } from './profile.service';
 import { UpdateStudentProfileRequest } from './dto/requests/update-student-profile.request';
+import { UpdateStudentPhoneRequest } from './dto/requests/update-student-phone.request';
 import { StudentProfileResponse } from './dto/responses/student-profile.response';
 
 @ApiTags('Website - Student Profile')
@@ -71,6 +72,30 @@ export class ProfileController {
       request,
       img,
     );
+    return ApiResponseDto.success(
+      data,
+      this.i18n.t('common.updated', { lang: getLang() }),
+    );
+  }
+
+  @Patch('phone')
+  @UseInterceptors(NoFilesInterceptor())
+  @ApiOperation({
+    summary: 'Update the authenticated student phone number',
+    description:
+      'The phone must be unique. The new number is marked as unverified.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the updated student profile',
+    type: StudentProfileResponse,
+  })
+  @ApiResponse({ status: 409, description: 'Phone number already in use' })
+  async updatePhone(
+    @CurrentUser('sub') studentId: number,
+    @Body() request: UpdateStudentPhoneRequest,
+  ): Promise<ApiResponseDto<StudentProfileResponse>> {
+    const data = await this.profileService.updatePhone(studentId, request);
     return ApiResponseDto.success(
       data,
       this.i18n.t('common.updated', { lang: getLang() }),

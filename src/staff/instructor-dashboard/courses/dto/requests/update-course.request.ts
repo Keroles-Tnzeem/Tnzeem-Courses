@@ -2,6 +2,7 @@ import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEnum,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
@@ -12,6 +13,8 @@ import {
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { CourseLevelEnum } from '../../../../../common/enums/course-level.enum';
+import { CourseStatusEnum } from '../../../../staff-dashboard/courses/enums/course-status.enum';
+import { INSTRUCTOR_COURSE_STATUSES } from './create-course.request';
 
 /**
  * Partial bilingual DTO — both language keys are optional.
@@ -129,4 +132,14 @@ export class UpdateCourseRequest {
     message: i18nValidationMessage('validation.IS_ENUM'),
   })
   level?: CourseLevelEnum;
+
+  @ApiPropertyOptional({
+    enum: INSTRUCTOR_COURSE_STATUSES,
+    description: 'Course status. Instructors can only use pending or draft; publishing is done by staff.',
+  })
+  @IsOptional()
+  @IsIn(INSTRUCTOR_COURSE_STATUSES, {
+    message: i18nValidationMessage('validation.IS_ENUM'),
+  })
+  status?: CourseStatusEnum;
 }
