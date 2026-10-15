@@ -186,6 +186,6 @@ export class InstructorSessionsService {
       );
     }
 
-    await this.sessionRepo.delete(entity.id);
+    await this.sessionRepo.softDelete(entity.id);
   }
 }

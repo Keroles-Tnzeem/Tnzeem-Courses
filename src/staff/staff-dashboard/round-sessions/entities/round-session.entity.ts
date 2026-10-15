@@ -1,5 +1,6 @@
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -42,4 +43,7 @@ export class RoundSessionEntity {
 
   @Column(() => AuditColumns, { prefix: false })
   audit: AuditColumns;
+
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
+  deletedAt: Date;
 }

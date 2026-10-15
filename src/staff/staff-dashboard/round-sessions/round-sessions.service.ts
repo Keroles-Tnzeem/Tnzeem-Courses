@@ -174,6 +174,6 @@ export class RoundSessionsService {
 
     async remove(id: number): Promise<void> {
         const entity = await this.findForWrite(id);
-        await this.sessionRepository.delete(entity.id);
+        await this.sessionRepository.softDelete(entity.id);
     }
 }
