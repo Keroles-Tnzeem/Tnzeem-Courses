@@ -1,0 +1,55 @@
+# DigitalOcean App Platform spec.
+# Apply with: doctl apps update <APP_ID> --spec .do/app.yaml
+# Secrets (type: SECRET) carry no value here; set them in the DO console.
+# Check this spec against the live app before applying (doctl apps spec get <APP_ID>)
+# so existing env values, region and database bindings are not overwritten.
+name: tnzeem-courses
+
+services:
+  - name: api
+    environment_slug: node-js
+    github:
+      repo: Keroles-Tnzeem/Tnzeem-Courses
+      branch: main
+      deploy_on_push: true
+    build_command: npm run build
+    # start:prod would rebuild on every start (prestart:prod), so run the compiled output directly.
+    run_command: node dist/src/main.js
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb
+    health_check:
+      http_path: /api/docs
+      initial_delay_seconds: 30
+    envs:
+      - { key: NODE_ENV, value: production }
+      # Migrations only: auto-sync must stay off or startup tries to alter the schema.
+      - { key: TYPEORM_SYNC, value: "false" }
+      - { key: APP_PORT, value: "8080" }
+      - { key: TRUST_PROXY, value: "true" }
+      - { key: DB_HOST, value: "", type: SECRET }
+      - { key: DB_PORT, value: "25060" }
+      - { key: DB_NAME, value: "", type: SECRET }
+      - { key: DB_USERNAME, value: "", type: SECRET }
+      - { key: DB_PASSWORD, value: "", type: SECRET }
+
+jobs:
+  # Runs before every deploy; if it fails the deploy is aborted and the old version keeps serving.
+  - name: migrate
+    kind: PRE_DEPLOY
+    environment_slug: node-js
+    github:
+      repo: Keroles-Tnzeem/Tnzeem-Courses
+      branch: main
+    build_command: npm run build
+    run_command: npm run migration:run:prod
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    envs:
+      - { key: NODE_ENV, value: production }
+      - { key: TYPEORM_SYNC, value: "false" }
+      - { key: DB_HOST, value: "", type: SECRET }
+      - { key: DB_PORT, value: "25060" }
+      - { key: DB_NAME, value: "", type: SECRET }
+      - { key: DB_USERNAME, value: "", type: SECRET }
+      - { key: DB_PASSWORD, value: "", type: SECRET }
