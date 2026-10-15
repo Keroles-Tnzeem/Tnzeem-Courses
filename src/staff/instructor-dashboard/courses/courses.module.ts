@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CourseEntity } from '../../staff-dashboard/courses/entities/course.entity';
+import { NotificationsModule } from '../../../shared/notifications/notifications.module';
 import { InstructorCoursesService } from './courses.service';
 import { InstructorCoursesController } from './courses.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CourseEntity])],
+  imports: [TypeOrmModule.forFeature([CourseEntity]), NotificationsModule],
   controllers: [InstructorCoursesController],
   providers: [InstructorCoursesService],
   exports: [InstructorCoursesService],

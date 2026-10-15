@@ -122,7 +122,7 @@ export class RoundSessionsController {
 
     @Permissions('round-sessions.delete')
     @Delete(':id')
-    @ApiOperation({ summary: 'Delete a session (soft delete)' })
+    @ApiOperation({ summary: 'Delete a session permanently' })
     @ApiParam({ name: 'id', type: Number })
     @ApiOkResponse({ description: 'Session deleted successfully' })
     async remove(@Param('id', ParseIntPipe) id: number) {

@@ -5,6 +5,7 @@ import { CoursesService } from './courses.service';
 import { CourseEntity } from './entities/course.entity';
 import { CourseCategoryEntity } from '../course-categories/entities/course-category.entity';
 import { StorageModule } from '../../../shared/storage/storage.module';
+import { NotificationsModule } from '../../../shared/notifications/notifications.module';
 import { UserEntity } from 'src/shared/user/entities/user.entity';
 
 @Module({
@@ -14,7 +15,8 @@ import { UserEntity } from 'src/shared/user/entities/user.entity';
             UserEntity,
             CourseCategoryEntity
         ]),
-        StorageModule
+        StorageModule,
+        NotificationsModule,
     ],
     controllers: [CoursesController],
     providers: [CoursesService],

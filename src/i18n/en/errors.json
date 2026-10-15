@@ -59,5 +59,6 @@
     "ORDER_INVALID_STATUS_TRANSITION": "This order status change is not allowed",
     "ORDER_CANNOT_CANCEL_COMPLETED": "The order cannot be cancelled because its enrollment is already completed",
     "ORDER_ROUND_LOCKED": "The round of a confirmed or cancelled order cannot be changed",
-    "OTP_SEND_FAILED": "We could not send the verification code, please try again"
+    "OTP_SEND_FAILED": "We could not send the verification code, please try again",
+    "NOTIFICATION_NOT_FOUND": "Notification not found"
 }

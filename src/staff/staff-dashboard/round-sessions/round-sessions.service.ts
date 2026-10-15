@@ -113,6 +113,17 @@ export class RoundSessionsService {
         return entity;
     }
 
+    /** Loads the session without its round so saving never rewrites round_id from the relation. */
+    private async findForWrite(id: number): Promise<RoundSessionEntity> {
+        const entity = await this.sessionRepository.findOne({ where: { id } });
+        if (!entity) {
+            throw new NotFoundException(
+                this.i18n.t('errors.NOT_FOUND', { lang: getLang() }),
+            );
+        }
+        return entity;
+    }
+
     async findByRound(roundId: number): Promise<RoundSessionEntity[]> {
         const round = await this.roundRepository.findOne({ where: { id: roundId } });
         if (!round) {
@@ -131,7 +142,7 @@ export class RoundSessionsService {
         id: number,
         dto: UpdateRoundSessionRequest,
     ): Promise<RoundSessionEntity> {
-        const entity = await this.findOne(id);
+        const entity = await this.findForWrite(id);
 
         if (dto.sessionNumber && dto.sessionNumber !== entity.sessionNumber) {
             const duplicate = await this.sessionRepository.findOne({
@@ -162,7 +173,7 @@ export class RoundSessionsService {
     }
 
     async remove(id: number): Promise<void> {
-        const entity = await this.findOne(id);
-        await this.sessionRepository.softDelete(entity.id);
+        const entity = await this.findForWrite(id);
+        await this.sessionRepository.delete(entity.id);
     }
 }

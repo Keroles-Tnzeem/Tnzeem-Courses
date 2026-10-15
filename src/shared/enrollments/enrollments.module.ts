@@ -6,6 +6,7 @@ import { EnrollmentsService } from './enrollments.service';
 import { EnrollmentsController } from './enrollments.controller';
 import { UserEntity } from '../user/entities/user.entity';
 import { RoundEntity } from '../../staff/staff-dashboard/rounds/entities/round.entity';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { OrderEntity } from '../orders/entities/order.entity';
 
 @Module({
@@ -16,6 +17,7 @@ import { OrderEntity } from '../orders/entities/order.entity';
             RoundEntity,
             OrderEntity,
         ]),
+        NotificationsModule,
     ],
     controllers: [
         EnrollmentsController,

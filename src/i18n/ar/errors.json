@@ -59,5 +59,6 @@
     "ORDER_INVALID_STATUS_TRANSITION": "لا يمكن تغيير حالة الطلب إلى هذه الحالة",
     "ORDER_CANNOT_CANCEL_COMPLETED": "لا يمكن إلغاء الطلب لأن التسجيل المرتبط به مكتمل بالفعل",
     "ORDER_ROUND_LOCKED": "لا يمكن تغيير جولة طلب مؤكد أو ملغي",
-    "OTP_SEND_FAILED": "تعذّر إرسال رمز التحقق، يرجى المحاولة مرة أخرى"
+    "OTP_SEND_FAILED": "تعذّر إرسال رمز التحقق، يرجى المحاولة مرة أخرى",
+    "NOTIFICATION_NOT_FOUND": "الإشعار غير موجود"
 }

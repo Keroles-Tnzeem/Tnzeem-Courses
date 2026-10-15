@@ -8,6 +8,7 @@ import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import i18nConfig from './config/i18n.config';
 import oauthConfig from './config/oauth.config';
+import mailConfig from './config/mail.config';
 import * as path from 'path';
 import { AuthModule } from './shared/auth/auth.module';
 import { UserModule } from './shared/user/user.module';
@@ -33,6 +34,7 @@ import { EnrollmentsModule } from './shared/enrollments/enrollments.module';
 import { CertificatesModule } from './website/shared/certificates/certificates.module';
 import { StaffEnrollmentsModule } from './staff/staff-dashboard/enrollments/enrollments.module';
 import { OrderCommentsModule } from './staff/staff-dashboard/order-comments/order-comments.module';
+import { NotificationsModule } from './shared/notifications/notifications.module';
 import { WebsiteStudentModule } from './website/student/student.module';
 
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -46,7 +48,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, i18nConfig, oauthConfig],
+      load: [appConfig, databaseConfig, i18nConfig, oauthConfig, mailConfig],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -97,6 +99,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
     OrderCommentsModule,
     InstructorDashboardModule,
     WebsiteStudentModule,
+    NotificationsModule,
   ],
   controllers: [],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

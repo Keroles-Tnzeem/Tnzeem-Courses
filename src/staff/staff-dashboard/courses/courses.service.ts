@@ -17,6 +17,9 @@ import { I18nService, I18nContext } from 'nestjs-i18n';
 import { courseLevelTranslationKey } from '../../../common/enums/course-level.enum';
 import { UserTypeEnum } from '../../../shared/user/enums/user-type.enum';
 import { UserEntity } from 'src/shared/user/entities/user.entity';
+import { NotificationsService } from '../../../shared/notifications/notifications.service';
+import { NotificationTypeEnum } from '../../../shared/notifications/enums/notification-type.enum';
+import { courseCreatedContent } from '../../../shared/notifications/templates/notification.templates';
 
 @Injectable()
 export class CoursesService {
@@ -28,6 +31,7 @@ export class CoursesService {
     @InjectRepository(CourseCategoryEntity)
     private readonly categoryRepo: Repository<CourseCategoryEntity>,
     private readonly i18n: I18nService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private toResponse(course: CourseEntity, lang: string): CourseResponse {
@@ -87,6 +91,12 @@ export class CoursesService {
     const course = this.courseRepo.create(courseData as Partial<CourseEntity>);
     try {
       const saved = await this.courseRepo.save(course);
+      await this.notificationsService.notify({
+        userId: saved.trainerId,
+        type: NotificationTypeEnum.COURSE_CREATED,
+        ...courseCreatedContent(saved.name, saved.status),
+        data: { courseId: saved.id },
+      });
       return this.toResponse(saved, lang);
     } catch (err) {
       if (err instanceof QueryFailedError && (err as any).code === '23505') {

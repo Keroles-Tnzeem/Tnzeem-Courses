@@ -21,6 +21,11 @@ import { QueryStudentOrderRequest } from './dto/requests/query-student-order.req
 import { CreateStudentOrderRequest } from './dto/requests/create-student-order.request';
 import { StudentOrderResponse } from './dto/responses/student-order.response';
 import { StudentOrderDetailsResponse } from './dto/responses/student-order-details.response';
+import { NotificationsService } from '../../../shared/notifications/notifications.service';
+import { NotificationTypeEnum } from '../../../shared/notifications/enums/notification-type.enum';
+import { NotificationChannelEnum } from '../../../shared/notifications/enums/notification-channel.enum';
+import { orderCreatedContent } from '../../../shared/notifications/templates/notification.templates';
+import { renderOrderCreatedEmail } from '../../../shared/notifications/templates/order-created.html';
 
 /** Namespaces the idempotency key so it can't collide with other endpoints. */
 const CREATE_ORDER_IDEMPOTENCY_SCOPE = 'student-orders.create';
@@ -31,6 +36,7 @@ export class StudentOrdersService {
     private readonly ordersRepository: OrdersRepository,
     private readonly i18n: I18nService,
     private readonly idempotencyService: IdempotencyService,
+    private readonly notificationsService: NotificationsService,
     @InjectRepository(CourseEntity)
     private readonly courseRepository: Repository<CourseEntity>,
     @InjectDataSource()
@@ -82,6 +88,10 @@ export class StudentOrdersService {
       const response = await this.createOrder(manager, studentId, dto, lang);
 
       await this.idempotencyService.complete(record.id, 201, response, manager);
+
+      // Fire notifications outside the transaction so a delivery failure
+      // never rolls back the already-committed order.
+      setImmediate(() => void this.sendOrderCreatedNotification(studentId, response));
 
       return response;
     });
@@ -147,6 +157,34 @@ export class StudentOrdersService {
       .getOne();
 
     return StudentOrderDetailsResponse.fromEntity(withRelations!, lang);
+  }
+
+  /**
+   * Dispatches an ORDER_CREATED notification through both IN_APP and MAIL channels.
+   * The mail channel receives a pre-rendered HTML template in `data.html`.
+   * This method never throws; any error is swallowed by NotificationsService.notify().
+   */
+  private async sendOrderCreatedNotification(
+    studentId: number,
+    order: StudentOrderDetailsResponse,
+  ): Promise<void> {
+    const courseName = { en: order.course?.name ?? '', ar: order.course?.name ?? '' };
+    const content = orderCreatedContent(courseName, order.id);
+
+    const html = renderOrderCreatedEmail({
+      studentName: `Student #${studentId}`,
+      orderId: order.id,
+      courseName: order.course?.name ?? '',
+    });
+
+    await this.notificationsService.notify({
+      userId: studentId,
+      type: NotificationTypeEnum.ORDER_CREATED,
+      title: content.title,
+      body: content.body,
+      channels: [NotificationChannelEnum.IN_APP, NotificationChannelEnum.MAIL],
+      data: { html, orderId: order.id },
+    });
   }
 
   async findAll(

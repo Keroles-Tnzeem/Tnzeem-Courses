@@ -12,9 +12,7 @@ import { RoundEntity } from '../../staff-dashboard/rounds/entities/round.entity'
 import { CreateSessionRequest } from './dto/requests/create-session.request';
 import { UpdateSessionRequest } from './dto/requests/update-session.request';
 import { QuerySessionRequest } from './dto/requests/query-session.request';
-import { SessionResponse } from './dto/responses/session.response';
 import { getLang } from '../../../common/helpers/lang.helper';
-import { PaginationResponseDto as PaginationResponse } from '../../../common/dto/responses/pagination.response';
 
 @Injectable()
 export class InstructorSessionsService {
@@ -42,7 +40,7 @@ export class InstructorSessionsService {
     return round;
   }
 
-  async create(trainerId: number, dto: CreateSessionRequest): Promise<SessionResponse> {
+  async create(trainerId: number, dto: CreateSessionRequest): Promise<RoundSessionEntity> {
     const round = await this.verifyRoundOwnership(dto.roundId, trainerId);
     if (dto.scheduledAt) {
       assertSessionWithinRound(new Date(dto.scheduledAt), round);
@@ -69,7 +67,7 @@ export class InstructorSessionsService {
     });
 
     const saved = await this.sessionRepo.save(entity);
-    return SessionResponse.fromEntity(saved);
+    return saved;
   }
 
   /** Sessions of one round; 404 when the round is not the trainer's own. */
@@ -77,7 +75,7 @@ export class InstructorSessionsService {
     trainerId: number,
     roundId: number,
     query: QuerySessionRequest,
-  ): Promise<PaginationResponse<SessionResponse>> {
+  ): Promise<{ data: RoundSessionEntity[]; total: number }> {
     await this.verifyRoundOwnership(roundId, trainerId);
     query.roundId = roundId;
     return this.findAll(trainerId, query);
@@ -86,7 +84,7 @@ export class InstructorSessionsService {
   async findAll(
     trainerId: number,
     query: QuerySessionRequest,
-  ): Promise<PaginationResponse<SessionResponse>> {
+  ): Promise<{ data: RoundSessionEntity[]; total: number }> {
     const { limit = 10, offset = 0, roundId, sortBy = 'session_number', sortOrder = 'ASC' } = query;
 
     const qb = this.sessionRepo
@@ -108,12 +106,10 @@ export class InstructorSessionsService {
     qb.orderBy(sortMap[sortBy] ?? 'session.sessionNumber', sortOrder as 'ASC' | 'DESC');
 
     const [entities, total] = await qb.skip(offset).take(limit).getManyAndCount();
-    const data = entities.map((e) => SessionResponse.fromEntity(e));
-    const page = Math.floor(offset / limit) + 1;
-    return PaginationResponse.success(data, total, page, limit);
+    return { data: entities, total };
   }
 
-  async findOne(trainerId: number, id: number): Promise<SessionResponse> {
+  async findOne(trainerId: number, id: number): Promise<RoundSessionEntity> {
     const entity = await this.sessionRepo
       .createQueryBuilder('session')
       .innerJoin('session.round', 'round')
@@ -127,10 +123,10 @@ export class InstructorSessionsService {
         this.i18n.t('errors.NOT_FOUND', { lang: getLang() }) || 'Session not found',
       );
     }
-    return SessionResponse.fromEntity(entity);
+    return entity;
   }
 
-  async update(trainerId: number, id: number, dto: UpdateSessionRequest): Promise<SessionResponse> {
+  async update(trainerId: number, id: number, dto: UpdateSessionRequest): Promise<RoundSessionEntity> {
     const entity = await this.sessionRepo
       .createQueryBuilder('session')
       .innerJoin('session.round', 'round')
@@ -172,7 +168,7 @@ export class InstructorSessionsService {
     if (dto.notes !== undefined) entity.notes = dto.notes;
 
     const saved = await this.sessionRepo.save(entity);
-    return SessionResponse.fromEntity(saved);
+    return saved;
   }
 
   async remove(trainerId: number, id: number): Promise<void> {
@@ -190,6 +186,6 @@ export class InstructorSessionsService {
       );
     }
 
-    await this.sessionRepo.softDelete(entity.id);
+    await this.sessionRepo.delete(entity.id);
   }
 }

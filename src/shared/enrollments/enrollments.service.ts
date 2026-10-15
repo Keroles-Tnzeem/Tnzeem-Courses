@@ -18,6 +18,12 @@ import { QueryEnrollmentRequest } from './dto/requests/query-enrollment.request'
 import { EnrollmentStatusEnum } from './enums/enrollment-status.enum';
 import { getLang } from '../../common/helpers/lang.helper';
 import { CertificateResponse } from './dto/responses/certificate.response';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationTypeEnum } from '../notifications/enums/notification-type.enum';
+import {
+    enrollmentCreatedContent,
+    enrollmentStatusChangedContent,
+} from '../notifications/templates/notification.templates';
 
 @Injectable()
 export class EnrollmentsService {
@@ -28,6 +34,7 @@ export class EnrollmentsService {
         @InjectRepository(UserEntity)
         private readonly userRepo: Repository<UserEntity>,
         private readonly i18n: I18nService,
+        private readonly notificationsService: NotificationsService,
     ) {}
 
     // Helpers
@@ -81,7 +88,7 @@ export class EnrollmentsService {
     async findOne(id: string): Promise<EnrollmentEntity> {
         const enrollment = await this.enrollmentsRepository.findOne({
             where: { id },
-            relations: { student: true, round: true, order: true },
+            relations: { student: true, round: { course: true }, order: true },
         });
 
         if (!enrollment) {
@@ -121,13 +128,23 @@ export class EnrollmentsService {
         });
 
         const saved = await this.enrollmentsRepository.save(enrollment);
-        return this.findOne(saved.id);
+        const created = await this.findOne(saved.id);
+
+        await this.notificationsService.notify({
+            userId: created.studentId,
+            type: NotificationTypeEnum.ENROLLMENT_CREATED,
+            ...enrollmentCreatedContent(created.round?.course?.name ?? { en: '', ar: '' }),
+            data: { enrollmentId: created.id, roundId: created.roundId },
+        });
+
+        return created;
     }
 
     // Update
 
     async update(id: string, dto: UpdateEnrollmentRequest): Promise<EnrollmentEntity> {
         const enrollment = await this.findOne(id);
+        const previousStatus = enrollment.status;
 
         if (dto.status !== undefined) {
             enrollment.status = dto.status;
@@ -146,7 +163,21 @@ export class EnrollmentsService {
         }
 
         await this.enrollmentsRepository.save(enrollment);
-        return this.findOne(id);
+        const updated = await this.findOne(id);
+
+        if (updated.status !== previousStatus) {
+            await this.notificationsService.notify({
+                userId: updated.studentId,
+                type: NotificationTypeEnum.ENROLLMENT_STATUS_CHANGED,
+                ...enrollmentStatusChangedContent(
+                    updated.round?.course?.name ?? { en: '', ar: '' },
+                    updated.status,
+                ),
+                data: { enrollmentId: updated.id, roundId: updated.roundId, status: updated.status },
+            });
+        }
+
+        return updated;
     }
 
     // Delete

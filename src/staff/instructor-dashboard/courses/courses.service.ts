@@ -14,6 +14,9 @@ import { CourseResponse } from './dto/responses/course.response';
 import { I18nService } from 'nestjs-i18n';
 import { courseLevelTranslationKey } from '../../../common/enums/course-level.enum';
 import { getLang } from '../../../common/helpers/lang.helper';
+import { NotificationsService } from '../../../shared/notifications/notifications.service';
+import { NotificationTypeEnum } from '../../../shared/notifications/enums/notification-type.enum';
+import { courseCreatedContent } from '../../../shared/notifications/templates/notification.templates';
 import { CourseStatusEnum } from '../../staff-dashboard/courses/enums/course-status.enum';
 
 @Injectable()
@@ -22,6 +25,7 @@ export class InstructorCoursesService {
     @InjectRepository(CourseEntity)
     private readonly courseRepo: Repository<CourseEntity>,
     private readonly i18n: I18nService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   private toResponse(course: CourseEntity): CourseResponse {
@@ -54,6 +58,12 @@ export class InstructorCoursesService {
 
     const course = this.courseRepo.create(courseData as Partial<CourseEntity>);
     const savedCourse = await this.courseRepo.save(course);
+    await this.notificationsService.notify({
+      userId: savedCourse.trainerId,
+      type: NotificationTypeEnum.COURSE_CREATED,
+      ...courseCreatedContent(savedCourse.name, savedCourse.status),
+      data: { courseId: savedCourse.id },
+    });
     return this.toResponse(savedCourse);
   }
 

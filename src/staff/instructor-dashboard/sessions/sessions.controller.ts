@@ -11,8 +11,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { NoFilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { TrainerGuard } from '../../../common/guards/trainer.guard';
 import { Trainer } from '../../../common/decorators/trainer.decorator';
@@ -21,6 +21,7 @@ import { InstructorSessionsService } from './sessions.service';
 import { CreateSessionRequest } from './dto/requests/create-session.request';
 import { UpdateSessionRequest } from './dto/requests/update-session.request';
 import { QuerySessionRequest } from './dto/requests/query-session.request';
+import { RoundSessionEntity } from '../../staff-dashboard/round-sessions/entities/round-session.entity';
 import { SessionResponse } from './dto/responses/session.response';
 import { PaginationResponseDto } from '../../../common/dto/responses/pagination.response';
 import { ApiResponseDto } from '../../../common/dto/responses/api.response';
@@ -29,6 +30,8 @@ import { getLang } from '../../../common/helpers/lang.helper';
 
 @ApiTags('Instructor Dashboard / Sessions')
 @ApiBearerAuth()
+@ApiResponse({ status: 401, description: 'Missing or invalid token' })
+@ApiResponse({ status: 403, description: 'Only instructors can access this resource' })
 @UseGuards(JwtAuthGuard, TrainerGuard)
 @Controller('instructor-dashboard/round-sessions')
 export class InstructorSessionsController {
@@ -37,14 +40,23 @@ export class InstructorSessionsController {
     private readonly i18n: I18nService,
   ) {}
 
+  private paginate(data: RoundSessionEntity[], total: number, query: QuerySessionRequest) {
+    const limit = query.limit ?? 10;
+    const page = Math.floor((query.offset ?? 0) / limit) + 1;
+    return PaginationResponseDto.success(
+      data.map((e) => SessionResponse.fromEntity(e)),
+      total,
+      page,
+      limit,
+      this.i18n.t('common.success', { lang: getLang() }),
+    );
+  }
+
   @Post()
+  @ApiResponse({ status: 400, description: 'Validation failed or session number already taken' })
+  @ApiResponse({ status: 404, description: 'Round not found or not yours' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'image', maxCount: 1 },
-      { name: 'introVideo', maxCount: 1 },
-    ]),
-  )
+  @UseInterceptors(NoFilesInterceptor())
   @ApiOperation({ summary: 'Create a new session for one of your rounds' })
   @ApiResponse({ status: 201, type: SessionResponse })
   async create(
@@ -53,7 +65,7 @@ export class InstructorSessionsController {
   ) {
     const data = await this.sessionsService.create(trainer.sub, request);
     return ApiResponseDto.success(
-      data,
+      SessionResponse.fromEntity(data),
       this.i18n.t('common.created', { lang: getLang() }),
     );
   }
@@ -65,12 +77,13 @@ export class InstructorSessionsController {
     @Trainer() trainer: JwtPayload,
     @Query() query: QuerySessionRequest,
   ) {
-    const res = await this.sessionsService.findAll(trainer.sub, query);
-    res.message = this.i18n.t('common.success', { lang: getLang() });
-    return res;
+    const { data, total } = await this.sessionsService.findAll(trainer.sub, query);
+    return this.paginate(data, total, query);
   }
 
   @Get('by-round/:roundId')
+  @ApiParam({ name: 'roundId', type: Number })
+  @ApiResponse({ status: 404, description: 'Round not found or not yours' })
   @ApiOperation({ summary: 'List sessions specifically by round ID' })
   @ApiResponse({ status: 200, type: PaginationResponseDto })
   async findByRound(
@@ -78,12 +91,13 @@ export class InstructorSessionsController {
     @Param('roundId', ParseIntPipe) roundId: number,
     @Query() query: QuerySessionRequest,
   ) {
-    const res = await this.sessionsService.findByRound(trainer.sub, roundId, query);
-    res.message = this.i18n.t('common.success', { lang: getLang() });
-    return res;
+    const { data, total } = await this.sessionsService.findByRound(trainer.sub, roundId, query);
+    return this.paginate(data, total, query);
   }
 
   @Get(':id')
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 404, description: 'Session not found or not yours' })
   @ApiOperation({ summary: 'Get a specific session' })
   @ApiResponse({ status: 200, type: SessionResponse })
   async findOne(
@@ -92,19 +106,16 @@ export class InstructorSessionsController {
   ) {
     const data = await this.sessionsService.findOne(trainer.sub, id);
     return ApiResponseDto.success(
-      data,
+      SessionResponse.fromEntity(data),
       this.i18n.t('common.success', { lang: getLang() }),
     );
   }
 
   @Patch(':id')
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 404, description: 'Session not found or not yours' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'image', maxCount: 1 },
-      { name: 'introVideo', maxCount: 1 },
-    ]),
-  )
+  @UseInterceptors(NoFilesInterceptor())
   @ApiOperation({ summary: 'Update a session' })
   @ApiResponse({ status: 200, type: SessionResponse })
   async update(
@@ -114,12 +125,14 @@ export class InstructorSessionsController {
   ) {
     const data = await this.sessionsService.update(trainer.sub, id, request);
     return ApiResponseDto.success(
-      data,
+      SessionResponse.fromEntity(data),
       this.i18n.t('common.updated', { lang: getLang() }),
     );
   }
 
   @Delete(':id')
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 404, description: 'Session not found or not yours' })
   @ApiOperation({ summary: 'Delete a session' })
   @ApiResponse({ status: 200 })
   async remove(
