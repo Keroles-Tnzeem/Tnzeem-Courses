@@ -33,6 +33,9 @@ export class CreateIdempotencyKeys1789200000000 implements MigrationInterface {
       BEGIN
         IF NOT EXISTS (
           SELECT 1 FROM pg_constraint WHERE conname = 'UQ_idempotency_key_scope'
+        ) AND NOT EXISTS (
+          -- a unique index of the same name (e.g. created by schema sync) also blocks the constraint
+          SELECT 1 FROM pg_class WHERE relname = 'UQ_idempotency_key_scope'
         ) THEN
           ALTER TABLE "idempotency_keys"
             ADD CONSTRAINT "UQ_idempotency_key_scope" UNIQUE ("key", "scope");
