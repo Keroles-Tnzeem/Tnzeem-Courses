@@ -22,6 +22,11 @@ import { Repository } from 'typeorm';
 import { OrderCommentEntity } from '../order-comments/entities/order-comment.entity';
 import { CourseEntity } from '../courses/entities/course.entity';
 import { BadRequestException } from '@nestjs/common';
+import { NotificationsService } from '../../../shared/notifications/notifications.service';
+import { NotificationTypeEnum } from '../../../shared/notifications/enums/notification-type.enum';
+import { NotificationChannelEnum } from '../../../shared/notifications/enums/notification-channel.enum';
+import { orderPaymentCompletedContent } from '../../../shared/notifications/templates/notification.templates';
+import { renderOrderPaymentCompletedEmail } from '../../../shared/notifications/templates/order-payment-completed.html';
 
 @Injectable()
 export class OrdersService {
@@ -34,7 +39,41 @@ export class OrdersService {
     private readonly orderCommentRepository: Repository<OrderCommentEntity>,
     @InjectRepository(CourseEntity)
     private readonly courseRepository: Repository<CourseEntity>,
+    private readonly notificationsService: NotificationsService,
   ) {}
+
+  /**
+   * Sends ORDER_PAYMENT_COMPLETED through IN_APP and MAIL (pre-rendered HTML in `data.html`).
+   * Never throws; delivery errors are swallowed by NotificationsService.notify().
+   */
+  private async sendPaymentCompletedNotification(
+    order: {
+      id: string;
+      studentId: number;
+      course?: { name?: { ar?: string; en?: string } } | null;
+    },
+    studentName: string,
+  ): Promise<void> {
+    const courseName = {
+      en: order.course?.name?.en ?? order.course?.name?.ar ?? '',
+      ar: order.course?.name?.ar ?? order.course?.name?.en ?? '',
+    };
+    const content = orderPaymentCompletedContent(courseName, order.id);
+    const html = renderOrderPaymentCompletedEmail({
+      studentName,
+      orderId: order.id,
+      courseName: courseName.ar,
+    });
+
+    await this.notificationsService.notify({
+      userId: order.studentId,
+      type: NotificationTypeEnum.ORDER_PAYMENT_COMPLETED,
+      title: content.title,
+      body: content.body,
+      channels: [NotificationChannelEnum.IN_APP, NotificationChannelEnum.MAIL],
+      data: { html, orderId: order.id },
+    });
+  }
 
   /** Fetch the last comment text for a given comment id */
   private async fetchLastCommentText(
@@ -294,6 +333,8 @@ export class OrdersService {
       );
     }
 
+    const previousPaymentStatus = order.paymentStatus;
+
     // The round must be settled first: confirming needs the final round.
     if (dto.roundId !== undefined && dto.roundId !== order.roundId) {
       // After confirmation the enrollment is tied to the round, so it can't move.
@@ -374,6 +415,19 @@ export class OrdersService {
     (withRelations as any).lastComment = lastCommentText
       ? { comment: lastCommentText }
       : undefined;
+
+    // Notify only on the transition into COMPLETED, never on later edits.
+    if (
+      previousPaymentStatus !== PaymentStatusEnum.COMPLETED &&
+      updated.paymentStatus === PaymentStatusEnum.COMPLETED
+    ) {
+      const studentName =
+        `${withRelations?.student?.firstName ?? ''} ${withRelations?.student?.lastName ?? ''}`.trim();
+      await this.sendPaymentCompletedNotification(
+        { id: updated.id, studentId: updated.studentId, course: withRelations?.course },
+        studentName,
+      );
+    }
 
     return OrderResponse.fromEntity(withRelations!, lang);
   }

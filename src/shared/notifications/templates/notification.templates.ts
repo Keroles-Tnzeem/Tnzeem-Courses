@@ -39,6 +39,21 @@ export function orderCreatedContent(
   };
 }
 
+export function orderPaymentCompletedContent(
+  courseName: Record<string, string>,
+  orderId: string,
+): NotificationContent {
+  const en = courseName.en ?? courseName.ar ?? '';
+  const ar = courseName.ar ?? courseName.en ?? '';
+  return {
+    title: { en: 'Payment confirmed', ar: 'تم تأكيد الدفع' },
+    body: {
+      en: `The payment for your order #${orderId} for "${en}" has been confirmed.`,
+      ar: `تم تأكيد دفع طلبك رقم #${orderId} للدورة "${ar}".`,
+    },
+  };
+}
+
 export function enrollmentStatusChangedContent(
   courseName: Record<string, string>,
   status: string,

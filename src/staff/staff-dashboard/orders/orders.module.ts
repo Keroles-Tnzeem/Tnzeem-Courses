@@ -4,6 +4,7 @@ import { OrdersModule as SharedOrdersModule } from '../../../shared/orders/order
 import { StorageModule } from '../../../shared/storage/storage.module';
 import { RoundsModule } from '../rounds/rounds.module';
 import { EnrollmentsModule } from '../../../shared/enrollments/enrollments.module';
+import { NotificationsModule } from '../../../shared/notifications/notifications.module';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { OrderCommentEntity } from '../order-comments/entities/order-comment.entity';
@@ -16,6 +17,7 @@ import { CourseEntity } from '../courses/entities/course.entity';
         StorageModule,      // provides StorageService
         RoundsModule,       // provides RoundsService (round → course → price)
         EnrollmentsModule,  // provides EnrollmentsService
+        NotificationsModule, // provides NotificationsService
     ],
     controllers: [OrdersController],
     providers: [OrdersService],
