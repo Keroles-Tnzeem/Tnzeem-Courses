@@ -1,14 +1,12 @@
 import {
-    BeforeInsert,
     Column,
     Entity,
     Index,
     JoinColumn,
     ManyToOne,
-    PrimaryColumn,
+    PrimaryGeneratedColumn,
 } from 'typeorm';
 import { AuditColumns } from '../../../common/entities/audit-columns';
-import { generateUlid } from '../../../common/helpers/ulid.helper';
 import { UserEntity } from '../../user/entities/user.entity';
 import { NotificationChannelEnum } from '../enums/notification-channel.enum';
 import { NotificationTypeEnum } from '../enums/notification-type.enum';
@@ -16,15 +14,8 @@ import { NotificationTypeEnum } from '../enums/notification-type.enum';
 @Entity('notifications')
 @Index('IDX_notifications_user_channel_read', ['userId', 'channel', 'readAt'])
 export class NotificationEntity {
-    @PrimaryColumn('varchar', { length: 26 })
-    id: string;
-
-    @BeforeInsert()
-    generateId() {
-        if (!this.id) {
-            this.id = generateUlid();
-        }
-    }
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ name: 'user_id' })
     userId: number;

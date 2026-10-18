@@ -18,7 +18,7 @@ export class CreateNotifications1789300000000 implements MigrationInterface {
 
     await queryRunner.query(`
       CREATE TABLE IF NOT EXISTS "notifications" (
-        "id" character varying(26) NOT NULL,
+        "id" SERIAL NOT NULL,
         "user_id" integer NOT NULL,
         "type" "notifications_type_enum" NOT NULL,
         "channel" "notifications_channel_enum" NOT NULL,

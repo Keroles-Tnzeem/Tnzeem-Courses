@@ -4,7 +4,7 @@ import { NotificationEntity } from '../../entities/notification.entity';
 import { NotificationTypeEnum } from '../../enums/notification-type.enum';
 
 export class NotificationResponse {
-    @ApiProperty() id: string;
+    @ApiProperty() id: number;
     @ApiProperty({ enum: NotificationTypeEnum }) type: NotificationTypeEnum;
     @ApiProperty() title: string;
     @ApiProperty() body: string;

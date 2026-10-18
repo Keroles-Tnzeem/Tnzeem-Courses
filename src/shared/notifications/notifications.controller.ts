@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Query,
   UseGuards,
@@ -53,12 +54,12 @@ export class NotificationsController {
 
   @Patch(':id/read')
   @ApiOperation({ summary: 'Mark one of my notifications as read' })
-  @ApiParam({ name: 'id', type: String, description: 'Notification ULID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Notification ID' })
   @ApiResponse({ status: 200 })
   @ApiResponse({ status: 404, description: 'Notification not found' })
   async markAsRead(
     @CurrentUser('sub') userId: number,
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<ApiResponseDto<null>> {
     await this.notificationsService.markAsRead(userId, id);
     return ApiResponseDto.success(null);

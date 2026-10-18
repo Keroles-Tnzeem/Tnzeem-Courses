@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, IsNull, Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { I18nService } from 'nestjs-i18n';
 import { getLang } from '../../common/helpers/lang.helper';
 import { PaginationResponseDto } from '../../common/dto/responses/pagination.response';
@@ -116,30 +116,14 @@ export class NotificationsService {
         );
     }
 
-    /**
-     * Latest in-app notifications (newest first). Omit `limit` to return all of them.
-     * With `markAsRead`, the unread ones returned are stamped with readAt = now; the
-     * response still reflects their state before this call so clients can highlight new ones.
-     */
-    async findLatest(
-        userId: number,
-        lang: string,
-        limit?: number,
-        markAsRead = false,
-    ): Promise<NotificationResponse[]> {
+    /** Latest in-app notifications (newest first). Omit `limit` to return all of them. */
+    async findLatest(userId: number, lang: string, limit?: number): Promise<NotificationResponse[]> {
         const rows = await this.notificationRepo.find({
             where: { userId, channel: NotificationChannelEnum.IN_APP },
             order: { audit: { createdAt: 'DESC' } },
             take: limit,
         });
-        const response = rows.map((n) => NotificationResponse.fromEntity(n, lang));
-
-        const unreadIds = rows.filter((n) => !n.readAt).map((n) => n.id);
-        if (markAsRead && unreadIds.length) {
-            await this.notificationRepo.update({ id: In(unreadIds) }, { readAt: new Date() });
-        }
-
-        return response;
+        return rows.map((n) => NotificationResponse.fromEntity(n, lang));
     }
 
     async unreadCount(userId: number): Promise<number> {
@@ -148,7 +132,7 @@ export class NotificationsService {
         });
     }
 
-    async markAsRead(userId: number, id: string): Promise<void> {
+    async markAsRead(userId: number, id: number): Promise<void> {
         const notification = await this.notificationRepo.findOne({
             where: { id, userId, channel: NotificationChannelEnum.IN_APP },
         });

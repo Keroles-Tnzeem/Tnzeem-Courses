@@ -1,5 +1,5 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, HttpCode, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { StudentGuard } from '../../../common/guards/student.guard';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
@@ -17,24 +17,24 @@ export class StudentNotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Get('latest')
-  @ApiOperation({ summary: 'Get the last 10 in-app notifications of the authenticated student and mark them as read' })
+  @ApiOperation({ summary: 'Get the last 10 in-app notifications of the authenticated student' })
   @ApiResponse({ status: 200, type: NotificationResponse, isArray: true })
   async latest(
     @CurrentUser('sub') studentId: number,
     @Lang() lang: string,
   ): Promise<ApiResponseDto<NotificationResponse[]>> {
-    const data = await this.notificationsService.findLatest(studentId, lang, 10, true);
+    const data = await this.notificationsService.findLatest(studentId, lang, 10);
     return ApiResponseDto.success(data);
   }
 
   @Get('all')
-  @ApiOperation({ summary: 'Get all in-app notifications of the authenticated student (not paginated) and mark them as read' })
+  @ApiOperation({ summary: 'Get all in-app notifications of the authenticated student (not paginated)' })
   @ApiResponse({ status: 200, type: NotificationResponse, isArray: true })
   async all(
     @CurrentUser('sub') studentId: number,
     @Lang() lang: string,
   ): Promise<ApiResponseDto<NotificationResponse[]>> {
-    const data = await this.notificationsService.findLatest(studentId, lang, undefined, true);
+    const data = await this.notificationsService.findLatest(studentId, lang);
     return ApiResponseDto.success(data);
   }
 
@@ -46,5 +46,19 @@ export class StudentNotificationsController {
   ): Promise<ApiResponseDto<UnreadCountResponse>> {
     const count = await this.notificationsService.unreadCount(studentId);
     return ApiResponseDto.success({ count });
+  }
+
+  @Post(':id/read')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Mark one notification of the authenticated student as read' })
+  @ApiParam({ name: 'id', type: Number, description: 'Notification ID' })
+  @ApiResponse({ status: 200, description: 'Marked as read (readAt = now)' })
+  @ApiResponse({ status: 404, description: 'Notification not found' })
+  async markAsRead(
+    @CurrentUser('sub') studentId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ApiResponseDto<null>> {
+    await this.notificationsService.markAsRead(studentId, id);
+    return ApiResponseDto.success(null);
   }
 }
