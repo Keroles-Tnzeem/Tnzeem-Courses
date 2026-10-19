@@ -78,7 +78,8 @@ export class InstructorRoundsService {
     trainerId: number,
     query: QueryRoundRequest,
   ): Promise<PaginationResponse<RoundResponse>> {
-    const { limit = 10, offset = 0, courseId, status } = query;
+    const { limit = 10, courseId, status } = query;
+    const offset = query.page ? (query.page - 1) * limit : (query.offset ?? 0);
 
     const qb = this.roundRepo
       .createQueryBuilder('round')

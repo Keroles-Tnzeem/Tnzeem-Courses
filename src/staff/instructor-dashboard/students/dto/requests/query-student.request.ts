@@ -4,6 +4,13 @@ import { IsOptional, IsString, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class QueryStudentRequest {
+  @ApiPropertyOptional({ default: 1, description: 'Page number (1-based); takes precedence over offset' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: i18nValidationMessage('validation.IS_INT') })
+  @Min(1, { message: i18nValidationMessage('validation.MIN') })
+  page?: number;
+
   @ApiPropertyOptional({ example: 10 })
   @IsOptional()
   @Type(() => Number)

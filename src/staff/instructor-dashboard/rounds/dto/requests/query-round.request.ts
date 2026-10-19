@@ -1,7 +1,7 @@
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsOptional, Min } from 'class-validator';
 import { RoundStatusEnum } from '../../../../staff-dashboard/rounds/enums/round-status.enum';
 
 export class QueryRoundRequest {
@@ -15,6 +15,13 @@ export class QueryRoundRequest {
   @IsOptional()
   @IsEnum(RoundStatusEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
   status?: RoundStatusEnum;
+
+  @ApiPropertyOptional({ default: 1, description: 'Page number (1-based); takes precedence over offset' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: i18nValidationMessage('validation.IS_INT') })
+  @Min(1, { message: i18nValidationMessage('validation.MIN') })
+  page?: number;
 
   @ApiPropertyOptional({ default: 10, description: 'Number of items per page' })
   @IsOptional()

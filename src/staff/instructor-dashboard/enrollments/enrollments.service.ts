@@ -70,7 +70,8 @@ export class InstructorEnrollmentsService {
     trainerId: number,
     query: QueryEnrollmentRequest,
   ): Promise<PaginationResponse<EnrollmentResponse>> {
-    const { limit = 10, offset = 0, roundId, studentId, status, search } = query;
+    const { limit = 10, roundId, studentId, status, search } = query;
+    const offset = query.page ? (query.page - 1) * limit : (query.offset ?? 0);
 
     const qb = this.enrollmentRepo
       .createQueryBuilder('enrollment')

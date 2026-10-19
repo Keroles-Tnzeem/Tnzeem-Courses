@@ -85,7 +85,8 @@ export class InstructorSessionsService {
     trainerId: number,
     query: QuerySessionRequest,
   ): Promise<{ data: RoundSessionEntity[]; total: number }> {
-    const { limit = 10, offset = 0, roundId, sortBy = 'session_number', sortOrder = 'ASC' } = query;
+    const { limit = 10, roundId, sortBy = 'session_number', sortOrder = 'ASC' } = query;
+    const offset = query.page ? (query.page - 1) * limit : (query.offset ?? 0);
 
     const qb = this.sessionRepo
       .createQueryBuilder('session')

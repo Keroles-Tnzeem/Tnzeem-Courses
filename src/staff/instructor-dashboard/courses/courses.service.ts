@@ -85,7 +85,8 @@ export class InstructorCoursesService {
     trainerId: number,
     query: QueryCourseRequest,
   ): Promise<PaginationResponse<CourseResponse>> {
-    const { limit = 10, offset = 0, search } = query;
+    const { limit = 10, search } = query;
+    const offset = query.page ? (query.page - 1) * limit : (query.offset ?? 0);
 
     const qb = this.courseRepo
       .createQueryBuilder('course')

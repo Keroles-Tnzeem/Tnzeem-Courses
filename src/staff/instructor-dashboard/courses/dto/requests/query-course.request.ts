@@ -1,5 +1,5 @@
 import { i18nValidationMessage } from 'nestjs-i18n';
-import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -8,6 +8,13 @@ export class QueryCourseRequest {
   @IsOptional()
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
   search?: string;
+
+  @ApiPropertyOptional({ default: 1, description: 'Page number (1-based); takes precedence over offset' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: i18nValidationMessage('validation.IS_INT') })
+  @Min(1, { message: i18nValidationMessage('validation.MIN') })
+  page?: number;
 
   @ApiPropertyOptional({ default: 10, description: 'Number of items per page' })
   @IsOptional()

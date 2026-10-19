@@ -19,7 +19,8 @@ export class InstructorStudentsService {
     query: QueryStudentRequest,
     lang: string,
   ): Promise<PaginationResponse<InstructorStudentOrderResponse>> {
-    const { limit = 10, offset = 0, search, courseId, roundId } = query;
+    const { limit = 10, search, courseId, roundId } = query;
+    const offset = query.page ? (query.page - 1) * limit : (query.offset ?? 0);
 
     const qb = this.orderRepository
       .createQueryBuilder('order')

@@ -42,7 +42,7 @@ export class InstructorSessionsController {
 
   private paginate(data: RoundSessionEntity[], total: number, query: QuerySessionRequest) {
     const limit = query.limit ?? 10;
-    const page = Math.floor((query.offset ?? 0) / limit) + 1;
+    const page = query.page ?? Math.floor((query.offset ?? 0) / limit) + 1;
     return PaginationResponseDto.success(
       data.map((e) => SessionResponse.fromEntity(e)),
       total,

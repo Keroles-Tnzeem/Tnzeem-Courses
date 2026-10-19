@@ -1,7 +1,7 @@
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, Min, IsString } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, Min, IsString } from 'class-validator';
 
 export class QuerySessionRequest {
   @ApiPropertyOptional({ description: 'Filter by round ID' })
@@ -9,6 +9,13 @@ export class QuerySessionRequest {
   @Type(() => Number)
   @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
   roundId?: number;
+
+  @ApiPropertyOptional({ default: 1, description: 'Page number (1-based); takes precedence over offset' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt({ message: i18nValidationMessage('validation.IS_INT') })
+  @Min(1, { message: i18nValidationMessage('validation.MIN') })
+  page?: number;
 
   @ApiPropertyOptional({ default: 10, description: 'Number of items per page' })
   @IsOptional()
