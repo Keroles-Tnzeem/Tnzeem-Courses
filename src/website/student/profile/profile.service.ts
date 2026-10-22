@@ -14,6 +14,7 @@ import { UploadType } from '../../../shared/storage/enums/upload-type.enum';
 import { UpdateStudentProfileRequest } from './dto/requests/update-student-profile.request';
 import { UpdateStudentPhoneRequest } from './dto/requests/update-student-phone.request';
 import { StudentProfileResponse } from './dto/responses/student-profile.response';
+import { ContactUsService } from '../../shared/contact-us/contact-us.service';
 
 @Injectable()
 export class ProfileService {
@@ -22,6 +23,7 @@ export class ProfileService {
     private readonly userRepo: Repository<UserEntity>,
     private readonly i18n: I18nService,
     private readonly storageService: StorageService,
+    private readonly contactUsService: ContactUsService,
   ) {}
 
   private async findStudent(studentId: number): Promise<UserEntity> {
@@ -105,6 +107,13 @@ export class ProfileService {
 
     try {
       const saved = await this.userRepo.save(user);
+
+      // Bind any existing inquiries that were submitted with this phone number.
+      await this.contactUsService.linkInquiriesToStudent(
+        saved.phone,
+        saved.id,
+      );
+
       return StudentProfileResponse.from(saved);
     } catch (e) {
       // Unique-violation race between the check above and the save.

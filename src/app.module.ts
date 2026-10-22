@@ -36,6 +36,8 @@ import { StaffEnrollmentsModule } from './staff/staff-dashboard/enrollments/enro
 import { OrderCommentsModule } from './staff/staff-dashboard/order-comments/order-comments.module';
 import { NotificationsModule } from './shared/notifications/notifications.module';
 import { WebsiteStudentModule } from './website/student/student.module';
+import { ContactUsModule } from './website/shared/contact-us/contact-us.module';
+import { StaffInquiriesModule } from './staff/staff-dashboard/inquiries/inquiries.module';
 
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
@@ -100,6 +102,8 @@ const i18nPath = process.env.NODE_ENV === 'production'
     InstructorDashboardModule,
     WebsiteStudentModule,
     NotificationsModule,
+    ContactUsModule,
+    StaffInquiriesModule,
   ],
   controllers: [],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
