@@ -147,11 +147,15 @@ export class StudentService {
   }
 
   async create(dto: CreateStudentRequest): Promise<UserEntity> {
-    const exists = await this.userRepo.findOne({ where: { email: dto.email } });
-    if (exists) {
-      throw new ConflictException(
-        this.i18n.t('errors.EMAIL_TAKEN', { lang: getLang() }),
-      );
+    if (dto.email) {
+      const exists = await this.userRepo.findOne({
+        where: { email: dto.email },
+      });
+      if (exists) {
+        throw new ConflictException(
+          this.i18n.t('errors.EMAIL_TAKEN', { lang: getLang() }),
+        );
+      }
     }
 
     if (dto.phone) {

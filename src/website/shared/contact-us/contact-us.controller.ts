@@ -19,6 +19,8 @@ import { Throttle } from '@nestjs/throttler';
 import { ContactUsService } from './contact-us.service';
 import { CreateInquiryRequest } from './dto/requests/create-inquiry.request';
 import { InquiryResponse } from './dto/responses/inquiry.response';
+import { MakeOrderRequest } from './dto/requests/make-order.request';
+import { MakeOrderResponse } from './dto/responses/make-order.response';
 import { ApiResponseDto } from '../../../common/dto/responses/api.response';
 import { getLang } from '../../../common/helpers/lang.helper';
 
@@ -45,5 +47,37 @@ export class ContactUsController {
       data,
       this.i18n.t('common.success', { lang: getLang() }),
     );
+  }
+
+  @Post('order')
+  @UseInterceptors(NoFilesInterceptor())
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Make an order for a course' })
+  @ApiCreatedResponse({ description: 'Order created', type: MakeOrderResponse })
+  @ApiNotFoundResponse({ description: 'Course not found or not published' })
+  async makeOrder(
+    @Body() request: MakeOrderRequest,
+  ): Promise<ApiResponseDto<MakeOrderResponse>> {
+    const data = await this.contactUsService.makeOrder(request);
+    return ApiResponseDto.success(
+      data,
+      this.i18n.t('common.success', { lang: getLang() }),
+    );
+  }
+
+  @Post('make-order')
+  @UseInterceptors(NoFilesInterceptor())
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Make an order for a course (alias for /website/contact-us/order)',
+  })
+  @ApiCreatedResponse({ description: 'Order created', type: MakeOrderResponse })
+  @ApiNotFoundResponse({ description: 'Course not found or not published' })
+  async makeOrderAlias(
+    @Body() request: MakeOrderRequest,
+  ): Promise<ApiResponseDto<MakeOrderResponse>> {
+    return this.makeOrder(request);
   }
 }

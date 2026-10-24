@@ -23,9 +23,9 @@ export class CreateStudentRequest {
   @MaxLength(50, { message: i18nValidationMessage('validation.MAX_LENGTH') })
   lastName: string;
 
+  @IsOptional()
   @IsEmail({}, { message: i18nValidationMessage('validation.IS_EMAIL') })
-  @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
-  email: string;
+  email?: string;
 
   @IsSaudiPhoneNumber()
   phone: string;
