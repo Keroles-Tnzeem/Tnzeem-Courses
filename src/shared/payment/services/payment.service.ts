@@ -67,7 +67,10 @@ export class PaymentService {
         }
 
         // Auto-confirm the order if payment is fully confirmed
-        if (order.status === OrderStatusEnum.PENDING) {
+        if (
+            order.status !== OrderStatusEnum.CONFIRMED &&
+            order.status !== OrderStatusEnum.CANCELLED
+        ) {
             order.status = OrderStatusEnum.CONFIRMED;
         }
 

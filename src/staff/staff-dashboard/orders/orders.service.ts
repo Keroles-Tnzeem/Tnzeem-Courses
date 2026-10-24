@@ -338,7 +338,10 @@ export class OrdersService {
     // The round must be settled first: confirming needs the final round.
     if (dto.roundId !== undefined && dto.roundId !== order.roundId) {
       // After confirmation the enrollment is tied to the round, so it can't move.
-      if (order.status !== OrderStatusEnum.PENDING) {
+      if (
+        order.status === OrderStatusEnum.CONFIRMED ||
+        order.status === OrderStatusEnum.CANCELLED
+      ) {
         throw new ConflictException(
           this.i18n.t('errors.ORDER_ROUND_LOCKED', { lang }),
         );
@@ -383,6 +386,8 @@ export class OrdersService {
         await this.guardAgainstCancellingCompletedEnrollment(order, lang);
         order.status = OrderStatusEnum.CANCELLED;
         order.paymentStatus = PaymentStatusEnum.CANCELLED;
+      } else {
+        order.status = dto.status;
       }
     }
 
@@ -454,16 +459,60 @@ export class OrdersService {
 
   // ── Rules
 
-  /** PENDING -> CONFIRMED | CANCELLED, CONFIRMED -> CANCELLED. CANCELLED is final. */
+  /** PENDING -> CONFIRMED | CANCELLED | NO_RESPONSE_*, CONFIRMED -> CANCELLED. CANCELLED is final. */
   private assertStatusTransition(
     from: OrderStatusEnum,
     to: OrderStatusEnum,
     lang: string,
   ): void {
+    const unconfirmedStatuses = [
+      OrderStatusEnum.PENDING,
+      OrderStatusEnum.NO_RESPONSE_1,
+      OrderStatusEnum.NO_RESPONSE_2,
+      OrderStatusEnum.NO_RESPONSE_3,
+      OrderStatusEnum.NO_RESPONSE_4,
+    ];
+
     const allowed: Record<OrderStatusEnum, OrderStatusEnum[]> = {
       [OrderStatusEnum.PENDING]: [
         OrderStatusEnum.CONFIRMED,
         OrderStatusEnum.CANCELLED,
+        OrderStatusEnum.NO_RESPONSE_1,
+        OrderStatusEnum.NO_RESPONSE_2,
+        OrderStatusEnum.NO_RESPONSE_3,
+        OrderStatusEnum.NO_RESPONSE_4,
+      ],
+      [OrderStatusEnum.NO_RESPONSE_1]: [
+        OrderStatusEnum.CONFIRMED,
+        OrderStatusEnum.CANCELLED,
+        OrderStatusEnum.PENDING,
+        OrderStatusEnum.NO_RESPONSE_2,
+        OrderStatusEnum.NO_RESPONSE_3,
+        OrderStatusEnum.NO_RESPONSE_4,
+      ],
+      [OrderStatusEnum.NO_RESPONSE_2]: [
+        OrderStatusEnum.CONFIRMED,
+        OrderStatusEnum.CANCELLED,
+        OrderStatusEnum.PENDING,
+        OrderStatusEnum.NO_RESPONSE_1,
+        OrderStatusEnum.NO_RESPONSE_3,
+        OrderStatusEnum.NO_RESPONSE_4,
+      ],
+      [OrderStatusEnum.NO_RESPONSE_3]: [
+        OrderStatusEnum.CONFIRMED,
+        OrderStatusEnum.CANCELLED,
+        OrderStatusEnum.PENDING,
+        OrderStatusEnum.NO_RESPONSE_1,
+        OrderStatusEnum.NO_RESPONSE_2,
+        OrderStatusEnum.NO_RESPONSE_4,
+      ],
+      [OrderStatusEnum.NO_RESPONSE_4]: [
+        OrderStatusEnum.CONFIRMED,
+        OrderStatusEnum.CANCELLED,
+        OrderStatusEnum.PENDING,
+        OrderStatusEnum.NO_RESPONSE_1,
+        OrderStatusEnum.NO_RESPONSE_2,
+        OrderStatusEnum.NO_RESPONSE_3,
       ],
       [OrderStatusEnum.CONFIRMED]: [OrderStatusEnum.CANCELLED],
       [OrderStatusEnum.CANCELLED]: [],
