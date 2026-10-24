@@ -68,11 +68,11 @@ export class QueryOrderRequest {
 
   @ApiPropertyOptional({
     example: 1,
-    description: 'Filter by assigned staff ID',
+    description: 'Filter by assigned staff ID (send 0 for unassigned orders)',
   })
   @Type(() => Number)
   @IsInt({ message: i18nValidationMessage('validation.IS_NUMBER') })
-  @Min(1, { message: i18nValidationMessage('validation.MIN') })
+  @Min(0, { message: i18nValidationMessage('validation.MIN') })
   @IsOptional()
   assignToId?: number;
 

@@ -223,8 +223,12 @@ export class OrdersService {
       qb.andWhere('order.trainer_id = :trainerId', { trainerId });
     }
 
-    if (assignToId) {
-      qb.andWhere('order.assign_to_id = :assignToId', { assignToId });
+    if (assignToId !== undefined && assignToId !== null) {
+      if (Number(assignToId) === 0) {
+        qb.andWhere('order.assign_to_id IS NULL');
+      } else {
+        qb.andWhere('order.assign_to_id = :assignToId', { assignToId });
+      }
     }
 
     if (status) {

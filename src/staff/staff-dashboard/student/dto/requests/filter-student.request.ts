@@ -5,10 +5,12 @@ import { IsDateString, IsInt, IsOptional, Min } from 'class-validator';
 import { PaginationRequest } from '../../../../../common/dto/requests/pagination.request';
 
 export class FilterStudentRequest extends PaginationRequest {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Filter by assigned staff ID (send 0 for unassigned)',
+  })
   @Type(() => Number)
   @IsInt({ message: i18nValidationMessage('validation.IS_INT') })
-  @Min(1, { message: i18nValidationMessage('validation.MIN') })
+  @Min(0, { message: i18nValidationMessage('validation.MIN') })
   @IsOptional()
   assignToId?: number;
 

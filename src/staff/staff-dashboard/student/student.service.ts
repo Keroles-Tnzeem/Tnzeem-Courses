@@ -4,7 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
+import {
+  Repository,
+  Between,
+  MoreThanOrEqual,
+  LessThanOrEqual,
+  IsNull,
+  ILike,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { UserEntity } from '../../../shared/user/entities/user.entity';
@@ -53,8 +60,12 @@ export class StudentService {
     if (search) {
       where.firstName = search; // adjust if ILike needed
     }
-    if (assignToId) {
-      where.assignToId = assignToId;
+    if (assignToId !== undefined && assignToId !== null) {
+      if (Number(assignToId) === 0) {
+        where.assignToId = IsNull();
+      } else {
+        where.assignToId = assignToId;
+      }
     }
     if (from || to) {
       where.audit = {};
@@ -144,6 +155,33 @@ export class StudentService {
     }
 
     return student;
+  }
+
+  async findByPhone(phone: string): Promise<UserEntity[]> {
+    const raw = phone.trim();
+    if (!raw) {
+      return [];
+    }
+
+    const cleaned = raw.replace(/[\s\-]/g, '');
+    const withoutCountry = cleaned.replace(/^(\+966|00966|966)/, '');
+    const withoutZero = withoutCountry.startsWith('0')
+      ? withoutCountry.slice(1)
+      : withoutCountry;
+
+    const searchPatterns = Array.from(
+      new Set([raw, cleaned, withoutCountry, withoutZero].filter(Boolean)),
+    );
+
+    return await this.userRepo.find({
+      where: searchPatterns.map((pattern) => ({
+        userType: UserTypeEnum.STUDENT,
+        phone: ILike(`%${pattern}%`),
+      })),
+      relations: this.relations,
+      take: 20,
+      order: { id: 'DESC' },
+    });
   }
 
   async create(dto: CreateStudentRequest): Promise<UserEntity> {

@@ -73,7 +73,7 @@ export class StudentController {
   }
 
   // GET /staff-dashboard/student/my-students
-  @Permissions('students.view')
+  //@Permissions('students.view')
   @Get('my-students')
   @ApiOperation({
     summary: 'Get students assigned to the current staff member',
@@ -99,6 +99,24 @@ export class StudentController {
       total,
       page,
       limit,
+      this.i18n.t('common.success', { lang: this.lang() }),
+    );
+  }
+
+  // GET /staff-dashboard/student/by-phone/:phone
+
+  @Get('by-phone/:phone')
+  @ApiOperation({ summary: 'Search students by phone number (text search)' })
+  @ApiParam({ name: 'phone', type: String, description: 'Student phone search term' })
+  @ApiOkResponse({
+    description: 'Students returned successfully',
+    type: StudentResponse,
+    isArray: true,
+  })
+  async findByPhone(@Param('phone') phone: string) {
+    const data = await this.studentService.findByPhone(phone);
+    return ApiResponseDto.success(
+      data.map(StudentResponse.from),
       this.i18n.t('common.success', { lang: this.lang() }),
     );
   }
