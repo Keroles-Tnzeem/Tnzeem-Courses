@@ -59,10 +59,13 @@ export class QueryOrderRequest {
   @IsOptional()
   roundId?: number;
 
-  @ApiPropertyOptional({ example: 1, description: 'Filter by trainer ID' })
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Filter by trainer ID (send 0 for orders without trainer)',
+  })
   @Type(() => Number)
   @IsInt({ message: i18nValidationMessage('validation.IS_NUMBER') })
-  @Min(1, { message: i18nValidationMessage('validation.MIN') })
+  @Min(0, { message: i18nValidationMessage('validation.MIN') })
   @IsOptional()
   trainerId?: number;
 

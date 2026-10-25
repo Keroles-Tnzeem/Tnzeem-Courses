@@ -99,7 +99,7 @@ export class OrdersService {
     }
 
     let coursePrice = 0;
-    let trainerId = 0;
+    let trainerId: number | null = null;
     let courseId = 0;
 
     if (dto.roundId) {
@@ -110,7 +110,7 @@ export class OrdersService {
         );
       }
       coursePrice = Number(round.course.price);
-      trainerId = round.course.trainerId;
+      trainerId = round.course.trainerId ?? null;
       courseId = round.courseId;
     } else if (dto.courseId) {
       const course = await this.courseRepository.findOne({
@@ -122,7 +122,7 @@ export class OrdersService {
         );
       }
       coursePrice = Number(course.price);
-      trainerId = course.trainerId;
+      trainerId = course.trainerId ?? null;
       courseId = course.id;
     }
 
@@ -219,8 +219,12 @@ export class OrdersService {
       qb.andWhere('order.round_id = :roundId', { roundId });
     }
 
-    if (trainerId) {
-      qb.andWhere('order.trainer_id = :trainerId', { trainerId });
+    if (trainerId !== undefined && trainerId !== null) {
+      if (Number(trainerId) === 0) {
+        qb.andWhere('order.trainer_id IS NULL');
+      } else {
+        qb.andWhere('order.trainer_id = :trainerId', { trainerId });
+      }
     }
 
     if (assignToId !== undefined && assignToId !== null) {
@@ -288,6 +292,16 @@ export class OrdersService {
 
     const data = entities.map((e) => OrderResponse.fromEntity(e, lang));
     return PaginationResponse.success(data, total, page, limit);
+  }
+
+  // ── Find My Orders (paginated) ────────────────────────────────────────────
+
+  async findMyOrders(
+    staffId: number,
+    query: QueryOrderRequest,
+    lang: string,
+  ): Promise<PaginationResponse<OrderResponse>> {
+    return this.findAll({ ...query, assignToId: staffId }, lang);
   }
 
   async findOne(id: string, lang: string): Promise<OrderDetailsResponse> {
@@ -441,9 +455,9 @@ export class OrdersService {
     return OrderResponse.fromEntity(withRelations!, lang);
   }
 
-  // ── Cancel (soft delete via status)
+  // ── Delete (hard delete with comments) ────────────────────────────────────
 
-  async cancel(id: string, lang: string): Promise<void> {
+  async delete(id: string, lang: string): Promise<void> {
     const order = await this.ordersRepository.findOne({ where: { id } });
 
     if (!order) {
@@ -452,13 +466,15 @@ export class OrdersService {
       );
     }
 
-    // Already cancelled: nothing to do (idempotent).
-    if (order.status === OrderStatusEnum.CANCELLED) return;
+    // Explicitly delete associated order comments
+    await this.orderCommentRepository.delete({ orderId: id });
 
-    await this.guardAgainstCancellingCompletedEnrollment(order, lang);
-    order.status = OrderStatusEnum.CANCELLED;
-    order.paymentStatus = PaymentStatusEnum.CANCELLED;
-    await this.ordersRepository.save(order);
+    // Hard delete the order
+    await this.ordersRepository.remove(order);
+  }
+
+  async cancel(id: string, lang: string): Promise<void> {
+    return this.delete(id, lang);
   }
 
   // ── Rules

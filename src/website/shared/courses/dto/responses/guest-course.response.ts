@@ -7,8 +7,8 @@ export class GuestCourseResponse {
   @ApiProperty()
   id: number;
 
-  @ApiProperty()
-  trainerId: number;
+  @ApiPropertyOptional()
+  trainerId?: number | null;
 
   @ApiProperty()
   categoryId: number;

@@ -19,8 +19,8 @@ export class OrderResponse {
   @ApiPropertyOptional()
   courseId: number | null;
 
-  @ApiProperty()
-  trainerId: number;
+  @ApiPropertyOptional()
+  trainerId?: number | null;
 
   @ApiProperty()
   mainPrice: number;

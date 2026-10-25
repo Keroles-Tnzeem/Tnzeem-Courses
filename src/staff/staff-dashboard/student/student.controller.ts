@@ -122,7 +122,7 @@ export class StudentController {
   }
 
   // GET /staff-dashboard/student/:id
-  @Permissions('students.view')
+  //@Permissions('students.view')
   @Get(':id')
   @ApiOperation({ summary: 'Get a student by ID' })
   @ApiParam({ name: 'id', type: Number })

@@ -5,7 +5,7 @@ import { parseJson } from '../../../../../common/helpers/parse-json.helper';
 
 export class CourseResponse {
   id: number;
-  trainerId: number;
+  trainerId?: number | null;
   categoryId: number;
   name: string;
   description: string;

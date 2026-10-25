@@ -92,7 +92,7 @@ export class CoursesService {
     try {
       const saved = await this.courseRepo.save(course);
       await this.notificationsService.notify({
-        userId: saved.trainerId,
+        userId: trainer.id,
         type: NotificationTypeEnum.COURSE_CREATED,
         ...courseCreatedContent(saved.name, saved.status),
         data: { courseId: saved.id },

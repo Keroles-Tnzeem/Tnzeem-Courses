@@ -91,9 +91,25 @@ export class OrdersController {
     return await this.ordersService.findAll(query, lang);
   }
 
+  // ── Find My Orders ────────────────────────────────────────────────────────
+
+  //@Permissions('orders.view')
+  @Get('my-orders')
+  @ApiOperation({
+    summary: 'Get orders assigned to the current staff member',
+  })
+  @ApiResponse({ status: 200, type: OrderResponse, isArray: true })
+  async findMyOrders(
+    @CurrentUser('sub') staffId: number,
+    @Query() query: QueryOrderRequest,
+    @Lang() lang: string,
+  ): Promise<PaginationResponse<OrderResponse>> {
+    return await this.ordersService.findMyOrders(staffId, query, lang);
+  }
+
   // Find One
 
-  @Permissions('orders.view')
+  // @Permissions('orders.view')
   @Get(':id')
   @ApiOperation({ summary: 'Get a single order by ULID' })
   @ApiParam({ name: 'id', type: String, description: 'Order ULID' })
@@ -139,19 +155,19 @@ export class OrdersController {
     return ApiResponseDto.success(order);
   }
 
-  // ── Cancel ────────────────────────────────────────────────────────────────
+  // ── Delete ────────────────────────────────────────────────────────────────
 
   @Permissions('orders.delete')
   @Delete(':id')
-  @ApiOperation({ summary: 'Cancel an order (sets status to CANCELLED)' })
+  @ApiOperation({ summary: 'Hard delete an order with its comments' })
   @ApiParam({ name: 'id', type: String, description: 'Order ULID' })
-  @ApiResponse({ status: 200, description: 'Order cancelled successfully' })
+  @ApiResponse({ status: 200, description: 'Order deleted successfully' })
   @ApiResponse({ status: 404, description: 'Order not found' })
-  async cancel(
+  async delete(
     @Param('id') id: string,
     @Lang() lang: string,
   ): Promise<ApiResponseDto<null>> {
-    await this.ordersService.cancel(id, lang);
-    return ApiResponseDto.success(null, 'Order cancelled successfully');
+    await this.ordersService.delete(id, lang);
+    return ApiResponseDto.success(null, 'Order deleted successfully');
   }
 }

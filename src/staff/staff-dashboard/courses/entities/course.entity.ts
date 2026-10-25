@@ -17,8 +17,8 @@ export class CourseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'trainer_id' })
-  trainerId: number;
+  @Column({ name: 'trainer_id', nullable: true })
+  trainerId?: number | null;
 
   @Column({ name: 'category_id' })
   categoryId: number;
@@ -67,9 +67,9 @@ export class CourseEntity {
   })
   level: CourseLevelEnum;
 
-  @ManyToOne(() => UserEntity, { eager: true })
+  @ManyToOne(() => UserEntity, { eager: true, nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'trainer_id' })
-  trainer: UserEntity;
+  trainer?: UserEntity | null;
 
   @ManyToOne(() => CourseCategoryEntity)
   @JoinColumn({ name: 'category_id' })

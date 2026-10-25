@@ -39,8 +39,8 @@ export class OrderEntity {
   @Column({ name: 'course_id', nullable: true })
   courseId: number | null;
 
-  @Column({ name: 'trainer_id' })
-  trainerId: number;
+  @Column({ name: 'trainer_id', nullable: true })
+  trainerId?: number | null;
 
   @Column({ name: 'assign_to_id', nullable: true })
   assignToId: number;
@@ -152,7 +152,7 @@ export class OrderEntity {
 
   // Relations
 
-  @ManyToOne(() => UserEntity, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'student_id' })
   student: UserEntity;
 
@@ -164,11 +164,11 @@ export class OrderEntity {
   @JoinColumn({ name: 'course_id' })
   course: CourseEntity;
 
-  @ManyToOne(() => UserEntity, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => UserEntity, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'trainer_id' })
-  trainer: UserEntity;
+  trainer?: UserEntity | null;
 
-  @ManyToOne(() => UserEntity, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => UserEntity, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'created_by_id' })
   creator?: UserEntity;
 

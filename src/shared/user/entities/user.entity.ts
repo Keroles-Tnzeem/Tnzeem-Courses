@@ -81,7 +81,7 @@ export class UserEntity {
   @Column({ name: 'assign_to_id', nullable: true })
   assignToId?: number;
 
-  @ManyToOne(() => UserEntity, { nullable: true })
+  @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'assign_to_id' })
   assignTo?: UserEntity;
 

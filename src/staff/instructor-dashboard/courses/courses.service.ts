@@ -59,7 +59,7 @@ export class InstructorCoursesService {
     const course = this.courseRepo.create(courseData as Partial<CourseEntity>);
     const savedCourse = await this.courseRepo.save(course);
     await this.notificationsService.notify({
-      userId: savedCourse.trainerId,
+      userId: trainerId,
       type: NotificationTypeEnum.COURSE_CREATED,
       ...courseCreatedContent(savedCourse.name, savedCourse.status),
       data: { courseId: savedCourse.id },
