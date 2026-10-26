@@ -52,7 +52,7 @@ export class OrderCommentsController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(NoFilesInterceptor())
   @ApiResponse({ status: 201, type: OrderCommentResponse })
-  @Permissions('orders.create')
+  //@Permissions('orders.create')
   async create(
     @CurrentUser('sub') staffId: number,
     @Body() dto: CreateOrderCommentRequest,
@@ -67,7 +67,7 @@ export class OrderCommentsController {
   @Get()
   @ApiOperation({ summary: 'List order comments' })
   @ApiResponse({ status: 200, type: OrderCommentResponse, isArray: true })
-  @Permissions('orders.view')
+  //@Permissions('orders.view')
   async findAll(
     @Query() query: QueryOrderCommentRequest,
   ): Promise<PaginationResponseDto<OrderCommentResponse>> {
@@ -78,7 +78,7 @@ export class OrderCommentsController {
   @ApiOperation({ summary: 'Get order comment by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, type: OrderCommentResponse })
-  @Permissions('orders.view')
+  //@Permissions('orders.view')
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ApiResponseDto<OrderCommentResponse>> {
@@ -92,7 +92,7 @@ export class OrderCommentsController {
   @UseInterceptors(NoFilesInterceptor())
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, type: OrderCommentResponse })
-  @Permissions('orders.update')
+  //@Permissions('orders.update')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateOrderCommentRequest,
@@ -108,7 +108,7 @@ export class OrderCommentsController {
   @ApiOperation({ summary: 'Delete order comment' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200 })
-  @Permissions('orders.delete')
+  //@Permissions('orders.delete')
   async remove(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ApiResponseDto<null>> {
