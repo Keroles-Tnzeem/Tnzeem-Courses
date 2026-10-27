@@ -1,104 +1,139 @@
-import {ForbiddenException, Injectable, UnauthorizedException} from "@nestjs/common";
-import {UserTypeEnum} from "../../user/enums/user-type.enum";
-import {UserService} from "../../user/user.service";
-import {JwtPayload, JwtTokenService} from "./jwt.service";
-import {LoginResponse} from "../dto/responses/login.response";
-import {LoginRequest} from "../dto/requests/login.request";
-import {RefreshTokenRequest} from "../dto/requests/refresh-token.request";
-import {TokenResponse} from "../dto/responses/token.response";
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { UserTypeEnum } from '../../user/enums/user-type.enum';
+import { UserService } from '../../user/user.service';
+import { JwtPayload, JwtTokenService } from './jwt.service';
+import { LoginResponse } from '../dto/responses/login.response';
+import { LoginRequest } from '../dto/requests/login.request';
+import { RefreshTokenRequest } from '../dto/requests/refresh-token.request';
+import { TokenResponse } from '../dto/responses/token.response';
 import { I18nService, I18nContext } from 'nestjs-i18n';
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private readonly userService: UserService,
-        private readonly jwtTokenService: JwtTokenService,
-        private readonly i18n: I18nService
-    ) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtTokenService: JwtTokenService,
+    private readonly i18n: I18nService,
+  ) {}
 
-    async login(dto: LoginRequest): Promise<LoginResponse> {
-        const user = await this.userService.findByEmail(dto.email);
+  async login(dto: LoginRequest): Promise<LoginResponse> {
+    const user = await this.userService.findByEmail(dto.email);
 
-        if (!user) {
-            throw new UnauthorizedException(this.i18n.t('errors.INVALID_CREDENTIALS', { lang: I18nContext.current()?.lang }));
-        }
-
-        const passwordMatches =
-            await this.userService.validatePassword(
-                user,
-                dto.password,
-            );
-
-        if (!passwordMatches) {
-            throw new UnauthorizedException(this.i18n.t('errors.INVALID_CREDENTIALS', { lang: I18nContext.current()?.lang }));
-        }
-
-        // Students sign in from the student app (phone + password / OTP), never here.
-        if (user.userType === UserTypeEnum.STUDENT) {
-            throw new ForbiddenException(this.i18n.t('errors.STUDENT_LOGIN_NOT_ALLOWED', { lang: I18nContext.current()?.lang }));
-        }
-
-        if (!user.isActive) {
-            throw new ForbiddenException(this.i18n.t('errors.ACCOUNT_DISABLED', { lang: I18nContext.current()?.lang }));
-        }
-
-        const payload = {
-            sub: user.id,
-            userType: user.userType,
-            permissions: this.userService.getPermissions(user),
-        };
-
-        const { accessToken, expiresIn } =
-            this.jwtTokenService.generateAccessToken(payload);
-            
-        const refreshToken = this.jwtTokenService.generateRefreshToken(payload);
-
-        const dashboardUrls: Record<UserTypeEnum, string> = {
-            [UserTypeEnum.ADMIN]: 'staff-dashboard',
-            [UserTypeEnum.SALES]: 'staff-dashboard',
-            [UserTypeEnum.SUPPORT]: 'staff-dashboard',
-            [UserTypeEnum.TRAINER]: 'trainer-dashboard',
-            [UserTypeEnum.STUDENT]: 'student-dashboard',
-        };
-        const url = dashboardUrls[user.userType] || '';
-
-        return {
-            accessToken,
-            refreshToken,
-            expireIn: expiresIn,
-            url,
-            user: this.userService.toUserDataResponse(user),
-        };
+    if (!user) {
+      throw new UnauthorizedException(
+        this.i18n.t('errors.INVALID_CREDENTIALS', {
+          lang: I18nContext.current()?.lang,
+        }),
+      );
     }
 
-    async refresh(dto: RefreshTokenRequest): Promise<TokenResponse> {
-        try {
-            const payload = await this.jwtTokenService.verifyRefreshToken(dto.refreshToken);
-            
-            const user = await this.userService.findById(payload.sub);
-            if (!user || !user.isActive) {
-                throw new UnauthorizedException(this.i18n.t('errors.INVALID_CREDENTIALS', { lang: I18nContext.current()?.lang }));
-            }
+    const passwordMatches = await this.userService.validatePassword(
+      user,
+      dto.password,
+    );
 
-            const newPayload = {
-                sub: user.id,
-                userType: user.userType,
-                permissions: this.userService.getPermissions(user),
-            };
-
-            const { accessToken, expiresIn } = this.jwtTokenService.generateAccessToken(newPayload);
-            const newRefreshToken = this.jwtTokenService.generateRefreshToken(newPayload);
-
-            return {
-                accessToken,
-                refreshToken: newRefreshToken,
-                expireIn: expiresIn,
-            };
-        } catch (error) {
-            if (error?.name === 'TokenExpiredError') {
-                throw new UnauthorizedException(this.i18n.t('errors.TOKEN_EXPIRED', { lang: I18nContext.current()?.lang }));
-            }
-            throw new UnauthorizedException(this.i18n.t('errors.INVALID_CREDENTIALS', { lang: I18nContext.current()?.lang }));
-        }
+    if (!passwordMatches) {
+      throw new UnauthorizedException(
+        this.i18n.t('errors.INVALID_CREDENTIALS', {
+          lang: I18nContext.current()?.lang,
+        }),
+      );
     }
+
+    // Students sign in from the student app (phone + password / OTP), never here.
+    if (user.userType === UserTypeEnum.STUDENT) {
+      throw new ForbiddenException(
+        this.i18n.t('errors.STUDENT_LOGIN_NOT_ALLOWED', {
+          lang: I18nContext.current()?.lang,
+        }),
+      );
+    }
+
+    if (!user.isActive) {
+      throw new ForbiddenException(
+        this.i18n.t('errors.ACCOUNT_DISABLED', {
+          lang: I18nContext.current()?.lang,
+        }),
+      );
+    }
+
+    const payload = {
+      sub: user.id,
+      userType: user.userType,
+      permissions: this.userService.getPermissions(user),
+    };
+
+    const { accessToken, expiresIn } =
+      this.jwtTokenService.generateAccessToken(payload);
+
+    const refreshToken = this.jwtTokenService.generateRefreshToken(payload);
+
+    const dashboardUrls: Record<UserTypeEnum, string> = {
+      [UserTypeEnum.ADMIN]: 'staff-dashboard',
+      [UserTypeEnum.SALES]: 'staff-dashboard',
+      [UserTypeEnum.SUPPORT]: 'staff-dashboard',
+      [UserTypeEnum.TRAINER]: 'trainer-dashboard',
+      [UserTypeEnum.STUDENT]: 'student-dashboard',
+    };
+    const url = dashboardUrls[user.userType] || '';
+
+    return {
+      accessToken,
+      refreshToken,
+      expireIn: expiresIn,
+      url,
+      user: this.userService.toUserDataResponse(user),
+    };
+  }
+
+  async refresh(dto: RefreshTokenRequest): Promise<TokenResponse> {
+    try {
+      const payload = await this.jwtTokenService.verifyRefreshToken(
+        dto.refreshToken,
+      );
+
+      const user = await this.userService.findById(payload.sub);
+      if (!user || !user.isActive) {
+        throw new UnauthorizedException(
+          this.i18n.t('errors.INVALID_CREDENTIALS', {
+            lang: I18nContext.current()?.lang,
+          }),
+        );
+      }
+
+      const newPayload = {
+        sub: user.id,
+        userType: user.userType,
+        permissions: this.userService.getPermissions(user),
+      };
+
+      const { accessToken, expiresIn } =
+        this.jwtTokenService.generateAccessToken(newPayload);
+      const newRefreshToken =
+        this.jwtTokenService.generateRefreshToken(newPayload);
+
+      return {
+        accessToken,
+        refreshToken: newRefreshToken,
+        expireIn: expiresIn,
+      };
+    } catch (error) {
+      if (error?.name === 'TokenExpiredError') {
+        throw new UnauthorizedException(
+          this.i18n.t('errors.TOKEN_EXPIRED', {
+            lang: I18nContext.current()?.lang,
+          }),
+        );
+      }
+      throw new UnauthorizedException(
+        this.i18n.t('errors.INVALID_CREDENTIALS', {
+          lang: I18nContext.current()?.lang,
+        }),
+      );
+    }
+  }
 }

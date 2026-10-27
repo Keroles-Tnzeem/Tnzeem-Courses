@@ -11,7 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { I18nService } from 'nestjs-i18n';
+import { I18nContext, I18nService } from 'nestjs-i18n';
 import { ConfigService } from '@nestjs/config';
 import { OAuth2Client, TokenPayload } from 'google-auth-library';
 import * as appleSignin from 'apple-signin-auth';
@@ -290,9 +290,7 @@ export class StudentAuthService {
 
   async login(dto: LoginStudentRequest): Promise<LoginResponse> {
     const lang = getLang();
-    const user = await this.userRepo.findOne({
-      where: { phone: dto.phone, userType: UserTypeEnum.STUDENT },
-    });
+    const user = await this.findStudentByPhoneOrNull(dto.phone);
 
     if (!user) {
       throw new UnauthorizedException(
@@ -310,9 +308,9 @@ export class StudentAuthService {
       );
     }
 
-    if (!user.phoneVerifiedAt) {
-      throw new UnauthorizedException(
-        this.i18n.t('errors.PHONE_NOT_VERIFIED', { lang }),
+    if (!user.isActive) {
+      throw new ForbiddenException(
+        this.i18n.t('errors.ACCOUNT_DISABLED', { lang }),
       );
     }
 

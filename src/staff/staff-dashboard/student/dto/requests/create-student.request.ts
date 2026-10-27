@@ -10,7 +10,9 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { i18nValidationMessage } from 'nestjs-i18n';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { GenderEnum } from '../../../../../shared/user/enums/gender.enum';
+import { OrderStatusEnum } from '../../../../../shared/orders/enums/order-status.enum';
 
 export class CreateStudentRequest {
   @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
@@ -33,6 +35,17 @@ export class CreateStudentRequest {
   @IsEnum(GenderEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
   @IsNotEmpty({ message: i18nValidationMessage('validation.IS_NOT_EMPTY') })
   gender: GenderEnum;
+
+  @ApiPropertyOptional({
+    enum: OrderStatusEnum,
+    default: OrderStatusEnum.PENDING,
+    example: OrderStatusEnum.PENDING,
+  })
+  @IsOptional()
+  @IsEnum(OrderStatusEnum, {
+    message: i18nValidationMessage('validation.IS_ENUM'),
+  })
+  status?: OrderStatusEnum;
 
   @IsOptional()
   @Type(() => Number)

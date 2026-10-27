@@ -11,6 +11,7 @@ import {
 import { Exclude } from 'class-transformer';
 import { UserTypeEnum } from '../enums/user-type.enum';
 import { GenderEnum } from '../enums/gender.enum';
+import { OrderStatusEnum } from '../../orders/enums/order-status.enum';
 import { UserPermissionEntity } from './user-permission.entity';
 import { TrainerInfoEntity } from './trainer-info.entity';
 import { AuditColumns } from '../../../common/entities/audit-columns';
@@ -59,6 +60,14 @@ export class UserEntity {
 
   @Column({ name: 'user_type', type: 'enum', enum: UserTypeEnum })
   userType: UserTypeEnum;
+
+  @Column({
+    type: 'enum',
+    enum: OrderStatusEnum,
+    enumName: 'users_status_enum',
+    default: OrderStatusEnum.PENDING,
+  })
+  status: OrderStatusEnum;
 
   @OneToMany(() => UserPermissionEntity, (up) => up.user, {
     cascade: true,

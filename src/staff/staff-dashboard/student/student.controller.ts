@@ -16,6 +16,7 @@ import { I18nContext, I18nService } from 'nestjs-i18n';
 import { StudentService } from './student.service';
 import { CreateStudentRequest } from './dto/requests/create-student.request';
 import { UpdateStudentRequest } from './dto/requests/update-student.request';
+import { UpdateStudentStatusRequest } from './dto/requests/update-student-status.request';
 import { StudentResponse } from './dto/responses/student.response';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../../common/guards/permissions.guard';
@@ -107,7 +108,11 @@ export class StudentController {
 
   @Get('by-phone/:phone')
   @ApiOperation({ summary: 'Search students by phone number (text search)' })
-  @ApiParam({ name: 'phone', type: String, description: 'Student phone search term' })
+  @ApiParam({
+    name: 'phone',
+    type: String,
+    description: 'Student phone search term',
+  })
   @ApiOkResponse({
     description: 'Students returned successfully',
     type: StudentResponse,
@@ -170,6 +175,27 @@ export class StudentController {
     @Body() dto: UpdateStudentRequest,
   ) {
     const data = await this.studentService.update(id, dto);
+    return ApiResponseDto.success(
+      StudentResponse.from(data),
+      this.i18n.t('common.updated', { lang: this.lang() }),
+    );
+  }
+
+  // PATCH /staff-dashboard/student/:id/status
+  @Permissions('students.update')
+  @Patch(':id/status')
+  @UseInterceptors(NoFilesInterceptor())
+  @ApiOperation({ summary: 'Update student status' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiOkResponse({
+    description: 'Student status updated successfully',
+    type: StudentResponse,
+  })
+  async updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateStudentStatusRequest,
+  ) {
+    const data = await this.studentService.updateStatus(id, dto.status);
     return ApiResponseDto.success(
       StudentResponse.from(data),
       this.i18n.t('common.updated', { lang: this.lang() }),

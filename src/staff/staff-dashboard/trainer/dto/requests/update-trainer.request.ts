@@ -57,9 +57,10 @@ export class UpdateTrainerRequest {
     numCourses?: number;
 
     @IsOptional()
-    @Transform(({ value }) => {
-        if (value === '0' || value === 0 || value === 'false') return false;
-        if (value === '1' || value === 1 || value === 'true') return true;
+    @Transform(({ obj, key, value }) => {
+        const raw = obj && key in obj ? obj[key] : value;
+        if (raw === '0' || raw === 0 || raw === 'false' || raw === false) return false;
+        if (raw === '1' || raw === 1 || raw === 'true' || raw === true) return true;
         return value;
     })
     @IsBoolean({ message: i18nValidationMessage('validation.IS_BOOLEAN') })

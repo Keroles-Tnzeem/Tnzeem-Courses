@@ -16,6 +16,7 @@ import * as bcrypt from 'bcrypt';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { UserEntity } from '../../../shared/user/entities/user.entity';
 import { UserTypeEnum } from '../../../shared/user/enums/user-type.enum';
+import { OrderStatusEnum } from '../../../shared/orders/enums/order-status.enum';
 import { SourceEntity } from '../sources/entities/source.entity';
 import { CreateStudentRequest } from './dto/requests/create-student.request';
 import { UpdateStudentRequest } from './dto/requests/update-student.request';
@@ -53,12 +54,23 @@ export class StudentService {
   async findAll(
     query: FilterStudentRequest,
   ): Promise<{ data: UserEntity[]; total: number }> {
-    const { page = 1, limit = 10, search, assignToId, from, to } = query;
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      assignToId,
+      from,
+      to,
+      status,
+    } = query;
     const skip = (page - 1) * limit;
 
     const where: any = { userType: UserTypeEnum.STUDENT };
     if (search) {
       where.firstName = search; // adjust if ILike needed
+    }
+    if (status) {
+      where.status = status;
     }
     if (assignToId !== undefined && assignToId !== null) {
       if (Number(assignToId) === 0) {
@@ -100,7 +112,7 @@ export class StudentService {
     userId: number,
     query: FilterStudentRequest,
   ): Promise<{ data: UserEntity[]; total: number }> {
-    const { page = 1, limit = 10, search, from, to } = query;
+    const { page = 1, limit = 10, search, from, to, status } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {
@@ -110,6 +122,9 @@ export class StudentService {
 
     if (search) {
       where.firstName = search;
+    }
+    if (status) {
+      where.status = status;
     }
     if (from || to) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -221,6 +236,7 @@ export class StudentService {
       password: hashed,
       userType: UserTypeEnum.STUDENT,
       sourceId: dto.sourceId,
+      status: dto.status ?? OrderStatusEnum.PENDING,
     });
 
     const saved = await this.userRepo.save(student);
@@ -257,9 +273,24 @@ export class StudentService {
       await this.ensureSourceExists(dto.sourceId);
     }
 
+    if (dto.password) {
+      dto.password = await bcrypt.hash(dto.password, 10);
+    }
+
+    if (dto.isActive !== undefined) {
+      student.isActive = dto.isActive;
+    }
+
     Object.assign(student, dto);
     await this.userRepo.save(student);
 
+    return this.findOne(id);
+  }
+
+  async updateStatus(id: number, status: OrderStatusEnum): Promise<UserEntity> {
+    const student = await this.findOne(id);
+    student.status = status;
+    await this.userRepo.save(student);
     return this.findOne(id);
   }
 

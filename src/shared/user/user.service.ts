@@ -27,6 +27,17 @@ export class UserService {
         });
     }
 
+    async findByPhone(phone: string): Promise<UserEntity | null> {
+        return this.userRepository.findOne({
+            where: { phone },
+            relations: {
+                userPermissions: {
+                    permission: true
+                }
+            }
+        });
+    }
+
     async findById(id: number): Promise<UserEntity | null> {
         return this.userRepository.findOne({
             where: { id },

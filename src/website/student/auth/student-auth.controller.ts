@@ -47,7 +47,7 @@ export class StudentAuthController {
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @UseInterceptors(AnyFilesInterceptor())
-  @ApiOperation({ summary: 'Authenticate a student with email/password' })
+  @ApiOperation({ summary: 'Authenticate a student with phone and password' })
   @ApiCreatedResponse({
     description: 'Student authenticated successfully',
     type: LoginResponse,
