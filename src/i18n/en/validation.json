@@ -19,7 +19,7 @@
     "MIN": "{property} must not be less than {constraints.0}",
     "MAX": "{property} must not be greater than {constraints.0}",
     "MAX_LENGTH": "{property} must be at most {constraints.0} characters",
-    "INVALID_SLUG": "{property} may only contain lowercase letters, numbers and single hyphens (e.g. node-js-course)",
+    "INVALID_SLUG": "{property} may only contain letters (Arabic or English), numbers and single hyphens (e.g. node-js-course or دورة-الويب)",
     "INVALID_OTP_CODE": "The verification code must be 6 digits",
     "WEAK_PASSWORD": "{property} must contain at least one letter and one number"
 }

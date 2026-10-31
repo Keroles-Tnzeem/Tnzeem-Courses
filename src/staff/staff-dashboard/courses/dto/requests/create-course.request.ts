@@ -102,7 +102,7 @@ export class CreateCourseRequest {
   @Transform(({ value }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
-  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+  @Matches(/^[a-z0-9\u0600-\u06FF]+(?:-[a-z0-9\u0600-\u06FF]+)*$/u, {
     message: i18nValidationMessage('validation.INVALID_SLUG'),
   })
   @MaxLength(100, { message: i18nValidationMessage('validation.MAX_LENGTH') })
