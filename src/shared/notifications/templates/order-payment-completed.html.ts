@@ -8,7 +8,9 @@ export interface OrderPaymentCompletedEmailData {
 /**
  * Renders a simple Arabic-only payment-completed HTML email.
  */
-export function renderOrderPaymentCompletedEmail(data: OrderPaymentCompletedEmailData): string {
+export function renderOrderPaymentCompletedEmail(
+  data: OrderPaymentCompletedEmailData,
+): string {
   const { orderId, courseName, appName = 'معهد التنظيم' } = data;
 
   return `<!DOCTYPE html>

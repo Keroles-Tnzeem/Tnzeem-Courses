@@ -10,8 +10,8 @@ import * as bcrypt from 'bcrypt';
 import { I18nService } from 'nestjs-i18n';
 import { OtpEntity } from '../entities/otp.entity';
 import { OtpPurposeEnum } from '../enums/otp-purpose.enum';
-import { NotificationService } from '../../../../shared/notification/notification.service';
-import { NotificationChannelEnum } from '../../../../shared/notification/enums/notification-channel.enum';
+import { NotificationsService } from '../../../../shared/notifications/notifications.service';
+import { NotificationChannelEnum } from '../../../../shared/notifications/enums/notification-channel.enum';
 import { getLang } from '../../../../common/helpers/lang.helper';
 
 export const OTP_TTL_SECONDS = 5 * 60;
@@ -24,7 +24,7 @@ export class OtpService {
   constructor(
     @InjectRepository(OtpEntity)
     private readonly otpRepo: Repository<OtpEntity>,
-    private readonly notificationService: NotificationService,
+    private readonly notificationsService: NotificationsService,
     private readonly i18n: I18nService,
   ) {}
 
@@ -98,7 +98,7 @@ export class OtpService {
     await this.otpRepo.save(otp);
 
     // Strategy pattern: WhatsApp today, Email in the future — see project-phases/phase-3.md
-    await this.notificationService.send(
+    await this.notificationsService.send(
       NotificationChannelEnum.WHATSAPP,
       phone,
       `Your Tnzeem verification code is ${code}. It expires in ${OTP_TTL_SECONDS / 60} minutes.`,

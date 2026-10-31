@@ -8,11 +8,11 @@ import { NotificationChannelEnum } from '../enums/notification-channel.enum';
  */
 @Injectable()
 export class InAppNotificationStrategy implements NotificationChannelStrategy {
-    supports(channel: NotificationChannelEnum): boolean {
-        return channel === NotificationChannelEnum.IN_APP;
-    }
+  supports(channel: NotificationChannelEnum): boolean {
+    return channel === NotificationChannelEnum.IN_APP;
+  }
 
-    async send(): Promise<void> {
-        return;
-    }
+  async send(): Promise<void> {
+    return;
+  }
 }

@@ -479,7 +479,7 @@ export class OrdersService {
 
   // ── Rules
 
-  /** PENDING -> CONFIRMED | CANCELLED | NO_RESPONSE_*, CONFIRMED -> CANCELLED. CANCELLED is final. */
+  /** PENDING -> CONFIRMED | CANCELLED | TRACKING | NO_RESPONSE_*, CONFIRMED -> CANCELLED. CANCELLED is final. */
   private assertStatusTransition(
     from: OrderStatusEnum,
     to: OrderStatusEnum,
@@ -487,6 +487,7 @@ export class OrdersService {
   ): void {
     const unconfirmedStatuses = [
       OrderStatusEnum.PENDING,
+      OrderStatusEnum.TRACKING,
       OrderStatusEnum.NO_RESPONSE_1,
       OrderStatusEnum.NO_RESPONSE_2,
       OrderStatusEnum.NO_RESPONSE_3,
@@ -497,6 +498,16 @@ export class OrdersService {
       [OrderStatusEnum.PENDING]: [
         OrderStatusEnum.CONFIRMED,
         OrderStatusEnum.CANCELLED,
+        OrderStatusEnum.TRACKING,
+        OrderStatusEnum.NO_RESPONSE_1,
+        OrderStatusEnum.NO_RESPONSE_2,
+        OrderStatusEnum.NO_RESPONSE_3,
+        OrderStatusEnum.NO_RESPONSE_4,
+      ],
+      [OrderStatusEnum.TRACKING]: [
+        OrderStatusEnum.CONFIRMED,
+        OrderStatusEnum.CANCELLED,
+        OrderStatusEnum.PENDING,
         OrderStatusEnum.NO_RESPONSE_1,
         OrderStatusEnum.NO_RESPONSE_2,
         OrderStatusEnum.NO_RESPONSE_3,
@@ -506,6 +517,7 @@ export class OrdersService {
         OrderStatusEnum.CONFIRMED,
         OrderStatusEnum.CANCELLED,
         OrderStatusEnum.PENDING,
+        OrderStatusEnum.TRACKING,
         OrderStatusEnum.NO_RESPONSE_2,
         OrderStatusEnum.NO_RESPONSE_3,
         OrderStatusEnum.NO_RESPONSE_4,
@@ -514,6 +526,7 @@ export class OrdersService {
         OrderStatusEnum.CONFIRMED,
         OrderStatusEnum.CANCELLED,
         OrderStatusEnum.PENDING,
+        OrderStatusEnum.TRACKING,
         OrderStatusEnum.NO_RESPONSE_1,
         OrderStatusEnum.NO_RESPONSE_3,
         OrderStatusEnum.NO_RESPONSE_4,
@@ -522,6 +535,7 @@ export class OrdersService {
         OrderStatusEnum.CONFIRMED,
         OrderStatusEnum.CANCELLED,
         OrderStatusEnum.PENDING,
+        OrderStatusEnum.TRACKING,
         OrderStatusEnum.NO_RESPONSE_1,
         OrderStatusEnum.NO_RESPONSE_2,
         OrderStatusEnum.NO_RESPONSE_4,
@@ -530,6 +544,7 @@ export class OrdersService {
         OrderStatusEnum.CONFIRMED,
         OrderStatusEnum.CANCELLED,
         OrderStatusEnum.PENDING,
+        OrderStatusEnum.TRACKING,
         OrderStatusEnum.NO_RESPONSE_1,
         OrderStatusEnum.NO_RESPONSE_2,
         OrderStatusEnum.NO_RESPONSE_3,

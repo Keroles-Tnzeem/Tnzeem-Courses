@@ -1,39 +1,39 @@
 export interface MailTemplateData {
-    appName: string;
-    en: { title: string; body: string };
-    ar: { title: string; body: string };
-    /** Optional call-to-action button */
-    action?: { url: string; label: { en: string; ar: string } };
+  appName: string;
+  en: { title: string; body: string };
+  ar: { title: string; body: string };
+  /** Optional call-to-action button */
+  action?: { url: string; label: { en: string; ar: string } };
 }
 
 const escapeHtml = (value: string): string =>
-    value
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 
 const section = (
-    dir: 'ltr' | 'rtl',
-    title: string,
-    body: string,
-    action?: { url: string; label: string },
+  dir: 'ltr' | 'rtl',
+  title: string,
+  body: string,
+  action?: { url: string; label: string },
 ): string => `
         <tr>
           <td dir="${dir}" style="padding:24px 32px;text-align:${dir === 'rtl' ? 'right' : 'left'};">
             <h2 style="margin:0 0 12px;font-size:20px;color:#111827;">${escapeHtml(title)}</h2>
             <p style="margin:0;font-size:15px;line-height:1.6;color:#374151;">${escapeHtml(body)}</p>
             ${
-                action
-                    ? `<p style="margin:20px 0 0;"><a href="${escapeHtml(action.url)}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#ffffff;text-decoration:none;border-radius:6px;font-size:14px;">${escapeHtml(action.label)}</a></p>`
-                    : ''
+              action
+                ? `<p style="margin:20px 0 0;"><a href="${escapeHtml(action.url)}" style="display:inline-block;padding:10px 20px;background:#2563eb;color:#ffffff;text-decoration:none;border-radius:6px;font-size:14px;">${escapeHtml(action.label)}</a></p>`
+                : ''
             }
           </td>
         </tr>`;
 
 /** Simple bilingual (English + Arabic) HTML email. Pass the data, get the HTML string. */
 export function renderMailTemplate(data: MailTemplateData): string {
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />

@@ -70,22 +70,22 @@ export function enrollmentStatusChangedContent(
 }
 
 const COURSE_STATUS_AR: Record<string, string> = {
-    pending: 'قيد المراجعة',
-    published: 'منشورة',
-    draft: 'مسودة',
+  pending: 'قيد المراجعة',
+  published: 'منشورة',
+  draft: 'مسودة',
 };
 
 export function courseCreatedContent(
-    courseName: Record<string, string>,
-    status: string,
+  courseName: Record<string, string>,
+  status: string,
 ): NotificationContent {
-    const en = courseName.en ?? courseName.ar ?? '';
-    const ar = courseName.ar ?? courseName.en ?? '';
-    return {
-        title: { en: 'New course created', ar: 'تم إنشاء دورة جديدة' },
-        body: {
-            en: `Your course "${en}" has been created. Current status: ${status}.`,
-            ar: `تم إنشاء دورتك "${ar}". الحالة الحالية: ${COURSE_STATUS_AR[status] ?? status}.`,
-        },
-    };
+  const en = courseName.en ?? courseName.ar ?? '';
+  const ar = courseName.ar ?? courseName.en ?? '';
+  return {
+    title: { en: 'New course created', ar: 'تم إنشاء دورة جديدة' },
+    body: {
+      en: `Your course "${en}" has been created. Current status: ${status}.`,
+      ar: `تم إنشاء دورتك "${ar}". الحالة الحالية: ${COURSE_STATUS_AR[status] ?? status}.`,
+    },
+  };
 }
