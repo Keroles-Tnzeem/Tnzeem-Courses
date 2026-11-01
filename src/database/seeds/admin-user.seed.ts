@@ -247,6 +247,11 @@ export const seedAdminUserAndPermissions = async (dataSource: DataSource) => {
       module: 'orders',
       description: { en: 'Delete Order', ar: 'حذف طلب' },
     },
+    {
+      name: 'invoices.create',
+      module: 'invoices',
+      description: { en: 'Create Invoice', ar: 'إنشاء فاتورة' },
+    },
   ];
 
   const savedPermissions: PermissionEntity[] = [];

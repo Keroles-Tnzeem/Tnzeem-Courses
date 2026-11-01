@@ -79,6 +79,12 @@ export class OrderResponse {
   @ApiProperty()
   updatedAt: Date;
 
+  @ApiProperty({
+    description: 'Whether the student has multiple orders in the system',
+    example: false,
+  })
+  isDuplicate: boolean;
+
   @ApiPropertyOptional()
   lastCommentId?: number;
 
@@ -118,7 +124,11 @@ export class OrderResponse {
     name: string;
   };
 
-  static fromEntity(entity: OrderEntity, lang: string = 'en'): OrderResponse {
+  static fromEntity(
+    entity: OrderEntity,
+    lang: string = 'en',
+    isDuplicate?: boolean,
+  ): OrderResponse {
     const response = new OrderResponse();
     response.id = entity.id;
     response.studentId = entity.studentId;
@@ -139,6 +149,10 @@ export class OrderResponse {
     response.createdBy = entity.createdBy;
     response.createdById = entity.createdById;
     response.assignToId = entity.assignToId;
+    response.isDuplicate =
+      isDuplicate !== undefined
+        ? isDuplicate
+        : Boolean((entity as any).isDuplicate);
 
     if (entity.assignTo) {
       response.assignTo = {

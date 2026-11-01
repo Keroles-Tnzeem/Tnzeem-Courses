@@ -161,7 +161,7 @@ export class StudentController {
   }
 
   // PATCH /staff-dashboard/student/:id
-  @Permissions('students.update')
+  //@Permissions('students.update')
   @Patch(':id')
   @UseInterceptors(NoFilesInterceptor())
   @ApiOperation({ summary: 'Update a student' })
@@ -182,7 +182,7 @@ export class StudentController {
   }
 
   // PATCH /staff-dashboard/student/:id/status
-  @Permissions('students.update')
+  //@Permissions('students.update')
   @Patch(':id/status')
   @UseInterceptors(NoFilesInterceptor())
   @ApiOperation({ summary: 'Update student status' })
@@ -226,7 +226,7 @@ export class StudentController {
   }
 
   // DELETE /staff-dashboard/student/:id
-  @Permissions('students.delete')
+  //@Permissions('students.delete')
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a student' })
   @ApiParam({ name: 'id', type: Number })

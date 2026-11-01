@@ -86,6 +86,18 @@ export class OrdersService {
     return comment?.comment ?? null;
   }
 
+  /** Check if a student has multiple orders in the orders table */
+  private async isStudentDuplicate(
+    studentId?: number | null,
+  ): Promise<boolean> {
+    if (!studentId) return false;
+    const count = await this.ordersRepository
+      .createQueryBuilder('order')
+      .where('order.student_id = :studentId', { studentId })
+      .getCount();
+    return count > 1;
+  }
+
   async create(
     dto: CreateOrderRequest,
     staffId: number,
@@ -163,6 +175,10 @@ export class OrdersService {
     (withRelations as any).lastComment = lastCommentText
       ? { comment: lastCommentText }
       : undefined;
+
+    (withRelations as any).isDuplicate = await this.isStudentDuplicate(
+      withRelations?.studentId,
+    );
 
     return OrderResponse.fromEntity(withRelations!, lang);
   }
@@ -282,12 +298,42 @@ export class OrdersService {
       : [];
     const commentMap = new Map(comments.map((c) => [c.id, c.comment]));
 
+    // Check which students have multiple orders in the system
+    const studentIds = Array.from(
+      new Set(
+        entities
+          .map((e) => e.studentId)
+          .filter((id): id is number => Boolean(id)),
+      ),
+    );
+
+    const duplicateStudentIdSet = new Set<number>();
+    if (studentIds.length > 0) {
+      const duplicateRecords = await this.ordersRepository
+        .createQueryBuilder('order')
+        .select('order.student_id', 'studentId')
+        .where('order.student_id IN (:...studentIds)', { studentIds })
+        .groupBy('order.student_id')
+        .having('COUNT(order.id) > 1')
+        .getRawMany();
+
+      for (const record of duplicateRecords) {
+        const rawId = record.studentId ?? record.studentid;
+        if (rawId !== undefined && rawId !== null) {
+          duplicateStudentIdSet.add(Number(rawId));
+        }
+      }
+    }
+
     for (const entity of entities) {
       if (entity.lastCommentId) {
         (entity as any).lastComment = {
           comment: commentMap.get(entity.lastCommentId) ?? null,
         };
       }
+      (entity as any).isDuplicate = duplicateStudentIdSet.has(
+        Number(entity.studentId),
+      );
     }
 
     const data = entities.map((e) => OrderResponse.fromEntity(e, lang));
@@ -327,6 +373,8 @@ export class OrdersService {
     (order as any).lastComment = lastCommentText
       ? { comment: lastCommentText }
       : undefined;
+
+    (order as any).isDuplicate = await this.isStudentDuplicate(order.studentId);
 
     const comments = await this.orderCommentRepository.find({
       where: { orderId: id },
@@ -438,6 +486,10 @@ export class OrdersService {
     (withRelations as any).lastComment = lastCommentText
       ? { comment: lastCommentText }
       : undefined;
+
+    (withRelations as any).isDuplicate = await this.isStudentDuplicate(
+      withRelations?.studentId,
+    );
 
     // Notify only on the transition into COMPLETED, never on later edits.
     if (
