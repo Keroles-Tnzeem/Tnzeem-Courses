@@ -1,11 +1,26 @@
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDateString, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { PaginationRequest } from '../../../../../common/dto/requests/pagination.request';
 import { OrderStatusEnum } from '../../../../../shared/orders/enums/order-status.enum';
 
 export class FilterStudentRequest extends PaginationRequest {
+  @ApiPropertyOptional({
+    example: '512345678',
+    description: 'Filter by student phone number',
+  })
+  @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+  @IsOptional()
+  phone?: string;
+
   @ApiPropertyOptional({
     description: 'Filter by assigned staff ID (send 0 for unassigned)',
   })
