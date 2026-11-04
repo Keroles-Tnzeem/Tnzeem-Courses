@@ -58,6 +58,7 @@ export class StudentService {
       page = 1,
       limit = 10,
       search,
+      phone,
       assignToId,
       from,
       to,
@@ -68,6 +69,14 @@ export class StudentService {
     const where: any = { userType: UserTypeEnum.STUDENT };
     if (search) {
       where.firstName = search; // adjust if ILike needed
+    }
+    if (phone?.trim()) {
+      const cleaned = phone.trim().replace(/[\s\-]/g, '');
+      const withoutCountry = cleaned.replace(/^(\+966|00966|966)/, '');
+      const normalized = withoutCountry.startsWith('0')
+        ? withoutCountry.slice(1)
+        : withoutCountry;
+      where.phone = ILike(`%${normalized || cleaned}%`);
     }
     if (status) {
       where.status = status;
@@ -112,7 +121,7 @@ export class StudentService {
     userId: number,
     query: FilterStudentRequest,
   ): Promise<{ data: UserEntity[]; total: number }> {
-    const { page = 1, limit = 10, search, from, to, status } = query;
+    const { page = 1, limit = 10, search, phone, from, to, status } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {
@@ -122,6 +131,14 @@ export class StudentService {
 
     if (search) {
       where.firstName = search;
+    }
+    if (phone?.trim()) {
+      const cleaned = phone.trim().replace(/[\s\-]/g, '');
+      const withoutCountry = cleaned.replace(/^(\+966|00966|966)/, '');
+      const normalized = withoutCountry.startsWith('0')
+        ? withoutCountry.slice(1)
+        : withoutCountry;
+      where.phone = ILike(`%${normalized || cleaned}%`);
     }
     if (status) {
       where.status = status;
