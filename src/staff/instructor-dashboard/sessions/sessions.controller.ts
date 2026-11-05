@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseIntPipe,
   Patch,
@@ -57,7 +58,7 @@ export class InstructorSessionsController {
   @ApiResponse({ status: 404, description: 'Round not found or not yours' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(NoFilesInterceptor())
-  @ApiOperation({ summary: 'Create a new session for one of your rounds' })
+  @ApiOperation({ summary: 'Create a new session (and Microsoft Teams meeting) for one of your rounds' })
   @ApiResponse({ status: 201, type: SessionResponse })
   async create(
     @Trainer() trainer: JwtPayload,
@@ -116,7 +117,7 @@ export class InstructorSessionsController {
   @ApiResponse({ status: 404, description: 'Session not found or not yours' })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(NoFilesInterceptor())
-  @ApiOperation({ summary: 'Update a session' })
+  @ApiOperation({ summary: 'Update a session and synchronize with Microsoft Teams' })
   @ApiResponse({ status: 200, type: SessionResponse })
   async update(
     @Trainer() trainer: JwtPayload,
@@ -130,10 +131,42 @@ export class InstructorSessionsController {
     );
   }
 
+  @Post(':id/resync-meeting')
+  @HttpCode(200)
+  @ApiParam({ name: 'id', type: Number })
+  @ApiOperation({ summary: 'Provision or retry Microsoft Teams synchronization for one of your sessions' })
+  @ApiResponse({ status: 200, type: SessionResponse })
+  async resyncMeeting(
+    @Trainer() trainer: JwtPayload,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const data = await this.sessionsService.resyncMeeting(trainer.sub, id);
+    return ApiResponseDto.success(
+      SessionResponse.fromEntity(data),
+      this.i18n.t('common.updated', { lang: getLang() }),
+    );
+  }
+
+  @Post(':id/cancel-meeting')
+  @HttpCode(200)
+  @ApiParam({ name: 'id', type: Number })
+  @ApiOperation({ summary: 'Cancel the Microsoft Teams meeting for one of your sessions' })
+  @ApiResponse({ status: 200, type: SessionResponse })
+  async cancelMeeting(
+    @Trainer() trainer: JwtPayload,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const data = await this.sessionsService.cancelMeeting(trainer.sub, id);
+    return ApiResponseDto.success(
+      SessionResponse.fromEntity(data),
+      this.i18n.t('common.updated', { lang: getLang() }),
+    );
+  }
+
   @Delete(':id')
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 404, description: 'Session not found or not yours' })
-  @ApiOperation({ summary: 'Delete a session' })
+  @ApiOperation({ summary: 'Delete a session and cancel its Microsoft Teams meeting' })
   @ApiResponse({ status: 200 })
   async remove(
     @Trainer() trainer: JwtPayload,

@@ -3,6 +3,8 @@ import { EnrollmentEntity } from '../../../../../shared/enrollments/entities/enr
 import { CourseLevelEnum } from '../../../../../common/enums/course-level.enum';
 import { RoundStatusEnum } from '../../../../../staff/staff-dashboard/rounds/enums/round-status.enum';
 import { getTranslatedString } from '../../../../../common/utils/translation.util';
+import { MeetingStatusEnum } from '../../../../../shared/meetings/enums/meeting-status.enum';
+import { MeetingsService } from '../../../../../shared/meetings/meetings.service';
 import {
   StudentEnrollmentCourse,
   StudentEnrollmentResponse,
@@ -37,10 +39,25 @@ export class StudentEnrollmentSession {
   scheduledAt?: Date;
 
   @ApiPropertyOptional()
-  zoomLink?: string;
+  scheduledEnd?: Date | null;
+
+  @ApiProperty()
+  timezone: string;
+
+  @ApiPropertyOptional()
+  zoomLink?: string | null;
+
+  @ApiProperty()
+  isJoinable: boolean;
 
   @ApiPropertyOptional()
   durationMinutes?: number;
+
+  @ApiProperty({ enum: MeetingStatusEnum })
+  meetingStatus: MeetingStatusEnum;
+
+  @ApiPropertyOptional()
+  microsoftOnlineMeetingId?: string | null;
 }
 
 export class StudentEnrollmentRoundDetails extends StudentEnrollmentRound {
@@ -102,14 +119,35 @@ export class StudentEnrollmentDetailsResponse extends StudentEnrollmentResponse 
           sessions: (entity.round.sessions ?? [])
             .slice()
             .sort((a, b) => a.sessionNumber - b.sessionNumber)
-            .map((session) => ({
-              id: session.id,
-              sessionNumber: session.sessionNumber,
-              title: session.title,
-              scheduledAt: session.scheduledAt,
-              zoomLink: session.zoomLink,
-              durationMinutes: session.durationMinutes,
-            })),
+            .map((session) => {
+              const effectiveStatus =
+                MeetingsService.resolveEffectiveStatus(session);
+              const isCancelled =
+                effectiveStatus === MeetingStatusEnum.CANCELLED;
+              const joinUrl = !isCancelled ? session.zoomLink ?? null : null;
+
+              return {
+                id: session.id,
+                sessionNumber: session.sessionNumber,
+                title: session.title,
+                scheduledAt: session.scheduledAt,
+                scheduledEnd:
+                  session.scheduledEnd ??
+                  (session.scheduledAt && session.durationMinutes
+                    ? new Date(
+                        new Date(session.scheduledAt).getTime() +
+                          session.durationMinutes * 60_000,
+                      )
+                    : null),
+                timezone: session.timezone || 'Asia/Riyadh',
+                zoomLink: joinUrl,
+                isJoinable: Boolean(joinUrl),
+                durationMinutes: session.durationMinutes,
+                meetingStatus: effectiveStatus,
+                microsoftOnlineMeetingId:
+                  session.microsoftOnlineMeetingId ?? null,
+              };
+            }),
         }
       : null;
 

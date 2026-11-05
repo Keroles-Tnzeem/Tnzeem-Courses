@@ -3,6 +3,7 @@ import {
     BadRequestException,
     Injectable,
     NotFoundException,
+    Optional,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,7 +13,9 @@ import { RoundEntity } from '../rounds/entities/round.entity';
 import { CreateRoundSessionRequest } from './dto/requests/create-round-session.request';
 import { UpdateRoundSessionRequest } from './dto/requests/update-round-session.request';
 import { QueryRoundSessionRequest } from './dto/requests/query-round-session.request';
-import {getLang} from "../../../common/helpers/lang.helper";
+import { getLang } from '../../../common/helpers/lang.helper';
+import { MeetingsService } from '../../../shared/meetings/meetings.service';
+import { MeetingStatusEnum } from '../../../shared/meetings/enums/meeting-status.enum';
 
 @Injectable()
 export class RoundSessionsService {
@@ -24,6 +27,9 @@ export class RoundSessionsService {
         private readonly roundRepository: Repository<RoundEntity>,
 
         private readonly i18n: I18nService,
+
+        @Optional()
+        private readonly meetingsService?: MeetingsService,
     ) {}
 
     private lang(): string {
@@ -40,8 +46,37 @@ export class RoundSessionsService {
             );
         }
 
-        if (dto.scheduledAt) {
-            assertSessionWithinRound(new Date(dto.scheduledAt), round);
+        const timezone =
+            dto.timezone && this.meetingsService
+                ? this.meetingsService.validateTimezone(dto.timezone)
+                : dto.timezone || 'Asia/Riyadh';
+
+        let scheduledAt: Date | undefined;
+        let scheduledEnd: Date | undefined;
+        let durationMinutes = dto.durationMinutes;
+
+        if (dto.scheduledAt || dto.endTime) {
+            if (this.meetingsService) {
+                const computed = this.meetingsService.computeStartAndEnd(
+                    dto.scheduledAt,
+                    dto.endTime,
+                    dto.durationMinutes,
+                );
+                scheduledAt = computed.scheduledStart;
+                scheduledEnd = computed.scheduledEnd;
+                durationMinutes = computed.durationMinutes;
+            } else if (dto.scheduledAt) {
+                scheduledAt = new Date(dto.scheduledAt);
+                if (dto.durationMinutes) {
+                    scheduledEnd = new Date(
+                        scheduledAt.getTime() + dto.durationMinutes * 60_000,
+                    );
+                }
+            }
+        }
+
+        if (scheduledAt) {
+            assertSessionWithinRound(scheduledAt, round);
         }
 
         const duplicate = await this.sessionRepository.findOne({
@@ -57,13 +92,40 @@ export class RoundSessionsService {
             roundId: dto.roundId,
             sessionNumber: dto.sessionNumber,
             title: dto.title,
-            scheduledAt: dto.scheduledAt ? new Date(dto.scheduledAt) : undefined,
+            scheduledAt,
+            scheduledEnd,
+            timezone,
             zoomLink: dto.zoomLink,
-            durationMinutes: dto.durationMinutes,
+            durationMinutes,
             notes: dto.notes,
+            meetingStatus: MeetingStatusEnum.SCHEDULED,
         });
 
-        return await this.sessionRepository.save(entity);
+        const saved = await this.sessionRepository.save(entity);
+
+        if (
+            this.meetingsService &&
+            this.meetingsService.shouldProvisionTeamsMeeting({
+                scheduledAt,
+                zoomLink: dto.zoomLink,
+                createTeamsMeeting: dto.createTeamsMeeting,
+            })
+        ) {
+            return await this.meetingsService.createOrSyncSessionMeeting(
+                saved.id,
+                {
+                    title: dto.title,
+                    notes: dto.notes,
+                    startTime: scheduledAt,
+                    endTime: scheduledEnd,
+                    durationMinutes,
+                    timezone,
+                    inviteAttendees: dto.inviteAttendees ?? true,
+                },
+            );
+        }
+
+        return saved;
     }
 
     async findAll(
@@ -73,6 +135,10 @@ export class RoundSessionsService {
             page = 1,
             limit = 10,
             roundId,
+            courseId,
+            meetingStatus,
+            syncStatus,
+            upcomingOnly,
             sortBy = 'session_number',
             sortOrder = 'ASC',
         } = query;
@@ -85,6 +151,25 @@ export class RoundSessionsService {
 
         if (roundId) {
             qb.andWhere('session.round_id = :roundId', { roundId });
+        }
+        if (courseId) {
+            qb.andWhere('round.course_id = :courseId', { courseId });
+        }
+        if (meetingStatus) {
+            qb.andWhere('session.meeting_status = :meetingStatus', {
+                meetingStatus,
+            });
+        }
+        if (syncStatus) {
+            qb.andWhere('session.sync_status = :syncStatus', { syncStatus });
+        }
+        if (upcomingOnly) {
+            qb.andWhere('session.meeting_status != :cancelledStatus', {
+                cancelledStatus: MeetingStatusEnum.CANCELLED,
+            }).andWhere(
+                '(session.scheduled_end >= :now OR (session.scheduled_end IS NULL AND session.scheduled_at >= :now))',
+                { now: new Date() },
+            );
         }
 
         const sortMap: Record<string, string> = {
@@ -153,27 +238,110 @@ export class RoundSessionsService {
                     this.i18n.t('errors.SESSION_NUMBER_TAKEN', { lang: getLang() }),
                 );
             }
+            entity.sessionNumber = dto.sessionNumber;
         }
 
-        if (dto.scheduledAt) {
-            const round = await this.roundRepository.findOne({ where: { id: entity.roundId } });
-            if (round) assertSessionWithinRound(new Date(dto.scheduledAt), round);
+        if (dto.timezone !== undefined) {
+            entity.timezone = this.meetingsService
+                ? this.meetingsService.validateTimezone(dto.timezone)
+                : dto.timezone;
         }
 
-        if (dto.scheduledAt !== undefined) {
-            entity.scheduledAt = dto.scheduledAt ? new Date(dto.scheduledAt) : null as unknown as Date;
+        if (dto.scheduledAt !== undefined || dto.endTime !== undefined || dto.durationMinutes !== undefined) {
+            const nextStartRaw =
+                dto.scheduledAt !== undefined
+                    ? dto.scheduledAt
+                        ? new Date(dto.scheduledAt)
+                        : null
+                    : entity.scheduledAt;
+
+            if (nextStartRaw && this.meetingsService) {
+                const computed = this.meetingsService.computeStartAndEnd(
+                    nextStartRaw,
+                    dto.endTime,
+                    dto.durationMinutes,
+                    entity.scheduledAt,
+                    entity.durationMinutes,
+                );
+                const round = await this.roundRepository.findOne({
+                    where: { id: entity.roundId },
+                });
+                if (round) assertSessionWithinRound(computed.scheduledStart, round);
+
+                entity.scheduledAt = computed.scheduledStart;
+                entity.scheduledEnd = computed.scheduledEnd;
+                entity.durationMinutes = computed.durationMinutes;
+            } else {
+                if (dto.scheduledAt !== undefined) {
+                    const nextDate = dto.scheduledAt
+                        ? new Date(dto.scheduledAt)
+                        : (null as unknown as Date);
+                    if (nextDate) {
+                        const round = await this.roundRepository.findOne({
+                            where: { id: entity.roundId },
+                        });
+                        if (round) assertSessionWithinRound(nextDate, round);
+                    }
+                    entity.scheduledAt = nextDate;
+                }
+                if (dto.durationMinutes !== undefined) {
+                    entity.durationMinutes = dto.durationMinutes;
+                }
+            }
         }
-        if (dto.sessionNumber !== undefined) entity.sessionNumber = dto.sessionNumber;
+
         if (dto.title !== undefined) entity.title = dto.title;
         if (dto.zoomLink !== undefined) entity.zoomLink = dto.zoomLink;
-        if (dto.durationMinutes !== undefined) entity.durationMinutes = dto.durationMinutes;
         if (dto.notes !== undefined) entity.notes = dto.notes;
+        if (dto.meetingStatus !== undefined && !entity.microsoftEventId) {
+            entity.meetingStatus = dto.meetingStatus;
+        }
 
-        return await this.sessionRepository.save(entity);
+        const saved = await this.sessionRepository.save(entity);
+
+        if (
+            this.meetingsService &&
+            (saved.microsoftEventId || dto.createTeamsMeeting)
+        ) {
+            return await this.meetingsService.updateSessionMeeting(saved.id, {
+                title: saved.title,
+                notes: saved.notes,
+                startTime: saved.scheduledAt,
+                endTime: saved.scheduledEnd,
+                durationMinutes: saved.durationMinutes,
+                timezone: saved.timezone,
+                status: dto.meetingStatus,
+                inviteAttendees: dto.inviteAttendees,
+                createIfMissing: dto.createTeamsMeeting ?? false,
+            });
+        }
+
+        return saved;
+    }
+
+    async resyncMeeting(id: number): Promise<RoundSessionEntity> {
+        const entity = await this.findForWrite(id);
+        if (!this.meetingsService) {
+            return entity;
+        }
+        return await this.meetingsService.resyncSessionMeeting(entity.id);
+    }
+
+    async cancelMeeting(id: number): Promise<RoundSessionEntity> {
+        const entity = await this.findForWrite(id);
+        if (!this.meetingsService) {
+            entity.meetingStatus = MeetingStatusEnum.CANCELLED;
+            entity.zoomLink = null as unknown as string;
+            return await this.sessionRepository.save(entity);
+        }
+        return await this.meetingsService.cancelSessionMeeting(entity.id);
     }
 
     async remove(id: number): Promise<void> {
         const entity = await this.findForWrite(id);
+        if (this.meetingsService && entity.microsoftEventId) {
+            await this.meetingsService.cancelSessionMeeting(entity.id);
+        }
         await this.sessionRepository.softDelete(entity.id);
     }
 }

@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
+    IsBoolean,
     IsDateString,
     IsInt,
     IsNotEmpty,
@@ -33,12 +34,17 @@ export class CreateRoundSessionRequest {
     @IsOptional()
     title?: string;
 
-    @ApiPropertyOptional({ example: '2025-01-20T18:00:00Z', description: 'Scheduled date and time (ISO 8601)' })
+    @ApiPropertyOptional({ example: '2026-11-15T18:00:00Z', description: 'Scheduled start date and time (ISO 8601)' })
     @IsDateString({}, { message: i18nValidationMessage('validation.IS_DATE') })
     @IsOptional()
     scheduledAt?: string;
 
-    @ApiPropertyOptional({ example: 'https://zoom.us/j/123456789', description: 'Zoom meeting link' })
+    @ApiPropertyOptional({ example: '2026-11-15T19:30:00Z', description: 'Scheduled end date and time (ISO 8601); computed from scheduledAt + durationMinutes if omitted' })
+    @IsDateString({}, { message: i18nValidationMessage('validation.IS_DATE') })
+    @IsOptional()
+    endTime?: string;
+
+    @ApiPropertyOptional({ example: 'https://teams.microsoft.com/l/meetup-join/...', description: 'Meeting join link (auto-generated via Microsoft Teams when createTeamsMeeting is enabled)' })
     @IsUrl({}, { message: i18nValidationMessage('validation.IS_URL') })
     @IsOptional()
     zoomLink?: string;
@@ -54,4 +60,40 @@ export class CreateRoundSessionRequest {
     @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
     @IsOptional()
     notes?: string;
+
+    @ApiPropertyOptional({
+        example: 'Asia/Riyadh',
+        description: 'IANA timezone identifier for the scheduled session',
+    })
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+    @MaxLength(100, { message: i18nValidationMessage('validation.MAX_LENGTH') })
+    @IsOptional()
+    timezone?: string;
+
+    @ApiPropertyOptional({
+        example: true,
+        description: 'Whether to provision a Microsoft Teams meeting (defaults to true when TEAMS_ENABLED=true and scheduledAt is provided)',
+    })
+    @Transform(({ value }) => {
+        if (value === 'true' || value === true) return true;
+        if (value === 'false' || value === false) return false;
+        return value;
+    })
+    @IsBoolean({ message: i18nValidationMessage('validation.IS_BOOLEAN') })
+    @IsOptional()
+    createTeamsMeeting?: boolean;
+
+    @ApiPropertyOptional({
+        example: true,
+        default: true,
+        description: 'Whether to invite the course trainer and enrolled students to the Teams calendar event',
+    })
+    @Transform(({ value }) => {
+        if (value === 'true' || value === true) return true;
+        if (value === 'false' || value === false) return false;
+        return value;
+    })
+    @IsBoolean({ message: i18nValidationMessage('validation.IS_BOOLEAN') })
+    @IsOptional()
+    inviteAttendees?: boolean;
 }

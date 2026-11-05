@@ -499,7 +499,11 @@ export class OrdersService {
       const studentName =
         `${withRelations?.student?.firstName ?? ''} ${withRelations?.student?.lastName ?? ''}`.trim();
       await this.sendPaymentCompletedNotification(
-        { id: updated.id, studentId: updated.studentId, course: withRelations?.course },
+        {
+          id: updated.id,
+          studentId: updated.studentId,
+          course: withRelations?.course,
+        },
         studentName,
       );
     }

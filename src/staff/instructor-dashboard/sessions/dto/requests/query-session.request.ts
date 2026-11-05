@@ -1,7 +1,17 @@
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsInt, IsNumber, IsOptional, Min, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
+import { MeetingStatusEnum } from '../../../../../shared/meetings/enums/meeting-status.enum';
+import { MeetingSyncStatusEnum } from '../../../../../shared/meetings/enums/meeting-sync-status.enum';
 
 export class QuerySessionRequest {
   @ApiPropertyOptional({ description: 'Filter by round ID' })
@@ -9,6 +19,32 @@ export class QuerySessionRequest {
   @Type(() => Number)
   @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
   roundId?: number;
+
+  @ApiPropertyOptional({ description: 'Filter by course ID' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({}, { message: i18nValidationMessage('validation.IS_NUMBER') })
+  courseId?: number;
+
+  @ApiPropertyOptional({ enum: MeetingStatusEnum, description: 'Filter by session meeting status' })
+  @IsEnum(MeetingStatusEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
+  @IsOptional()
+  meetingStatus?: MeetingStatusEnum;
+
+  @ApiPropertyOptional({ enum: MeetingSyncStatusEnum, description: 'Filter by Microsoft Teams sync status' })
+  @IsEnum(MeetingSyncStatusEnum, { message: i18nValidationMessage('validation.IS_ENUM') })
+  @IsOptional()
+  syncStatus?: MeetingSyncStatusEnum;
+
+  @ApiPropertyOptional({ description: 'When true, only return non-cancelled upcoming/live sessions' })
+  @Transform(({ value }) => {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return value;
+  })
+  @IsBoolean({ message: i18nValidationMessage('validation.IS_BOOLEAN') })
+  @IsOptional()
+  upcomingOnly?: boolean;
 
   @ApiPropertyOptional({ default: 1, description: 'Page number (1-based); takes precedence over offset' })
   @IsOptional()

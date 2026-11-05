@@ -60,5 +60,17 @@
     "ORDER_CANNOT_CANCEL_COMPLETED": "لا يمكن إلغاء الطلب لأن التسجيل المرتبط به مكتمل بالفعل",
     "ORDER_ROUND_LOCKED": "لا يمكن تغيير جولة طلب مؤكد أو ملغي",
     "OTP_SEND_FAILED": "تعذّر إرسال رمز التحقق، يرجى المحاولة مرة أخرى",
-    "NOTIFICATION_NOT_FOUND": "الإشعار غير موجود"
+    "NOTIFICATION_NOT_FOUND": "الإشعار غير موجود",
+    "MEETING_NOT_FOUND": "الاجتماع غير موجود",
+    "MEETING_START_TIME_REQUIRED": "تحديد وقت البداية مطلوب لإنشاء اجتماع Microsoft Teams",
+    "MEETING_INVALID_TIME_RANGE": "يجب أن يكون وقت انتهاء الاجتماع بعد وقت بدايته",
+    "MEETING_SYNC_IN_PROGRESS": "جاري مزامنة الاجتماع مع Microsoft Teams بالفعل",
+    "MEETING_ALREADY_CANCELLED": "تم إلغاء هذا الاجتماع مسبقاً",
+    "MEETING_PERSISTENCE_FAILED": "تعذر حفظ بيانات الاجتماع محلياً؛ تم التراجع عن إنشاء الاجتماع في Microsoft Teams",
+    "INVALID_TIMEZONE": "المنطقة الزمنية المحددة غير صالحة",
+    "TEAMS_NOT_CONFIGURED": "إعدادات الربط مع Microsoft Teams غير مكتملة",
+    "TEAMS_GRAPH_AUTH_FAILED": "فشلت المصادقة أو الصلاحيات مع خدمة Microsoft Teams",
+    "TEAMS_GRAPH_RATE_LIMITED": "تم تجاوز حد الطلبات المسموح لخدمة Microsoft Teams، يرجى المحاولة بعد قليل",
+    "TEAMS_GRAPH_TIMEOUT": "انتهت مهلة الاتصال بخدمة Microsoft Teams، يرجى المحاولة مرة أخرى",
+    "TEAMS_GRAPH_FAILED": "تعذر الاتصال بخدمة Microsoft Teams"
 }

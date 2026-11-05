@@ -4,9 +4,13 @@ import { RoundSessionEntity } from '../../staff-dashboard/round-sessions/entitie
 import { RoundEntity } from '../../staff-dashboard/rounds/entities/round.entity';
 import { InstructorSessionsController } from './sessions.controller';
 import { InstructorSessionsService } from './sessions.service';
+import { MeetingsModule } from '../../../shared/meetings/meetings.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RoundSessionEntity, RoundEntity])],
+  imports: [
+    TypeOrmModule.forFeature([RoundSessionEntity, RoundEntity]),
+    MeetingsModule,
+  ],
   controllers: [InstructorSessionsController],
   providers: [InstructorSessionsService],
   exports: [InstructorSessionsService],

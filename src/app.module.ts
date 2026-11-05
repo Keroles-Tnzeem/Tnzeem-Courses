@@ -9,8 +9,10 @@ import databaseConfig from './config/database.config';
 import i18nConfig from './config/i18n.config';
 import oauthConfig from './config/oauth.config';
 import mailConfig from './config/mail.config';
+import teamsConfig from './config/teams.config';
 import * as path from 'path';
 import { AuthModule } from './shared/auth/auth.module';
+import { MeetingsModule } from './shared/meetings/meetings.module';
 import { UserModule } from './shared/user/user.module';
 import { StaffModule } from './staff/staff-dashboard/staff/staff.module';
 import { PermissionsModule } from './staff/staff-dashboard/permissions/permissions.module';
@@ -50,7 +52,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, i18nConfig, oauthConfig, mailConfig],
+      load: [appConfig, databaseConfig, i18nConfig, oauthConfig, mailConfig, teamsConfig],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -102,6 +104,7 @@ const i18nPath = process.env.NODE_ENV === 'production'
     InstructorDashboardModule,
     WebsiteStudentModule,
     NotificationsModule,
+    MeetingsModule,
     ContactUsModule,
     StaffInquiriesModule,
   ],

@@ -3,6 +3,7 @@ import {
     Controller,
     Delete,
     Get,
+    HttpCode,
     Param,
     ParseIntPipe,
     Patch,
@@ -49,7 +50,7 @@ export class RoundSessionsController {
     @Permissions('round-sessions.create')
     @Post()
     @UseInterceptors(NoFilesInterceptor())
-    @ApiOperation({ summary: 'Create a new session for a round' })
+    @ApiOperation({ summary: 'Create a new session (and Microsoft Teams meeting) for a round' })
     @ApiCreatedResponse({ description: 'Session created successfully', type: RoundSessionResponse })
     async create(@Body() dto: CreateRoundSessionRequest) {
         const data = await this.roundSessionsService.create(dto);
@@ -61,7 +62,7 @@ export class RoundSessionsController {
 
     @Permissions('round-sessions.view')
     @Get()
-    @ApiOperation({ summary: 'List sessions with pagination, roundId filter, and sorting' })
+    @ApiOperation({ summary: 'List sessions with pagination, filters, and sorting' })
     @ApiOkResponse({ description: 'Sessions returned successfully', type: RoundSessionResponse, isArray: true })
     async findAll(@Query() query: QueryRoundSessionRequest) {
         const { data, total } = await this.roundSessionsService.findAll(query);
@@ -106,7 +107,7 @@ export class RoundSessionsController {
     @Permissions('round-sessions.update')
     @Patch(':id')
     @UseInterceptors(NoFilesInterceptor())
-    @ApiOperation({ summary: 'Update a session' })
+    @ApiOperation({ summary: 'Update a session and synchronize with Microsoft Teams' })
     @ApiParam({ name: 'id', type: Number })
     @ApiOkResponse({ description: 'Session updated successfully', type: RoundSessionResponse })
     async update(
@@ -120,9 +121,37 @@ export class RoundSessionsController {
         );
     }
 
+    @Permissions('round-sessions.update')
+    @Post(':id/resync-meeting')
+    @HttpCode(200)
+    @ApiOperation({ summary: 'Provision or retry Microsoft Teams synchronization for a session' })
+    @ApiParam({ name: 'id', type: Number })
+    @ApiOkResponse({ description: 'Session Teams meeting synchronized successfully', type: RoundSessionResponse })
+    async resyncMeeting(@Param('id', ParseIntPipe) id: number) {
+        const data = await this.roundSessionsService.resyncMeeting(id);
+        return ApiResponseDto.success(
+            RoundSessionResponse.from(data),
+            this.i18n.t('common.updated', { lang: this.lang() }),
+        );
+    }
+
+    @Permissions('round-sessions.update')
+    @Post(':id/cancel-meeting')
+    @HttpCode(200)
+    @ApiOperation({ summary: 'Cancel the Microsoft Teams meeting for a session without deleting the session' })
+    @ApiParam({ name: 'id', type: Number })
+    @ApiOkResponse({ description: 'Session Teams meeting cancelled successfully', type: RoundSessionResponse })
+    async cancelMeeting(@Param('id', ParseIntPipe) id: number) {
+        const data = await this.roundSessionsService.cancelMeeting(id);
+        return ApiResponseDto.success(
+            RoundSessionResponse.from(data),
+            this.i18n.t('common.updated', { lang: this.lang() }),
+        );
+    }
+
     @Permissions('round-sessions.delete')
     @Delete(':id')
-    @ApiOperation({ summary: 'Delete a session (soft delete)' })
+    @ApiOperation({ summary: 'Delete a session (soft delete) and cancel its Microsoft Teams meeting' })
     @ApiParam({ name: 'id', type: Number })
     @ApiOkResponse({ description: 'Session deleted successfully' })
     async remove(@Param('id', ParseIntPipe) id: number) {
