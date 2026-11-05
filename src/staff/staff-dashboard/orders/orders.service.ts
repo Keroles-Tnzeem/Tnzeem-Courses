@@ -531,7 +531,7 @@ export class OrdersService {
 
   // ── Rules
 
-  /** PENDING -> CONFIRMED | CANCELLED | TRACKING | NO_RESPONSE_*, CONFIRMED -> CANCELLED. CANCELLED is final. */
+  /** PENDING -> CONFIRMED | CANCELLED | TRACKING | REPEATED | NO_RESPONSE_*, CONFIRMED -> CANCELLED. CANCELLED is final. */
   private assertStatusTransition(
     from: OrderStatusEnum,
     to: OrderStatusEnum,
@@ -540,6 +540,7 @@ export class OrdersService {
     const unconfirmedStatuses = [
       OrderStatusEnum.PENDING,
       OrderStatusEnum.TRACKING,
+      OrderStatusEnum.REPEATED,
       OrderStatusEnum.NO_RESPONSE_1,
       OrderStatusEnum.NO_RESPONSE_2,
       OrderStatusEnum.NO_RESPONSE_3,
@@ -551,6 +552,7 @@ export class OrdersService {
         OrderStatusEnum.CONFIRMED,
         OrderStatusEnum.CANCELLED,
         OrderStatusEnum.TRACKING,
+        OrderStatusEnum.REPEATED,
         OrderStatusEnum.NO_RESPONSE_1,
         OrderStatusEnum.NO_RESPONSE_2,
         OrderStatusEnum.NO_RESPONSE_3,
@@ -560,6 +562,17 @@ export class OrdersService {
         OrderStatusEnum.CONFIRMED,
         OrderStatusEnum.CANCELLED,
         OrderStatusEnum.PENDING,
+        OrderStatusEnum.REPEATED,
+        OrderStatusEnum.NO_RESPONSE_1,
+        OrderStatusEnum.NO_RESPONSE_2,
+        OrderStatusEnum.NO_RESPONSE_3,
+        OrderStatusEnum.NO_RESPONSE_4,
+      ],
+      [OrderStatusEnum.REPEATED]: [
+        OrderStatusEnum.CONFIRMED,
+        OrderStatusEnum.CANCELLED,
+        OrderStatusEnum.PENDING,
+        OrderStatusEnum.TRACKING,
         OrderStatusEnum.NO_RESPONSE_1,
         OrderStatusEnum.NO_RESPONSE_2,
         OrderStatusEnum.NO_RESPONSE_3,
@@ -570,6 +583,7 @@ export class OrdersService {
         OrderStatusEnum.CANCELLED,
         OrderStatusEnum.PENDING,
         OrderStatusEnum.TRACKING,
+        OrderStatusEnum.REPEATED,
         OrderStatusEnum.NO_RESPONSE_2,
         OrderStatusEnum.NO_RESPONSE_3,
         OrderStatusEnum.NO_RESPONSE_4,
@@ -579,6 +593,7 @@ export class OrdersService {
         OrderStatusEnum.CANCELLED,
         OrderStatusEnum.PENDING,
         OrderStatusEnum.TRACKING,
+        OrderStatusEnum.REPEATED,
         OrderStatusEnum.NO_RESPONSE_1,
         OrderStatusEnum.NO_RESPONSE_3,
         OrderStatusEnum.NO_RESPONSE_4,
@@ -588,6 +603,7 @@ export class OrdersService {
         OrderStatusEnum.CANCELLED,
         OrderStatusEnum.PENDING,
         OrderStatusEnum.TRACKING,
+        OrderStatusEnum.REPEATED,
         OrderStatusEnum.NO_RESPONSE_1,
         OrderStatusEnum.NO_RESPONSE_2,
         OrderStatusEnum.NO_RESPONSE_4,
@@ -597,6 +613,7 @@ export class OrdersService {
         OrderStatusEnum.CANCELLED,
         OrderStatusEnum.PENDING,
         OrderStatusEnum.TRACKING,
+        OrderStatusEnum.REPEATED,
         OrderStatusEnum.NO_RESPONSE_1,
         OrderStatusEnum.NO_RESPONSE_2,
         OrderStatusEnum.NO_RESPONSE_3,
