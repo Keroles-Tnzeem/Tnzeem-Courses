@@ -25,9 +25,9 @@ export class InstructorStudentsService {
     const qb = this.orderRepository
       .createQueryBuilder('order')
       .innerJoinAndSelect('order.student', 'student')
-      .leftJoinAndSelect('order.course', 'course')
+      .innerJoinAndSelect('order.course', 'course')
       .leftJoinAndSelect('order.round', 'round')
-      .where('order.trainer_id = :trainerId', { trainerId })
+      .where('course.trainer_id = :trainerId', { trainerId })
       // Only show orders that are either completed or actively having an enrollment
       .andWhere('order.has_enrollment = :hasEnrollment', { hasEnrollment: true });
 
