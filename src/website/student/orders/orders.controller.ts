@@ -104,6 +104,10 @@ export class StudentOrdersController {
     type: StudentOrderSessionResponse,
     isArray: true,
   })
+  @ApiResponse({
+    status: 400,
+    description: 'Order must be confirmed and paid to access sessions',
+  })
   @ApiResponse({ status: 404, description: 'Order not found' })
   async getRoundSessions(
     @CurrentUser('sub') studentId: number,
@@ -127,6 +131,10 @@ export class StudentOrdersController {
     status: 200,
     type: StudentOrderSessionResponse,
     isArray: true,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Order must be confirmed and paid to access sessions',
   })
   @ApiResponse({ status: 404, description: 'Order not found' })
   async getSessions(

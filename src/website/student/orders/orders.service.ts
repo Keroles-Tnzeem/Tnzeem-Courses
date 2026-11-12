@@ -256,6 +256,15 @@ export class StudentOrdersService {
       );
     }
 
+    if (
+      order.status !== OrderStatusEnum.CONFIRMED ||
+      order.paymentStatus !== PaymentStatusEnum.COMPLETED
+    ) {
+      throw new BadRequestException(
+        this.i18n.t('errors.ORDER_MUST_BE_CONFIRMED_AND_PAID', { lang }),
+      );
+    }
+
     if (!order.roundId) {
       return [];
     }
