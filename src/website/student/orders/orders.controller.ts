@@ -27,6 +27,7 @@ import { QueryStudentOrderRequest } from './dto/requests/query-student-order.req
 import { CreateStudentOrderRequest } from './dto/requests/create-student-order.request';
 import { StudentOrderResponse } from './dto/responses/student-order.response';
 import { StudentOrderDetailsResponse } from './dto/responses/student-order-details.response';
+import { StudentOrderSessionResponse } from './dto/responses/student-order-session.response';
 import {NoFilesInterceptor} from "@nestjs/platform-express";
 
 @ApiTags('Website - Student Orders')
@@ -91,5 +92,48 @@ export class StudentOrdersController {
   ): Promise<ApiResponseDto<StudentOrderDetailsResponse>> {
     const order = await this.ordersService.findOne(studentId, id, lang);
     return ApiResponseDto.success(order);
+  }
+
+  @Get(':id/round-sessions')
+  @ApiOperation({
+    summary: 'Get round sessions for an order of the authenticated student',
+  })
+  @ApiParam({ name: 'id', type: String, description: 'Order ULID' })
+  @ApiResponse({
+    status: 200,
+    type: StudentOrderSessionResponse,
+    isArray: true,
+  })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  async getRoundSessions(
+    @CurrentUser('sub') studentId: number,
+    @Param('id') id: string,
+    @Lang() lang: string,
+  ): Promise<ApiResponseDto<StudentOrderSessionResponse[]>> {
+    const sessions = await this.ordersService.getRoundSessions(
+      studentId,
+      id,
+      lang,
+    );
+    return ApiResponseDto.success(sessions);
+  }
+
+  @Get(':id/sessions')
+  @ApiOperation({
+    summary: 'Get round sessions for an order of the authenticated student (alias)',
+  })
+  @ApiParam({ name: 'id', type: String, description: 'Order ULID' })
+  @ApiResponse({
+    status: 200,
+    type: StudentOrderSessionResponse,
+    isArray: true,
+  })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  async getSessions(
+    @CurrentUser('sub') studentId: number,
+    @Param('id') id: string,
+    @Lang() lang: string,
+  ): Promise<ApiResponseDto<StudentOrderSessionResponse[]>> {
+    return this.getRoundSessions(studentId, id, lang);
   }
 }

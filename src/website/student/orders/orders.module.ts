@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrdersModule as SharedOrdersModule } from '../../../shared/orders/orders.module';
 import { IdempotencyModule } from '../../../shared/idempotency/idempotency.module';
 import { CourseEntity } from '../../../staff/staff-dashboard/courses/entities/course.entity';
+import { RoundSessionEntity } from '../../../staff/staff-dashboard/round-sessions/entities/round-session.entity';
 import { NotificationsModule } from '../../../shared/notifications/notifications.module';
 import { StudentOrdersService } from './orders.service';
 import { StudentOrdersController } from './orders.controller';
@@ -12,7 +13,7 @@ import { StudentOrdersController } from './orders.controller';
     SharedOrdersModule,
     IdempotencyModule,
     NotificationsModule,
-    TypeOrmModule.forFeature([CourseEntity]),
+    TypeOrmModule.forFeature([CourseEntity, RoundSessionEntity]),
   ],
   controllers: [StudentOrdersController],
   providers: [StudentOrdersService],

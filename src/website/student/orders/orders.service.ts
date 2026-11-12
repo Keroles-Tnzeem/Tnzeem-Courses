@@ -10,6 +10,7 @@ import { I18nService } from 'nestjs-i18n';
 import { OrdersRepository } from '../../../shared/orders/repositories/orders.repository';
 import { OrderEntity } from '../../../shared/orders/entities/order.entity';
 import { CourseEntity } from '../../../staff/staff-dashboard/courses/entities/course.entity';
+import { RoundSessionEntity } from '../../../staff/staff-dashboard/round-sessions/entities/round-session.entity';
 import { OrderStatusEnum } from '../../../shared/orders/enums/order-status.enum';
 import { OrderCreatorTypeEnum } from '../../../shared/orders/enums/order-creator-type.enum';
 import { PaymentMethodEnum } from '../../../shared/payment/enums/payment-method.enum';
@@ -21,6 +22,7 @@ import { QueryStudentOrderRequest } from './dto/requests/query-student-order.req
 import { CreateStudentOrderRequest } from './dto/requests/create-student-order.request';
 import { StudentOrderResponse } from './dto/responses/student-order.response';
 import { StudentOrderDetailsResponse } from './dto/responses/student-order-details.response';
+import { StudentOrderSessionResponse } from './dto/responses/student-order-session.response';
 import { NotificationsService } from '../../../shared/notifications/notifications.service';
 import { NotificationTypeEnum } from '../../../shared/notifications/enums/notification-type.enum';
 import { NotificationChannelEnum } from '../../../shared/notifications/enums/notification-channel.enum';
@@ -39,6 +41,8 @@ export class StudentOrdersService {
     private readonly notificationsService: NotificationsService,
     @InjectRepository(CourseEntity)
     private readonly courseRepository: Repository<CourseEntity>,
+    @InjectRepository(RoundSessionEntity)
+    private readonly sessionRepository: Repository<RoundSessionEntity>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
   ) {}
@@ -235,5 +239,34 @@ export class StudentOrdersService {
     }
 
     return StudentOrderDetailsResponse.fromEntity(order, lang);
+  }
+
+  async getRoundSessions(
+    studentId: number,
+    orderId: string,
+    lang: string,
+  ): Promise<StudentOrderSessionResponse[]> {
+    const order = await this.ordersRepository.findOne({
+      where: { id: orderId, studentId },
+    });
+
+    if (!order) {
+      throw new NotFoundException(
+        this.i18n.t('errors.ORDER_NOT_FOUND', { lang }),
+      );
+    }
+
+    if (!order.roundId) {
+      return [];
+    }
+
+    const sessions = await this.sessionRepository.find({
+      where: { roundId: order.roundId },
+      order: { sessionNumber: 'ASC' },
+    });
+
+    return sessions.map((session) =>
+      StudentOrderSessionResponse.fromEntity(session),
+    );
   }
 }
