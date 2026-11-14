@@ -1,7 +1,7 @@
 import {
-    ConflictException,
-    Injectable,
-    NotFoundException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -21,194 +21,232 @@ import { CertificateResponse } from './dto/responses/certificate.response';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationTypeEnum } from '../notifications/enums/notification-type.enum';
 import {
-    enrollmentCreatedContent,
-    enrollmentStatusChangedContent,
+  enrollmentCreatedContent,
+  enrollmentStatusChangedContent,
 } from '../notifications/templates/notification.templates';
 
 @Injectable()
 export class EnrollmentsService {
-    constructor(
-        private readonly enrollmentsRepository: EnrollmentsRepository,
-        @InjectRepository(RoundEntity)
-        private readonly roundRepo: Repository<RoundEntity>,
-        @InjectRepository(UserEntity)
-        private readonly userRepo: Repository<UserEntity>,
-        private readonly i18n: I18nService,
-        private readonly notificationsService: NotificationsService,
-    ) {}
+  constructor(
+    private readonly enrollmentsRepository: EnrollmentsRepository,
+    @InjectRepository(RoundEntity)
+    private readonly roundRepo: Repository<RoundEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
+    private readonly i18n: I18nService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
-    // Helpers
+  // Helpers
 
-    private async ensureStudentExists(studentId: number): Promise<UserEntity> {
-        const student = await this.userRepo.findOne({
-            where: { id: studentId, userType: UserTypeEnum.STUDENT },
-        });
-        if (!student) {
-            throw new NotFoundException(
-                this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }),
-            );
+  private async ensureStudentExists(studentId: number): Promise<UserEntity> {
+    const student = await this.userRepo.findOne({
+      where: { id: studentId, userType: UserTypeEnum.STUDENT },
+    });
+    if (!student) {
+      throw new NotFoundException(
+        this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }),
+      );
+    }
+    return student;
+  }
+
+  private async ensureRoundExists(roundId: number): Promise<RoundEntity> {
+    const round = await this.roundRepo.findOne({ where: { id: roundId } });
+    if (!round) {
+      throw new NotFoundException(
+        this.i18n.t('errors.ROUND_NOT_FOUND', { lang: getLang() }),
+      );
+    }
+    return round;
+  }
+
+  // List / Paginate
+
+  async findAll(
+    query: QueryEnrollmentRequest,
+  ): Promise<{ data: EnrollmentEntity[]; total: number }> {
+    const { page = 1, limit = 10, studentId, roundId, status } = query;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (studentId) where.studentId = studentId;
+    if (roundId) where.roundId = roundId;
+    if (status) where.status = status;
+
+    const [data, total] = await this.enrollmentsRepository.findAndCount({
+      where,
+      skip,
+      take: limit,
+      order: { audit: { createdAt: 'DESC' } },
+      relations: { student: true, round: true },
+    });
+
+    return { data, total };
+  }
+
+  // Find One
+
+  async findOne(id: string): Promise<EnrollmentEntity> {
+    const enrollment = await this.enrollmentsRepository.findOne({
+      where: { id },
+      relations: { student: true, round: { course: true }, order: true },
+    });
+
+    if (!enrollment) {
+      throw new NotFoundException(
+        this.i18n.t('errors.ENROLLMENT_NOT_FOUND', { lang: getLang() }),
+      );
+    }
+
+    return enrollment;
+  }
+
+  async findByOrderId(orderId: string): Promise<EnrollmentEntity | null> {
+    return this.enrollmentsRepository.findOne({ where: { orderId } });
+  }
+
+  // Create
+
+  async create(dto: CreateEnrollmentRequest): Promise<EnrollmentEntity> {
+    await this.ensureStudentExists(dto.studentId);
+
+    if (dto.roundId != null) {
+      await this.ensureRoundExists(dto.roundId);
+
+      const alreadyEnrolled = await this.enrollmentsRepository.exists(
+        dto.studentId,
+        dto.roundId,
+      );
+      if (alreadyEnrolled) {
+        throw new ConflictException(
+          this.i18n.t('errors.ENROLLMENT_ALREADY_EXISTS', { lang: getLang() }),
+        );
+      }
+    }
+
+    const enrollment = this.enrollmentsRepository.create({
+      studentId: dto.studentId,
+      roundId: dto.roundId,
+      orderId: dto.orderId,
+      status: dto.status ?? EnrollmentStatusEnum.PENDING,
+    });
+
+    const saved = await this.enrollmentsRepository.save(enrollment);
+    const created = await this.findOne(saved.id);
+
+    await this.notificationsService.notify({
+      userId: created.studentId,
+      type: NotificationTypeEnum.ENROLLMENT_CREATED,
+      ...enrollmentCreatedContent(
+        created.round?.course?.name ?? { en: '', ar: '' },
+      ),
+      data: { enrollmentId: created.id, roundId: created.roundId },
+    });
+
+    return created;
+  }
+
+  // Update
+
+  async update(
+    id: string,
+    dto: UpdateEnrollmentRequest,
+  ): Promise<EnrollmentEntity> {
+    const enrollment = await this.findOne(id);
+    const previousStatus = enrollment.status;
+
+    if (dto.status !== undefined) {
+      enrollment.status = dto.status;
+
+      if (dto.status === EnrollmentStatusEnum.COMPLETED) {
+        // Auto-generate certificate serial number if marked completed and doesn't have one
+        if (!enrollment.certificateSerialNum) {
+          const randomStr = crypto.randomBytes(4).toString('hex').toUpperCase();
+          enrollment.certificateSerialNum = `CERT-${randomStr}`;
         }
-        return student;
+      } else {
+        // Certificate is only valid while completed — clear it if the enrollment leaves that status.
+        // (explicit null, not undefined, so TypeORM's save() actually clears the DB column)
+        enrollment.certificateSerialNum = null;
+      }
     }
 
-    private async ensureRoundExists(roundId: number): Promise<RoundEntity> {
-        const round = await this.roundRepo.findOne({ where: { id: roundId } });
-        if (!round) {
-            throw new NotFoundException(
-                this.i18n.t('errors.ROUND_NOT_FOUND', { lang: getLang() }),
-            );
-        }
-        return round;
+    await this.enrollmentsRepository.save(enrollment);
+    const updated = await this.findOne(id);
+
+    if (updated.status !== previousStatus) {
+      await this.notificationsService.notify({
+        userId: updated.studentId,
+        type: NotificationTypeEnum.ENROLLMENT_STATUS_CHANGED,
+        ...enrollmentStatusChangedContent(
+          updated.round?.course?.name ?? { en: '', ar: '' },
+          updated.status,
+        ),
+        data: {
+          enrollmentId: updated.id,
+          roundId: updated.roundId,
+          status: updated.status,
+        },
+      });
     }
 
-    // List / Paginate
+    return updated;
+  }
 
-    async findAll(query: QueryEnrollmentRequest): Promise<{ data: EnrollmentEntity[]; total: number }> {
-        const { page = 1, limit = 10, studentId, roundId, status } = query;
-        const skip = (page - 1) * limit;
-
-        const where: any = {};
-        if (studentId) where.studentId = studentId;
-        if (roundId)   where.roundId   = roundId;
-        if (status)    where.status     = status;
-
-        const [data, total] = await this.enrollmentsRepository.findAndCount({
-            where,
-            skip,
-            take: limit,
-            order: { audit: { createdAt: 'DESC' } },
-            relations: { student: true, round: true },
-        });
-
-        return { data, total };
+  async updateRound(id: string, roundId: number): Promise<EnrollmentEntity> {
+    const enrollment = await this.findOne(id);
+    if (enrollment.roundId === roundId) {
+      return enrollment;
     }
 
-    // Find One
+    await this.ensureRoundExists(roundId);
 
-    async findOne(id: string): Promise<EnrollmentEntity> {
-        const enrollment = await this.enrollmentsRepository.findOne({
-            where: { id },
-            relations: { student: true, round: { course: true }, order: true },
-        });
-
-        if (!enrollment) {
-            throw new NotFoundException(
-                this.i18n.t('errors.ENROLLMENT_NOT_FOUND', { lang: getLang() }),
-            );
-        }
-
-        return enrollment;
+    const alreadyEnrolled = await this.enrollmentsRepository.exists(
+      enrollment.studentId,
+      roundId,
+    );
+    if (alreadyEnrolled) {
+      throw new ConflictException(
+        this.i18n.t('errors.ENROLLMENT_ALREADY_EXISTS', { lang: getLang() }),
+      );
     }
 
-    async findByOrderId(orderId: string): Promise<EnrollmentEntity | null> {
-        return this.enrollmentsRepository.findOne({ where: { orderId } });
+    await this.enrollmentsRepository.update(id, { roundId });
+    return this.findOne(id);
+  }
+
+  // Delete
+
+  async remove(id: string): Promise<void> {
+    const enrollment = await this.findOne(id);
+    await this.enrollmentsRepository.remove(enrollment);
+  }
+
+  // Verify Certificate
+  async verifyCertificate(
+    certificateSerialNum: string,
+  ): Promise<CertificateResponse> {
+    const enrollment = await this.enrollmentsRepository.findOne({
+      where: { certificateSerialNum },
+      relations: { student: true, round: { course: { trainer: true } } },
+    });
+
+    if (!enrollment) {
+      throw new NotFoundException(
+        this.i18n.t('errors.CERTIFICATE_NOT_FOUND', { lang: getLang() }),
+      );
     }
 
-    // Create
-
-    async create(dto: CreateEnrollmentRequest): Promise<EnrollmentEntity> {
-        await this.ensureStudentExists(dto.studentId);
-
-        if (dto.roundId != null) {
-            await this.ensureRoundExists(dto.roundId);
-
-            const alreadyEnrolled = await this.enrollmentsRepository.exists(dto.studentId, dto.roundId);
-            if (alreadyEnrolled) {
-                throw new ConflictException(
-                    this.i18n.t('errors.ENROLLMENT_ALREADY_EXISTS', { lang: getLang() }),
-                );
-            }
-        }
-
-        const enrollment = this.enrollmentsRepository.create({
-            studentId: dto.studentId,
-            roundId:   dto.roundId,
-            orderId:   dto.orderId,
-            status:    dto.status ?? EnrollmentStatusEnum.PENDING,
-        });
-
-        const saved = await this.enrollmentsRepository.save(enrollment);
-        const created = await this.findOne(saved.id);
-
-        await this.notificationsService.notify({
-            userId: created.studentId,
-            type: NotificationTypeEnum.ENROLLMENT_CREATED,
-            ...enrollmentCreatedContent(created.round?.course?.name ?? { en: '', ar: '' }),
-            data: { enrollmentId: created.id, roundId: created.roundId },
-        });
-
-        return created;
+    if (enrollment.status !== EnrollmentStatusEnum.COMPLETED) {
+      throw new ConflictException(
+        this.i18n.t('errors.CERTIFICATE_NOT_COMPLETE_YET', { lang: getLang() }),
+      );
     }
 
-    // Update
+    const appUrl = process.env.APP_URL || 'http://localhost:3000';
+    const lang = getLang();
 
-    async update(id: string, dto: UpdateEnrollmentRequest): Promise<EnrollmentEntity> {
-        const enrollment = await this.findOne(id);
-        const previousStatus = enrollment.status;
-
-        if (dto.status !== undefined) {
-            enrollment.status = dto.status;
-
-            if (dto.status === EnrollmentStatusEnum.COMPLETED) {
-                // Auto-generate certificate serial number if marked completed and doesn't have one
-                if (!enrollment.certificateSerialNum) {
-                    const randomStr = crypto.randomBytes(4).toString('hex').toUpperCase();
-                    enrollment.certificateSerialNum = `CERT-${randomStr}`;
-                }
-            } else {
-                // Certificate is only valid while completed — clear it if the enrollment leaves that status.
-                // (explicit null, not undefined, so TypeORM's save() actually clears the DB column)
-                enrollment.certificateSerialNum = null;
-            }
-        }
-
-        await this.enrollmentsRepository.save(enrollment);
-        const updated = await this.findOne(id);
-
-        if (updated.status !== previousStatus) {
-            await this.notificationsService.notify({
-                userId: updated.studentId,
-                type: NotificationTypeEnum.ENROLLMENT_STATUS_CHANGED,
-                ...enrollmentStatusChangedContent(
-                    updated.round?.course?.name ?? { en: '', ar: '' },
-                    updated.status,
-                ),
-                data: { enrollmentId: updated.id, roundId: updated.roundId, status: updated.status },
-            });
-        }
-
-        return updated;
-    }
-
-    // Delete
-
-    async remove(id: string): Promise<void> {
-        const enrollment = await this.findOne(id);
-        await this.enrollmentsRepository.remove(enrollment);
-    }
-
-    // Verify Certificate
-    async verifyCertificate(certificateSerialNum: string): Promise<CertificateResponse> {
-        const enrollment = await this.enrollmentsRepository.findOne({
-            where: { certificateSerialNum },
-            relations: { student: true, round: { course: { trainer: true } } },
-        });
-
-        if (!enrollment) {
-            throw new NotFoundException(
-                this.i18n.t('errors.CERTIFICATE_NOT_FOUND', { lang: getLang() }),
-            );
-        }
-
-        if (enrollment.status !== EnrollmentStatusEnum.COMPLETED) {
-            throw new ConflictException(
-                this.i18n.t('errors.CERTIFICATE_NOT_COMPLETE_YET', { lang: getLang() }),
-            );
-        }
-
-        const appUrl = process.env.APP_URL || 'http://localhost:3000';
-        const lang = getLang();
-
-        return CertificateResponse.fromEntity(enrollment, appUrl, lang);
-    }
+    return CertificateResponse.fromEntity(enrollment, appUrl, lang);
+  }
 }

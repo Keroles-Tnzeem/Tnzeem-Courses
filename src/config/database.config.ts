@@ -1,6 +1,13 @@
 import { registerAs } from '@nestjs/config';
+import * as path from 'path';
 
-export default registerAs('database', () => ({
+export default registerAs('database', () => {
+  const synchronize =
+    process.env.TYPEORM_SYNC !== undefined
+      ? process.env.TYPEORM_SYNC === 'true'
+      : process.env.NODE_ENV === 'development';
+
+  return {
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -8,14 +15,18 @@ export default registerAs('database', () => ({
     password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_NAME || 'tnzeem',
     ssl:
-        process.env.NODE_ENV === 'production'
-            ? { rejectUnauthorized: false }
-            : false,
+      process.env.NODE_ENV === 'production'
+        ? { rejectUnauthorized: false }
+        : false,
     // Schema auto-sync is opt-in: on by default only for NODE_ENV=development.
     // TYPEORM_SYNC=true/false overrides. Staging/production use migrations.
-    synchronize:
-        process.env.TYPEORM_SYNC !== undefined
-            ? process.env.TYPEORM_SYNC === 'true'
-            : process.env.NODE_ENV === 'development',
+    synchronize,
+    migrations: [path.join(__dirname, '../database/migrations/*.{ts,js}')],
+    migrationsTableName: 'typeorm_migrations',
+    migrationsRun:
+      process.env.TYPEORM_MIGRATIONS_RUN !== undefined
+        ? process.env.TYPEORM_MIGRATIONS_RUN === 'true'
+        : !synchronize,
     autoLoadEntities: true,
-}));
+  };
+});

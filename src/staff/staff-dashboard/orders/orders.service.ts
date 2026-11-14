@@ -401,23 +401,37 @@ export class OrdersService {
 
     const previousPaymentStatus = order.paymentStatus;
 
-    // The round must be settled first: confirming needs the final round.
+    // Update round and re-tie existing enrollment if present.
     if (dto.roundId !== undefined && dto.roundId !== order.roundId) {
-      // After confirmation the enrollment is tied to the round, so it can't move.
-      if (
-        order.status === OrderStatusEnum.CONFIRMED ||
-        order.status === OrderStatusEnum.CANCELLED
-      ) {
-        throw new ConflictException(
-          this.i18n.t('errors.ORDER_ROUND_LOCKED', { lang }),
-        );
-      }
       const round = await this.roundsService.findOne(dto.roundId);
       if (!round.course) {
         throw new NotFoundException(
           this.i18n.t('errors.COURSE_NOT_FOUND', { lang }),
         );
       }
+
+      const existingEnrollment = await this.enrollmentsService.findByOrderId(
+        order.id,
+      );
+      if (existingEnrollment) {
+        await this.enrollmentsService.updateRound(
+          existingEnrollment.id,
+          dto.roundId,
+        );
+        order.hasEnrollment = true;
+      } else if (
+        order.status === OrderStatusEnum.CONFIRMED &&
+        dto.status === undefined
+      ) {
+        await this.enrollmentsService.create({
+          studentId: order.studentId,
+          roundId: dto.roundId,
+          orderId: order.id,
+          status: EnrollmentStatusEnum.PENDING,
+        });
+        order.hasEnrollment = true;
+      }
+
       order.roundId = dto.roundId;
       order.courseId = round.courseId;
       order.trainerId = round.course.trainerId;
