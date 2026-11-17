@@ -11,6 +11,7 @@ import {
   LessThanOrEqual,
   IsNull,
   ILike,
+  In,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { I18nContext, I18nService } from 'nestjs-i18n';
@@ -21,6 +22,7 @@ import { SourceEntity } from '../sources/entities/source.entity';
 import { CreateStudentRequest } from './dto/requests/create-student.request';
 import { UpdateStudentRequest } from './dto/requests/update-student.request';
 import { AssignStaffToStudentRequest } from './dto/requests/assign-staff.request';
+import { MoveStudentsRequest } from './dto/requests/move-students.request';
 import { FilterStudentRequest } from './dto/requests/filter-student.request';
 import { OrdersRepository } from '../../../shared/orders/repositories/orders.repository';
 import { getLang } from '../../../common/helpers/lang.helper';
@@ -344,6 +346,73 @@ export class StudentService {
     );
 
     return this.findOne(studentId);
+  }
+
+  // ── Move Students & Orders Between Staff ──────────────────────────────────
+  async moveStudents(dto: MoveStudentsRequest): Promise<{
+    fromAssignToId: number;
+    toAssignToId: number;
+    movedStudentsCount: number;
+  }> {
+    const [fromStaff, toStaff] = await Promise.all([
+      this.userRepo.findOne({
+        where: [
+          { id: dto.fromAssignToId, userType: UserTypeEnum.SALES },
+          { id: dto.fromAssignToId, userType: UserTypeEnum.SUPPORT },
+        ],
+      }),
+      this.userRepo.findOne({
+        where: [
+          { id: dto.toAssignToId, userType: UserTypeEnum.SALES },
+          { id: dto.toAssignToId, userType: UserTypeEnum.SUPPORT },
+        ],
+      }),
+    ]);
+
+    if (!fromStaff || !toStaff) {
+      throw new NotFoundException(
+        this.i18n.t('errors.USER_NOT_FOUND', { lang: getLang() }),
+      );
+    }
+
+    const studentWhere: any = {
+      userType: UserTypeEnum.STUDENT,
+      assignToId: dto.fromAssignToId,
+    };
+    if (dto.studentIds?.length) {
+      studentWhere.id = In(dto.studentIds);
+    }
+
+    const students = await this.userRepo.find({
+      where: studentWhere,
+      select: ['id'],
+    });
+    const movedStudentIds = students.map((s) => s.id);
+
+    if (movedStudentIds.length > 0) {
+      await this.userRepo.update(
+        { id: In(movedStudentIds) },
+        { assignToId: dto.toAssignToId, assignAt: new Date() },
+      );
+
+      await this.ordersRepository.update(
+        { studentId: In(movedStudentIds) },
+        { assignToId: dto.toAssignToId },
+      );
+    }
+
+    if (!dto.studentIds?.length) {
+      await this.ordersRepository.update(
+        { assignToId: dto.fromAssignToId },
+        { assignToId: dto.toAssignToId },
+      );
+    }
+
+    return {
+      fromAssignToId: dto.fromAssignToId,
+      toAssignToId: dto.toAssignToId,
+      movedStudentsCount: movedStudentIds.length,
+    };
   }
 
   // ── Delete ────────────────────────────────────────────────────────────────

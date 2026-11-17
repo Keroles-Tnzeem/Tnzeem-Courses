@@ -98,6 +98,14 @@ export const seedAdminUserAndPermissions = async (dataSource: DataSource) => {
       description: { en: 'Assign Staff to Student', ar: 'إسناد موظف إلى طالب' },
     },
     {
+      name: 'students.move',
+      module: 'students',
+      description: {
+        en: 'Move Students to Another Staff',
+        ar: 'نقل الطلاب إلى موظف آخر',
+      },
+    },
+    {
       name: 'users.view',
       module: 'users',
       description: { en: 'View Staff', ar: 'عرض الموظفين' },

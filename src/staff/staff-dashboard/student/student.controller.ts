@@ -33,6 +33,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AssignStaffToStudentRequest } from './dto/requests/assign-staff.request';
+import { MoveStudentsRequest } from './dto/requests/move-students.request';
 import { FilterStudentRequest } from './dto/requests/filter-student.request';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 
@@ -157,6 +158,25 @@ export class StudentController {
     return ApiResponseDto.success(
       StudentResponse.from(data),
       this.i18n.t('common.created', { lang: this.lang() }),
+    );
+  }
+
+  // PATCH /staff-dashboard/student/move
+  @Permissions('students.move')
+  @Patch('move')
+  @UseInterceptors(NoFilesInterceptor())
+  @ApiOperation({
+    summary:
+      'Move students and their orders from one staff member to another',
+  })
+  @ApiOkResponse({
+    description: 'Students and their orders moved successfully',
+  })
+  async moveStudents(@Body() dto: MoveStudentsRequest) {
+    const data = await this.studentService.moveStudents(dto);
+    return ApiResponseDto.success(
+      data,
+      this.i18n.t('common.updated', { lang: this.lang() }),
     );
   }
 
