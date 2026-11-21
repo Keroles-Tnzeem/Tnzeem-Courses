@@ -32,7 +32,7 @@ export class OrderCommentEntity {
     @JoinColumn({ name: 'order_id' })
     order: OrderEntity;
 
-    @ManyToOne(() => UserEntity, { onDelete: 'RESTRICT' })
+    @ManyToOne(() => UserEntity, { createForeignKeyConstraints: false })
     @JoinColumn({ name: 'staff_id' })
     staff: UserEntity;
 }
